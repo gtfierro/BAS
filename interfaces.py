@@ -1,5 +1,18 @@
 import zope.interface
 
+
+class BACnetInterface(zope.interface.Interface):
+  """
+  Interface that all objects/nodes must implement
+  self.container: reference to BObj or Relational this object is in
+  self.uid: UUID
+  """
+  
+  type = interface.Attribute("allowed 2-3 char A-Z string from btypes.py")
+  name = interface.Attribute("string name, not necessarily unique")
+  container = interface.Attribute("reference to the containing BObj or Relational object")
+  uid = interface.Attribute("UUID")
+
 class IAH(zope.interface.Interface):
   """
   Interface for all Air Handler objects (type AH)
@@ -7,13 +20,11 @@ class IAH(zope.interface.Interface):
   For all objects that implement this, we probably want some sort of
   assert obj.type == "AH"
   """
-
   #high level methods will take form of:
   #def high_level_method(arg, arg, arg):
   # stuff
   # here
   # -> don't need to use "self" bc of how zope works
-
   pass
 
 class ICWL(zope.interface.Interface):

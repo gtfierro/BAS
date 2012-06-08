@@ -2,6 +2,7 @@ from bacnet_classes import *
 #handles all other imports for us
 
 #TODO: modularize!
+#TODO: fix graph traversals
 
 def query(self, query_string):
 

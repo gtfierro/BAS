@@ -1,10 +1,13 @@
 import uuid
 import sys
 import re
+import btypes
 import networkx as nx
 import matplotlib.pyplot as plt
 from collections import deque
 from collections import defaultdict
+from zope.interface import implements
+from interfaces import *
 
 class BACnetPoint(object):
   """
@@ -12,6 +15,8 @@ class BACnetPoint(object):
   Uses uuid as a unique identifier, has optional name
   Supports methods add_child, add_parent
   """
+  implements(BACnetInterface)
+
   def __init__(self, obj_type, container='', name=''):
     """
     obj_type: string that conforms to the list of recognized object types
@@ -54,7 +59,7 @@ class BNode(BACnetPoint):
 
   def add_attribute(self, name, bacnet_point):
     """
-    Interface for interacting with dict self.attributes
+    for interacting with dict self.attributes
     """
     self.attributes[name] = bacnet_point
   
