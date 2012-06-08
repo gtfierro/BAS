@@ -1,8 +1,7 @@
 #TODO: have bacnet_classes use this to validate the creation of objects/nodes
 #TODO: validation methods
-import zope.interface
-import json
 from interfaces import *
+import json
 from copy import deepcopy
 
 """
@@ -107,3 +106,10 @@ def import_json(j):
       tmp_dict[ot]['allowed_types'][nt]['interface'] = getattr(interfaces, tmp_dict[ot]['allowed_types'][nt]['interface'])
   return tmp_dict
 
+def get_interface(s):
+  """ Get the interface for a given string, e.g. 'AH' or 'AH.FAN' """
+  keys = s.split()
+  if len(keys) == 1:
+      return type_dict[keys[0]]['interface']
+  elif len(keys) == 2:
+      return type_dict[keys[0]]['allowed_types'][keys[1]]['interface']

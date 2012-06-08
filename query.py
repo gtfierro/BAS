@@ -1,4 +1,4 @@
-from bacnet_classes import *
+from node import *
 #handles all other imports for us
 
 #TODO: modularize!
@@ -70,7 +70,7 @@ def query(self, query_string):
         print "GOT:",target.name
         result.append(target)
       print "searching",target,
-      if hasattr(t,"_nk"): #t is of type BObj
+      if hasattr(t,"_nk"): #t is of type Obj
         print "(obj)"
         for node in t._nk:
           #append for a dfs of the nodes

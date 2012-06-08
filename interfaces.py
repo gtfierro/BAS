@@ -1,28 +1,5 @@
 import zope.interface
 
-
-class BACnetInterface(zope.interface.Interface):
-  """
-  Interface that all objects/nodes must implement
-  """
-  
-  type = interface.Attribute("allowed 2-3 char A-Z string from btypes.py")
-  name = interface.Attribute("string name, not necessarily unique")
-  container = interface.Attribute("reference to the containing BObj or Relational object")
-  uid = interface.Attribute("UUID")
-
-  def add_child(child):
-    """
-    Give this node a child w/n the context of it's container graph
-    child: BNode or BObj (which ever this object's type is)
-    """
-
-  def add_parent(parent):
-    """
-    Give this node a parent w/n the context of it's container graph
-    parent: BNode or BObj (which ever this object's type is)
-    """
-
 class IAH(zope.interface.Interface):
   """
   Interface for all Air Handler objects (type AH)
