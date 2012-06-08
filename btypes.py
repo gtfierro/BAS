@@ -1,8 +1,9 @@
 #TODO: have bacnet_classes use this to validate the creation of objects/nodes
 #TODO: validation methods
-
 import zope.interface
+import json
 from interfaces import *
+from copy import deepcopy
 
 """
 type_dict defines the allowed types of objects, and the allowed types of nodes
@@ -80,4 +81,29 @@ type_dict = {
                                      }
                    }
             }
+
+def export_json():
+  """
+  Fix up the type_dict for exporting to JSON. This means changing the interface references
+  to their string representations
+  """
+  tmp_dict = deepcopy(type_dict)
+  for ot in tmp_dict.iterkeys():
+    tmp_dict[ot]['interface'] = tmp_dict[ot]['interface'].__name__
+    for nt in tmp_dict[ot]['allowed_types'].iterkeys():
+      tmp_dict[ot]['allowed_types'][nt]['interface'] = tmp_dict[ot]['allowed_types'][nt]['interface'].__name__
+  return json.dumps(tmp_dict)
+
+def import_json(j):
+  """
+  We just take in the JSON-formatted dict, but for all 'interface's, we have to use getattr
+  to replace the value in the dict with the actual interface reference
+  """
+  import interfaces
+  tmp_dict= json.loads(j)
+  for ot in tmp_dict.iterkeys():
+    tmp_dict[ot]['interface'] = getattr(interfaces, tmp_dict[ot]['interface'])
+    for nt in tmp_dict[ot]['allowed_types'].iterkeys():
+      tmp_dict[ot]['allowed_types'][nt]['interface'] = getattr(interfaces, tmp_dict[ot]['allowed_types'][nt]['interface'])
+  return tmp_dict
 
