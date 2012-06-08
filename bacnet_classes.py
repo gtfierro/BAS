@@ -50,36 +50,29 @@ class BACnetPoint(object):
     """
     self.container.add_node_parent(self, parent)
 
-class BNode(BACnetPoint):
-
-  def __init__(self, obj_type, container='', name=''):
-    self.attributes = {}
-    BACnetPoint.__init__(self,obj_type,container,name)
-    print "Node",self.name, self.uid
-
-  def add_attribute(self, name, bacnet_point):
-    """
-    for interacting with dict self.attributes
-    """
-    self.attributes[name] = bacnet_point
-  
-class BObj(BACnetPoint):
-
-  def __init__(self, obj_type, container='', name=''):
-    self.nodes = []
+class Container(object):
+  """
+  Inheritable class for handling basic graph operations beyond what networkx provides
+  """
+  def __init__(self, objects):
     self._nk = nx.DiGraph()
     self.type_dict = defaultdict(list)
-    BACnetPoint.__init__(self,obj_type, container, name)
-    print ">>>Object",self.name, self.uid
+    if objects:
+      for obj in objects:
+        obj.container = self
+        self._nk.add_node(obj)
+    self._populate_type_dict()
 
   def _populate_type_dict(self):
-    """
-    Iterates through all interal nodes and inserts them into a dictionary organized by type
-    """
     for o in self._nk.nodes():
       if o not in self.type_dict[o.type]:
         self.type_dict[o.type].append(o)
-  #add child to an internal node
+      #will only iterate through nodes if the objects we iterated through
+      #above also inherit from Container
+      if "Container" in [par.name for par in o.__class__.__bases__]:
+        for n in o._nk.nodes():
+          if n not in self.type_dict[n.type]:
+            self.type_dict[n.type].append(n)
 
   def add_node_child(self, node, child):
     """
@@ -116,12 +109,31 @@ class BObj(BACnetPoint):
     Associates nodes with this object's internal graph
     """
     extension = [nodes] if type(nodes) != list else nodes
-    self.nodes.extend(extension)
     for node in extension:
       node.container = self
       self._nk.add_node(node)
 
-class Relational(object):
+
+class BNode(BACnetPoint):
+  """
+  Internal components of a larget object  
+  """
+
+  def __init__(self, obj_type, container, name):
+    self.attributes = {}
+    BACnetPoint.__init__(self,obj_type,container,name)
+    print "Node",self.name, self.uid
+  
+class BObj(BACnetPoint,Container):
+
+  def __init__(self, obj_type, container, name):
+    self.nodes = []
+    self._nk = nx.DiGraph()
+    self.type_dict = defaultdict(list)
+    BACnetPoint.__init__(self,obj_type, container, name)
+    print ">>>Object",self.name, self.uid
+
+class Relational(Container):
 
   def __init__(self, name, objects=None):
     self._nk = nx.DiGraph()
@@ -133,33 +145,9 @@ class Relational(object):
         self._nk.add_node(obj)
     self._populate_type_dict()
 
-  def _populate_type_dict(self):
-    for o in self._nk.nodes():
-      if o not in self.type_dict[o.type]:
-        self.type_dict[o.type].append(o)
-      print [x.type for x in o.nodes]
-      for n in o.nodes:
-        if n not in self.type_dict[n.type]:
-          self.type_dict[n.type].append(n)
-
+  #TODO: need this for queries?
   def extend_by_unique_uid(self, target, extend):
     extend = [extend] if type(extend) != list else extend
     to_add = [t for t in extend if t.uid not in map(lambda x: x.uid, target)]
     target.extend(to_add)
 
-  #add child to an internal node
-  def add_node_child(self, node, child):
-    #check if child exists as a node in our interal graph
-    # if false, add the child then add the edge
-    # regardless, add edge if edge doesn't exist
-    if child not in self._nk:
-      self._nk.add_node(child)
-    if child not in self._nk[node]:
-      self._nk.add_edge(node,child)
-
-  #add parent to an internal node
-  def add_node_parent(self, node, parent):
-    if parent not in self._nk:
-      self._nk.add_node(parent)
-    if node not in self._nk[parent]:
-      self._nk.add_edge(parent,node)
