@@ -112,6 +112,7 @@ class Container(object):
     for node in extension:
       node.container = self
       self._nk.add_node(node)
+    self._populate_type_dict()
 
 
 class BNode(BACnetPoint):
@@ -126,24 +127,17 @@ class BNode(BACnetPoint):
   
 class BObj(BACnetPoint,Container):
 
-  def __init__(self, obj_type, container, name):
+  def __init__(self, obj_type, container, name, objects=[]):
     self.nodes = []
-    self._nk = nx.DiGraph()
-    self.type_dict = defaultdict(list)
     BACnetPoint.__init__(self,obj_type, container, name)
+    Container.__init__(self, objects)
     print ">>>Object",self.name, self.uid
 
 class Relational(Container):
 
-  def __init__(self, name, objects=None):
-    self._nk = nx.DiGraph()
-    self.type_dict = defaultdict(list)
+  def __init__(self, name, objects=[]):
     self.name = name
-    if objects:
-      for obj in objects:
-        obj.container = self
-        self._nk.add_node(obj)
-    self._populate_type_dict()
+    Container.__init__(self, objects)
 
   #TODO: need this for queries?
   def extend_by_unique_uid(self, target, extend):
