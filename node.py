@@ -1,8 +1,6 @@
 import uuid
 import networkx as nx
 from collections import defaultdict
-from zope.interface import implements
-from interfaces import *
 
 class Node(object):
   """
@@ -10,7 +8,6 @@ class Node(object):
   Uses uuid as a unique identifier, has optional name
   Supports methods add_child, add_parent
   """
-  implements(NodeInterface)
 
   def __init__(self, obj_type, container, name):
     """
@@ -30,6 +27,9 @@ class Node(object):
   def __cmp__(self, other):
     # use self.uuid to compare to other objects
     return self.uid.__cmp__(other.uid)
+
+  def __hash__(self):
+    return hash(self.uid)
 
   def add_child(self, child):
     """
@@ -64,7 +64,7 @@ class Container(object):
         self.type_dict[o.type].append(o)
       #will only iterate through nodes if the objects we iterated through
       #above also inherit from Container
-      if "Container" in [par.name for par in o.__class__.__bases__]:
+      if "Container" in [par.__name__ for par in o.__class__.__bases__]:
         for n in o._nk.nodes():
           if n not in self.type_dict[n.type]:
             self.type_dict[n.type].append(n)
@@ -119,6 +119,15 @@ class Point(Node):
     self.attributes = {}
     Node.__init__(self,obj_type,container,name)
     print "Point",self.name, self.uid
+
+  def set_attribute(self, att, value):
+      self.attributes[att] = value
+
+  def get_attribute(self, att):
+      return self.attributes[att]
+
+  def del_attribute(self, att):
+      del self.attributes[att]
 
 class Obj(Node, Container):
 
