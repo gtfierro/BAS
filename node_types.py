@@ -108,7 +108,7 @@ def import_json(j):
 
 def get_interface(s):
   """ Get the interface for a given string, e.g. 'AH' or 'AH.FAN' """
-  keys = s.split()
+  keys = s.split('.')
   if len(keys) == 1:
       return type_dict[keys[0]]['interface']
   elif len(keys) == 2:
