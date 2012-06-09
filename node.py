@@ -21,6 +21,8 @@ class Node(object):
     self.uid = uuid.uuid4()
     self.metadata = {}
 
+    self.container.add_nodes(self)
+
   def __str__(self):
     return self.name
 
