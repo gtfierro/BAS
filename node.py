@@ -127,7 +127,7 @@ class Container(object):
         results.append(retfn(nd))
       #if the node is itself a container, we search it too!
       if hasattr(nd,"_nk"):
-        results.append(nd.search(fn,retfn))
+        results.extend(nd.search(fn,retfn))
     return results
 
 class Point(Node):
