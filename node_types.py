@@ -78,7 +78,17 @@ type_dict = {
                                                 "interface" : ISEN
                                               },
                                      }
-                   }
+                   },
+            "LIGHT": {
+                  "name": "Light Group",
+                  "interface": ILIGHT,
+                  "allowed_types": {
+                                    "RELAY" : {
+                                              "name"      : "Relay",
+                                              "interface" : IRELAY
+                                            },
+                                   }
+                  },
             }
 
 def export_json():

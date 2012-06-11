@@ -121,6 +121,15 @@ class Container(object):
         results.extend(nd.search(fn,retfn))
     return results
 
+  @property
+  def nodes(self):
+    for nd in nx.dfs_preorder_nodes(self._nk):
+      yield nd
+      #if the node is itself a container, we search it too!
+      if isinstance(nd, Container):
+        for node in nd.nodes:
+            yield node
+
 class Point(Node):
   """
   Internal components of a larger object
@@ -132,18 +141,27 @@ class Point(Node):
     print "Point",self.name, self.uid
 
   def set_attribute(self, att, value):
-      self.attributes[att] = value
+    self.attributes[att] = value
 
   def get_attribute(self, att):
-      return self.attributes[att]
+    return self.attributes[att]
 
   def del_attribute(self, att):
-      del self.attributes[att]
+    del self.attributes[att]
+
+  def __getitem__(self, att):
+    return self.get_attribute(att)
+
+  def __setitem__(self, att, value):
+    self.set_attribute(att, value)
+
+  def __delitem__(self, att):
+    self.del_attribute(att)
 
 class Obj(Node, Container):
 
   def __init__(self, container, name, objects=[]):
-    self.nodes = []
+    self._nodes = []
     Node.__init__(self, container, name)
     Container.__init__(self, objects)
     print ">>>Object",self.name, self.uid

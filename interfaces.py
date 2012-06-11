@@ -80,3 +80,14 @@ class IVV(zope.interface.Interface):
   """
   pass
 
+class ILIGHT(zope.interface.Interface):
+  """
+  Interface for a light object
+  """
+  pass
+
+class IRELAY(zope.interface.Interface):
+  """
+  Interface for a relay point
+  """
+  pass
