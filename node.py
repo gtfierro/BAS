@@ -111,10 +111,25 @@ class Container(object):
       self._nk.add_node(node)
     self._populate_type_dict()
 
+  def search(self, fn, retfn=lambda x: x.uid):
+    """
+    searches dfs preorder for nodes for which the function [fn] evaluates to true
+    It appends all True values to a results list, and applies [retfn] to them
+    """
+    results = []
+    #apply fn to arbitrary node, make sure that it is a binary fxn
+    tmp = self._nk.nodes()[0]
+    if fn(tmp) not in [True, False]:
+      print "Function must return True or False"
+      return None
+    for nd in nx.dfs_preorder_nodes(self._nk):
+      if fn(nd):
+        results.append(retfn(nd))
+    return results
 
 class Point(Node):
   """
-  Internal components of a larget object
+  Internal components of a larger object
   """
 
   def __init__(self, obj_type, container, name):
