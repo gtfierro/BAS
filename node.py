@@ -49,8 +49,8 @@ class Node(object):
   @property
   def type(self):
     for interface in zope.interface.providedBy(self):
-        if interface.__name__.startswith('I'):
-            return interface.__name__[1:]
+      if interface.__name__.startswith('I'):
+        return interface.__name__[1:]
     return ''
 
 
