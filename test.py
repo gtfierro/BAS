@@ -1,8 +1,6 @@
-from node import *
+from node import Relational
 from bacnet_classes import *
 
-
-## COMMENT: why specify the type as a string here?
 x = Relational('Everything')
 ah1 = BacNetAH(x, 'Air Handler 1')
 
