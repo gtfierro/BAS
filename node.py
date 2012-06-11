@@ -1,5 +1,6 @@
 import uuid
 import networkx as nx
+import zope.interface
 
 class Node(object):
   """
@@ -44,6 +45,14 @@ class Node(object):
     parent: Point or Obj (which ever this object's type is)
     """
     self.container.add_node_parent(self, parent)
+
+  @property
+  def type(self):
+    for interface in zope.interface.providedBy(self):
+        if interface.__name__.startswith('I'):
+            return interface.__name__[1:]
+    return ''
+
 
 class Container(object):
   """
