@@ -125,7 +125,8 @@ class Container(object):
     for nd in nx.dfs_preorder_nodes(self._nk):
       if fn(nd):
         results.append(retfn(nd))
-      if getattr(nd,"_nk"):
+      #if the node is itself a container, we search it too!
+      if hasattr(nd,"_nk"):
         results.append(nd.search(fn,retfn))
     return results
 
