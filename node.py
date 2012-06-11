@@ -1,6 +1,5 @@
 import uuid
 import networkx as nx
-from collections import defaultdict
 
 class Node(object):
   """
@@ -9,13 +8,12 @@ class Node(object):
   Supports methods add_child, add_parent
   """
 
-  def __init__(self, obj_type, container, name):
+  def __init__(self, container, name):
     """
     obj_type: string that conforms to the list of recognized object types
     container: Obj or Relational of which this object is a part
     name: string name of this object
     """
-    self.type = obj_type
     self.name = name
     self.container = container
     self.uid = uuid.uuid4()
@@ -53,23 +51,10 @@ class Container(object):
   """
   def __init__(self, objects):
     self._nk = nx.DiGraph()
-    self.type_dict = defaultdict(list)
     if objects:
       for obj in objects:
         obj.container = self
         self._nk.add_node(obj)
-    self._populate_type_dict()
-
-  def _populate_type_dict(self):
-    for o in self._nk.nodes():
-      if o not in self.type_dict[o.type]:
-        self.type_dict[o.type].append(o)
-      #will only iterate through nodes if the objects we iterated through
-      #above also inherit from Container
-      if "Container" in [par.__name__ for par in o.__class__.__bases__]:
-        for n in o._nk.nodes():
-          if n not in self.type_dict[n.type]:
-            self.type_dict[n.type].append(n)
 
   def add_node_child(self, node, child):
     """
@@ -83,7 +68,6 @@ class Container(object):
       self._nk.add_node(child)
     if child not in self._nk[node]:
       self._nk.add_edge(node,child)
-    self._populate_type_dict()
 
   #add parent to an internal node
   def add_node_parent(self, node, parent):
@@ -98,7 +82,6 @@ class Container(object):
       self._nk.add_node(parent)
     if node not in self._nk[parent]:
       self._nk.add_edge(parent,node)
-    self._populate_type_dict()
 
   #for internal graph setup
   def add_nodes(self, nodes):
@@ -109,7 +92,6 @@ class Container(object):
     for node in extension:
       node.container = self
       self._nk.add_node(node)
-    self._populate_type_dict()
 
   def search(self, fn, retfn=lambda x: x.uid):
     """
@@ -135,9 +117,9 @@ class Point(Node):
   Internal components of a larger object
   """
 
-  def __init__(self, obj_type, container, name):
+  def __init__(self, container, name):
     self.attributes = {}
-    Node.__init__(self,obj_type,container,name)
+    Node.__init__(self,container,name)
     print "Point",self.name, self.uid
 
   def set_attribute(self, att, value):
@@ -151,9 +133,9 @@ class Point(Node):
 
 class Obj(Node, Container):
 
-  def __init__(self, obj_type, container, name, objects=[]):
+  def __init__(self, container, name, objects=[]):
     self.nodes = []
-    Node.__init__(self,obj_type, container, name)
+    Node.__init__(self, container, name)
     Container.__init__(self, objects)
     print ">>>Object",self.name, self.uid
 
