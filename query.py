@@ -1,5 +1,11 @@
+import lexerparser
 from node import *
 #handles all other imports for us
+
+class Interpreter:
+
+  def __init__(self):
+    self.lp = lexerparser.LexerParser()
 
 #TODO: modularize!
 #TODO: fix graph traversals
