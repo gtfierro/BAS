@@ -17,16 +17,16 @@ class IAH(Interface):
   _required_tags = Dict(
                     title = u'Required Tags for Air Handler',
                     required=True,
-                    min_length = len(type_dict['AH']['required_tags'])
-                    max_length = len(type_dict['AH']['required_tags'])
+                    min_length = len(type_dict['AH']['required_tags']),
+                    max_length = len(type_dict['AH']['required_tags']),
                     key_type = Choice(values = tuple(len(type_dict['AH']['required_tags'])))
                    )
 
   _optional_tags = Dict(
                     title = u'Optional Tags for Air Handler',
                     optional=True,
-                    min_length = len(type_dict['AH']['optional_tags'])
-                    max_length = len(type_dict['AH']['optional_tags'])
+                    min_length = len(type_dict['AH']['optional_tags']),
+                    max_length = len(type_dict['AH']['optional_tags']),
                     key_type = Choice(values = tuple(len(type_dict['AH']['optional_tags'])))
                    )
 
