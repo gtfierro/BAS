@@ -145,6 +145,15 @@ def get_interface(s):
   elif len(keys) == 2:
       return getattr(interfaces,type_dict[keys[0]]['allowed_types'][keys[1]]['interface'])
 
+def list_interfaces():
+  """ Returns a list of all supported interfaces identified in type_dict """
+  ifaces = []
+  for obj in type_dict.iterkeys():
+    ifaces.append(get_interface(obj))
+    for pt in type_dict[obj]['allowed_types'].iterkeys():
+      ifaces.append(get_interface(obj+'.'+pt))
+  return ifaces
+
 def get_tag_name(tag):
   """ convert something like DIS_AIR_TMP_SEN to Discharge Air Temp Sensor """
   #convert tag to a list 

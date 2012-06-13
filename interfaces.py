@@ -25,8 +25,6 @@ class IAH(Interface):
   _optional_tags = Dict(
                     title = u'Optional Tags for Air Handler',
                     required=True,
-                    min_length = len(get_optional_tags('AH')),
-                    max_length = len(get_optional_tags('AH')),
                     key_type = Choice(values = tuple(get_optional_tags('AH')))
                    )
 
