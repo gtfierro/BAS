@@ -65,6 +65,14 @@ class Container(object):
         obj.container = self
         self._nk.add_node(obj)
 
+  def draw_graph(self, filename="out.png")
+    """
+    Uses matplotlib.pyplot and nx.draw_circular to make a graph and saves it as "out.png"
+    """
+    import matplotlib.pyplot as plt
+    nx.draw_circular(self._nk, fileanem)
+    plt.show()
+
   def add_node_child(self, node, child):
     """
     check if child exists as a node in our interal graph
@@ -102,7 +110,7 @@ class Container(object):
       node.container = self
       self._nk.add_node(node)
 
-  def search(self, fn, retfn=lambda x: x.uid):
+  def search(self, fn, retfn=lambda x: x):
     """
     searches dfs preorder for nodes for which the function [fn] evaluates to true
     It appends all True values to a results list, and applies [retfn] to them

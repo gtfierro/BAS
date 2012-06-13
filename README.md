@@ -7,6 +7,25 @@ I'm creating this README file so that I can explain my logic for writing things 
 * networkx
 * matplotlib.pyplot
 * collections.deque, defaultdict
+* plt
+
+##Query Language
+Currently the query language has only been tested on the graph in the ```test.py``` file.
+
+###Syntax
+The grammar is all in ```lexerparser.py``` at the top, but essentially your query must consist of at least one **TOKEN** follwed by an arbitrary number of interleaved **DELIMETERS** and **TOKENS**, ending with a **TOKEN**. **TOKEN**s can be 
+* ```#STR```: '#' followed by all caps, no spaces string. This resolves to the set all of all objects/nodes with type specified by 'STR'. Supported types can be found in ```node_types.py```.
+* ```$string name```: '$' followed by the name of an object. This **is** case sensitive. This resolves to the set of all objects named 'string name'.
+* ```%8d666322-745f-475f-a463-8329eb7547fa```: '%' followed by a UUID. This resolves to the object identified by that UUID.
+
+###Sample Queries
+Run ```python lexerparser.py```, and you'll get a prompt looking something like ```query> ```. Try the following:
+* ```#SEN < #CCV < $Outside Air Damper```: the set of all sensors that are down stream of any of the cooling valves downstream of the Outside Air Damper
+* ```#DMP > #FAN ```: all dampers upstream of a fan
+* etc..
+
+###What's next
+I'm working on expanding the sample graphs so that I can make sure that this works in the edge cases and with broader queries. There are bound to be bugs, but this is an MVP of sorts.
 
 ##Creating Nodes and Objects
 ...and forcing them to adhere to our interfaces
