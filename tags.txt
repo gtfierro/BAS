@@ -4,48 +4,43 @@ If a point ends with "CMD", then we know we can write to it (it's some sort of s
 input point that we can use to control it), *but* we can also read from that point to get the
 current value of it
 
-Items marked with '*', get rid of?
-
 from http://project-haystack.org/doc/AHUs
 AH -- Air Handler
+  **required**
   DIS_AIR_TMP_SEN -- Discharge Air Temp Sensor
-  DIS_AIR_HUM_SEN -- Discharge Air Humidity Sensor
-  DIS_AIR_PRS_SEN -- Discharge Air Pressure Sensor
-* DIS_AIR_FLW_SEN -- Discharge Air Flow Sensor
-  DIS_AIR_FAN_POW_SEN -- Discharge Air Fan Power Sensor
   DIS_AIR_FAN_SPD_CMD -- Discharge Air Fan Speed cmd
 
-  RET_AIR_TMP_SEN -- Return Air Temp Sensor
-  RET_AIR_HUM_SEN -- Return Air Humidity Sensor
-  RET_AIR_PRS_SEN -- Return Air Pressure Sensor
-* RET_AIR_FLW_SEN -- Return Air Flow Sensor
-  RET_AIR_CO2_SEN -- Return Air CO2 Sensor
-  RET_AIR_FAN_POW_SEN -- Return Air Fan Power Sensor
   RET_AIR_FAN_SPD_CMD -- Return Air Fan Speed cmd
 
   MIX_AIR_TMP_SEN -- Mixed Air Temp Sensor
 
   ZON_AIR_TMP_SEN -- Zone Air Temp Sensor
+  ZON_AIR_SPT_CMD -- Zone Air SetPoint cmd
+
+  OUT_AIR_DMP_CMD -- Outside Air Damper cmd
+  
+  EXH_AIR_DMP_CMD -- Exhause Air Damper cmd
+
+  **optional
+  DIS_AIR_HUM_SEN -- Discharge Air Humidity Sensor
+  DIS_AIR_PRS_SEN -- Discharge Air Pressure Sensor
+  DIS_AIR_FLW_SEN -- Discharge Air Flow Sensor
+  DIS_AIR_FAN_POW_SEN -- Discharge Air Fan Power Sensor
+
+  RET_AIR_TMP_SEN -- Return Air Temp Sensor
+  RET_AIR_HUM_SEN -- Return Air Humidity Sensor
+  RET_AIR_PRS_SEN -- Return Air Pressure Sensor
+  RET_AIR_FLW_SEN -- Return Air Flow Sensor
+  RET_AIR_CO2_SEN -- Return Air CO2 Sensor
+  RET_AIR_FAN_POW_SEN -- Return Air Fan Power Sensor
+
   ZON_AIR_HUM_SEN -- Zone Air Humidity Sensor
   ZON_AIR_CO2_SEN -- Zone Air CO2 Sensor
-  ZON_AIR_SPT_CMD -- Zone Air SetPoint cmd
 
   OUT_AIR_TMP_SEN -- Outside Air Temp Sensor
   OUT_AIR_HUM_SEN -- Outside Air Humidity Sensor
   OUT_AIR_PRS_SEN -- Outside Air Pressure Sensor
-* OUT_AIR_FLW_SEN -- Outside Air Flow Sensor
+  OUT_AIR_FLW_SEN -- Outside Air Flow Sensor
   OUT_AIR_FLW_STP_CMD -- Outside Air Flow SetPoint cmd 
-  OUT_AIR_DMP_CMD -- Outside Air Damper cmd
-  
-  EXH_AIR_FAN_CMD -- Exhaust Air Fan cmd
-  EXH_AIR_DMP_CMD -- Exhause Air Damper cmd
 
-#  Haystack isn't very explicit on cooling/heating for an AH
-#  It calls them
-#  'cool stage cmd'
-#  'heat stage cmd'
-#  'humidifier cmd'
-#  'filter sensor'
-#
-#  Can we fold these into 'CWV' (cooling coil valve) and 'HCV' (heating coil valve)
-   
+  EXH_AIR_FAN_CMD -- Exhaust Air Fan cmd

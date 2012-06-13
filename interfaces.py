@@ -1,80 +1,102 @@
-import zope.interface
+from zope.interface import Interface
+from zope.interface import Attribute
+from zope.schema import Dict, Choice
+from zope.schema import getValidationErrors
+from node_types import *
 
-class IAH(zope.interface.Interface):
+#TODO: do what I did for IAH for all other interfaces, both here, in tags.txt and in node_types.py
+
+class IAH(Interface):
   """
   Interface for all Air Handler objects (type AH)
 
-  For all objects that implement this, we probably want some sort of
-  assert obj.type == "AH"
+  All Air Handlers must have 2 dictionaries, _required_tags and _optional_tags with keys
+  that are the abbreviated tag names listed in node_types.type_dict and values that correspond
+  to the smap lookup/actuation points for those tags
   """
+  _required_tags = Dict(
+                    title = u'Required Tags for Air Handler',
+                    required=True,
+                    min_length = len(type_dict['AH']['required_tags'])
+                    max_length = len(type_dict['AH']['required_tags'])
+                    key_type = Choice(values = tuple(len(type_dict['AH']['required_tags'])))
+                   )
+
+  _optional_tags = Dict(
+                    title = u'Optional Tags for Air Handler',
+                    optional=True,
+                    min_length = len(type_dict['AH']['optional_tags'])
+                    max_length = len(type_dict['AH']['optional_tags'])
+                    key_type = Choice(values = tuple(len(type_dict['AH']['optional_tags'])))
+                   )
+
   #high level methods will take form of:
   #def high_level_method(arg, arg, arg):
   # stuff
   # here
   # -> don't need to use "self" bc of how zope works
-  pass
 
-class ICWL(zope.interface.Interface):
+class ICWL(Interface):
   """
   Interface for all Chilled Water Loop objects (type CWL)
   """
   pass
 
-class IHWL(zope.interface.Interface):
+class IHWL(Interface):
   """
   Interface for all Hot Water Loop objects (type HWL)
   """
   pass
 
-class IFAN(zope.interface.Interface):
+class IFAN(Interface):
   """
   Interface for the FAN node
   """
   pass
 
-class ICCV(zope.interface.Interface):
+class ICCV(Interface):
   """
   Interface for the CCV node
   """
   pass
 
-class IDMP(zope.interface.Interface):
+class IDMP(Interface):
   """
   Interface for the DMP node
   """
   pass
 
-class ISEN(zope.interface.Interface):
+class ISEN(Interface):
   """
   Interface for the SEN node
   """
   pass
 
-class ICH(zope.interface.Interface):
+class ICH(Interface):
   """
   Interface for the CH node
   """
   pass
 
-class IHX(zope.interface.Interface):
+class IHX(Interface):
   """
   Interface for the HX node
   """
   pass
 
-class IPU(zope.interface.Interface):
+class IPU(Interface):
   """
   Interface for the PU node
   """
   pass
 
-class ICT(zope.interface.Interface):
+class ICT(Interface):
   """
   Interface for the CT node
   """
   pass
 
-class IVV(zope.interface.Interface):
+class IVV(Interface):
   """
   Interface for the VV node
   """

@@ -12,6 +12,14 @@ type_dict = {
             "AH": {                                         #type declaration for BObj
                   "name": "Air Handler",                    #what the type means
                   "interface": IAH,                         #reference to the interface we need to implement
+                  "required_tags": ['DIS_AIR_TMP_SEN','DIS_AIR_FAN_SPD_CMD','RET_AIR_FAN_SPD_CMD', # list of required tags for lookup dict
+                                    'MIX_AIR_TMP_SEN','ZON_AIR_TMP_SEN','ZON_AIR_SPT_CMD','OUT_AIR_DMP_CMD',
+                                    'EXH_AIR_DMP_CMD'],
+                  "optional_tags": ['DIS_AIR_HUM_SEN','DIS_AIR_PRS_SEN','DIS_AIR_FLW_SEN','DIS_AIR_FAN_POW_SEN', # list of optional tags for lookup dict
+                                    'RET_AIR_TMP_SEN','RET_AIR_HUM_SEN','RET_AIR_PRS_SEN','RET_AIR_FLW_SEN',
+                                    'RET_AIR_CO2_SEN','RET_AIR_FAN_POW_SEN','ZON_AIR_HUM_SEN','ZON_AIR_CO2_SEN',
+                                    'OUT_AIR_TMP_SEN','OUT_AIR_HUM_SEN','OUT_AIR_PRS_SEN','OUT_AIR_FLW_SEN',
+                                    'OUT_AIR_FLW_STP_CMD','EXH_AIR_FAN_CMD'],
                   "allowed_types": {                        #allowed types for this object's nodes
                                     "FAN" : {                           #type declaration for BNode
                                               "name"      : "Fan",      #what the type means
@@ -81,6 +89,29 @@ type_dict = {
                    }
             }
 
+abbreviations = {
+    'DIS' : 'Discharge',
+    'AIR' : 'Air',
+    'TMP' : 'Temperature',
+    'SEN' : 'Sensor',
+    'SPD' : 'Speed',
+    'CMD' : 'Point of Actuation',
+    'RET' : 'Return',
+    'MIX' : 'Mixed',
+    'ZON' : 'Zone',
+    'SPT' : 'Setpoint',
+    'OUT' : 'Outside',
+    'DMP' : 'Damper',
+    'HUM' : 'Humidity',
+    'PRS' : 'Pressure',
+    'FLW' : 'Flow',
+    'POW' : 'Power',
+    'CO2' : 'Carbon Dioxide',
+    'EXH' : 'Exhaust',
+    'FAN' : 'Fan',
+    }
+
+
 def export_json():
   """
   Fix up the type_dict for exporting to JSON. This means changing the interface references
@@ -113,3 +144,12 @@ def get_interface(s):
       return type_dict[keys[0]]['interface']
   elif len(keys) == 2:
       return type_dict[keys[0]]['allowed_types'][keys[1]]['interface']
+
+def get_tag_name(tag):
+  """ convert something like DIS_AIR_TMP_SEN to Discharge Air Temp Sensor """
+  #convert tag to a list 
+  tag = tag.split("_") if "_" in tag else [tag]
+  classification = [abbreviations[prefix] for prefix in tag]
+  return " ".join(classification)
+
+

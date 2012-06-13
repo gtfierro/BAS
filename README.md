@@ -4,9 +4,11 @@ I'm creating this README file so that I can explain my logic for writing things 
 
 ##Requirements
 * zope.interface
+* zope.schema
 * networkx
 * matplotlib.pyplot
-* collections.deque, defaultdict
+* collections.deque
+* collections.defaultdict
 * plt
 
 ##Query Language
