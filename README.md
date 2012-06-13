@@ -34,59 +34,64 @@ I'm working on expanding the sample graphs so that I can make sure that this wor
 
 ###On types
 
-This is where ```btypes.py``` comes in. It has ```type_dict```, which contains stuff like the following:
+This is where ```node_types.py``` comes in. It has ```type_dict```, which contains stuff like the following:
 
 ```
 type_dict = {
             "AH": {                                         #type declaration for BObj
                   "name": "Air Handler",                    #what the type means
-                  "interface": IAH,                         #reference to the interface we need to implement
+                  "interface": 'IAH',                         #reference to the interface we need to implement
+                  "required_tags": ['DIS_AIR_TMP_SEN','DIS_AIR_FAN_SPD_CMD','RET_AIR_FAN_SPD_CMD', # list of required tags for lookup dict
+                                    'MIX_AIR_TMP_SEN','ZON_AIR_TMP_SEN','ZON_AIR_SPT_CMD','OUT_AIR_DMP_CMD',
+                                    'EXH_AIR_DMP_CMD'],
+                  "optional_tags": ['DIS_AIR_HUM_SEN','DIS_AIR_PRS_SEN','DIS_AIR_FLW_SEN','DIS_AIR_FAN_POW_SEN', # list of optional tags for lookup dict
+                                    'RET_AIR_TMP_SEN','RET_AIR_HUM_SEN','RET_AIR_PRS_SEN','RET_AIR_FLW_SEN',
+                                    'RET_AIR_CO2_SEN','RET_AIR_FAN_POW_SEN','ZON_AIR_HUM_SEN','ZON_AIR_CO2_SEN',
+                                    'OUT_AIR_TMP_SEN','OUT_AIR_HUM_SEN','OUT_AIR_PRS_SEN','OUT_AIR_FLW_SEN',
+                                    'OUT_AIR_FLW_STP_CMD','EXH_AIR_FAN_CMD'],
                   "allowed_types": {                        #allowed types for this object's nodes
                                     "FAN" : {                           #type declaration for BNode
                                               "name"      : "Fan",      #what the type means
-                                              "interface" : IFAN        #reference to the interface we need to implement
+                                              "interface" : 'IFAN'        #reference to the interface we need to implement
                                             },
                                     "CCV" : {
                                               "name"      : "Cooling Coil",
-                                              "interface" : ICCV
+                                              "interface" : 'ICCV'
                                             },
                                     "DMP" : {
                                               "name"      : "Damper",
-                                              "interface" : IDMP
+                                              "interface" : 'IDMP'
                                             },
                                     "SEN" : { 
                                               "name"      : "Sensor",
-                                              "interface" : ISEN
+                                              "interface" : 'ISEN'
                                             }
                                    }
                   },
-             }
-```
-Naturally, we're going to have to write basic interfaces for each of these types. The way ```zope.interface``` works, I'm not sure the best way to actually instantiate the ```BObj``` and ```BNode``` objects, but I'll explore the options. Currently all the basic interfaces are in ```interfaces.py```.
-
-One of the advantages of maintaining this rather frightening looking dictionary is that it's essentially JSON (aside from the interfaces, but when we export this to JSON, we can turn the interfaces into strings, and when we load from JSON we can do some ```sys._getframe``` magic and just get the interface references again). JSON means that it's easy to extend, modify, read the allowed types for whatever you're working with, so this should lower the learning curve for people who are using this.
-
-###On actually making the objects
-
-This is where we have to make some sort of a design decision. It would be *nice* to be able to have the developer declare an object/node like so:
-
-```
-my_air_handler_object = BObj('AH', name="Air Handler 1")
 ```
 
-so that with the initialization of the object, we are able to determine *at runtime* which interface to implement and thus guarantee that we're exposing the correct higher level methods to the user via the object. *However*, it seems that ```zope.interface``` implements interfaces as class statements, which means we need to have a predefined class that implements each interface *and* is a subclass of ```BObj```/```BNode```, which would require the end developer to put more work into writing a class for every single type of object they want. This will be tedious, but allows greater flexibility for the end developer, especially if they have multiple ```FAN``` types that require different methods of actuation or have different areas of specialization. This leaves us with something like the following:
+We also provide some accessor methods as shortcuts for getting some of this information. Most noteably is the use of the ```get_tag_name(tag)``` method, which takes in one of the tag strings like ``` `DIS_AIR_TMP_SEN` ``` and returns the expanded name "Discharge Air Temp Sensor."
+
+The interface definitions now look something like the following:
 
 ```
-from interfaces import IAH
 
-class DevAH(BObj):
-  zope.interface.Implements(IAH) #IAH is the interface for Air Handlers (type 'AH')
+class IAH(Interface):
+  _required_tags = Dict(
+                    title = u'Required Tags for Air Handler',
+                    required=True,
+                    min_length = len(get_required_tags('AH')),
+                    max_length = len(get_required_tags('AH')),
+                    key_type = Choice(values = tuple(get_required_tags('AH')))
+                   )
 
-  def special_method(self, arg1, arg2):
-    ...
-
-  def higher_level_method(self):
-    ...
-
-my_air_handler_object = DevAH(name="Air Handler 1") #this declaration takes care of the object type by nature of what object we're initializing
+  _optional_tags = Dict(
+                    title = u'Optional Tags for Air Handler',
+                    required=True,
+                    min_length = len(get_optional_tags('AH')),
+                    max_length = len(get_optional_tags('AH')),
+                    key_type = Choice(values = tuple(get_optional_tags('AH')))
+                   )
 ```
+
+All Air Handlers ('AH') have to provide two dictionaries, ```_required_tags``` and ```_optional_tags```, whose keys are the tag names provided in the ```type_dict``` above and whose values are the sMAP lookup/actuation points for those tags. This provides us with more robust method of forcing user-defined objects (currently in ```bacnet_classes.py```) to adhere to our minimum specifications.
