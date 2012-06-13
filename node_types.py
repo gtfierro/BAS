@@ -1,6 +1,5 @@
 #TODO: have bacnet_classes use this to validate the creation of objects/nodes
 #TODO: validation methods
-from interfaces import *
 import json
 from copy import deepcopy
 
@@ -11,7 +10,7 @@ for each of those objects. There's some redundancy
 type_dict = {
             "AH": {                                         #type declaration for BObj
                   "name": "Air Handler",                    #what the type means
-                  "interface": IAH,                         #reference to the interface we need to implement
+                  "interface": 'IAH',                         #reference to the interface we need to implement
                   "required_tags": ['DIS_AIR_TMP_SEN','DIS_AIR_FAN_SPD_CMD','RET_AIR_FAN_SPD_CMD', # list of required tags for lookup dict
                                     'MIX_AIR_TMP_SEN','ZON_AIR_TMP_SEN','ZON_AIR_SPT_CMD','OUT_AIR_DMP_CMD',
                                     'EXH_AIR_DMP_CMD'],
@@ -23,67 +22,67 @@ type_dict = {
                   "allowed_types": {                        #allowed types for this object's nodes
                                     "FAN" : {                           #type declaration for BNode
                                               "name"      : "Fan",      #what the type means
-                                              "interface" : IFAN        #reference to the interface we need to implement
+                                              "interface" : 'IFAN'        #reference to the interface we need to implement
                                             },
                                     "CCV" : {
                                               "name"      : "Cooling Coil",
-                                              "interface" : ICCV
+                                              "interface" : 'ICCV'
                                             },
                                     "DMP" : {
                                               "name"      : "Damper",
-                                              "interface" : IDMP
+                                              "interface" : 'IDMP'
                                             },
                                     "SEN" : { 
                                               "name"      : "Sensor",
-                                              "interface" : ISEN
+                                              "interface" : 'ISEN'
                                             }
                                    }
                   },
             "CWL": {
                     "name": "Chilled Water Loop",
-                    "interface":ICWL,
+                    "interface":'ICWL',
                     "allowed_types": {
                                       "CH"  : {
                                                 "name"     :  "Chiller",
-                                                "interface":  ICH
+                                                "interface":  'ICH'
                                               },
                                       "PU"  : {
                                                 "name"      : "Pump",
-                                                "interface" : IPU
+                                                "interface" : 'IPU'
                                               },
                                       "CT"  : {
                                                 "name"      : "Cooling Tower",
-                                                "interface" : ICT
+                                                "interface" : 'ICT'
                                               },
                                       "VV"  : {
                                                 "name"      : "Valve",
-                                                "interface" : IVV
+                                                "interface" : 'IVV'
                                               },
                                       "SEN" : {
                                                 "name"      : "Sensor",
-                                                "interface" : ISEN
+                                                "interface" : 'ISEN'
                                               },
                                      }
                    },
             "HWL": {
                     "name": "Hot Water Loop",
-                    "interface":IHWL,
+                    "interface":'IHWL',
                     "allowed_types": {
                                       "HX"  : {
                                                 "name"      : "Heat Exchanger",
-                                                "interface" : IHX
+                                                "interface" : 'IHX'
                                               },
                                       "PU"  : {
                                                 "name"      : "Pump",
-                                                "interface" : IPU
+                                                "interface" : 'IPU'
                                               },
                                       "VV"  : {
                                                 "name"      : "Valve",
-                                                "interface" : IVV
+                                                "interface" : 'IVV'
                                               },
                                       "SEN" : {
                                                 "name"      : "Sensor",
-                                                "interface" : ISEN
+                                                "interface" : 'ISEN'
                                               },
                                      }
                    }
@@ -118,10 +117,10 @@ def export_json():
   to their string representations
   """
   tmp_dict = deepcopy(type_dict)
-  for ot in tmp_dict.iterkeys():
-    tmp_dict[ot]['interface'] = tmp_dict[ot]['interface'].__name__
-    for nt in tmp_dict[ot]['allowed_types'].iterkeys():
-      tmp_dict[ot]['allowed_types'][nt]['interface'] = tmp_dict[ot]['allowed_types'][nt]['interface'].__name__
+#  for ot in tmp_dict.iterkeys():
+#    tmp_dict[ot]['interface'] = tmp_dict[ot]['interface']
+#    for nt in tmp_dict[ot]['allowed_types'].iterkeys():
+#      tmp_dict[ot]['allowed_types'][nt]['interface'] = tmp_dict[ot]['allowed_types'][nt]['interface'].__name__
   return json.dumps(tmp_dict)
 
 def import_json(j):
@@ -131,19 +130,20 @@ def import_json(j):
   """
   import interfaces
   tmp_dict= json.loads(j)
-  for ot in tmp_dict.iterkeys():
-    tmp_dict[ot]['interface'] = getattr(interfaces, tmp_dict[ot]['interface'])
-    for nt in tmp_dict[ot]['allowed_types'].iterkeys():
-      tmp_dict[ot]['allowed_types'][nt]['interface'] = getattr(interfaces, tmp_dict[ot]['allowed_types'][nt]['interface'])
+#  for ot in tmp_dict.iterkeys():
+#    tmp_dict[ot]['interface'] = getattr(interfaces, tmp_dict[ot]['interface'])
+#    for nt in tmp_dict[ot]['allowed_types'].iterkeys():
+#      tmp_dict[ot]['allowed_types'][nt]['interface'] = getattr(interfaces, tmp_dict[ot]['allowed_types'][nt]['interface'])
   return tmp_dict
 
 def get_interface(s):
   """ Get the interface for a given string, e.g. 'AH' or 'AH.FAN' """
+  import interfaces
   keys = s.split('.')
   if len(keys) == 1:
-      return type_dict[keys[0]]['interface']
+      return getattr(interfaces,type_dict[keys[0]]['interface'])
   elif len(keys) == 2:
-      return type_dict[keys[0]]['allowed_types'][keys[1]]['interface']
+      return getattr(interfaces,type_dict[keys[0]]['allowed_types'][keys[1]]['interface'])
 
 def get_tag_name(tag):
   """ convert something like DIS_AIR_TMP_SEN to Discharge Air Temp Sensor """
@@ -151,5 +151,13 @@ def get_tag_name(tag):
   tag = tag.split("_") if "_" in tag else [tag]
   classification = [abbreviations[prefix] for prefix in tag]
   return " ".join(classification)
+
+def get_required_tags(s):
+  """ Return list of required tags for a given string e.g. 'AH' """
+  return type_dict[s]['required_tags']
+
+def get_optional_tags(s):
+  """ Return list of optional tags for a given string e.g. 'AH' """
+  return type_dict[s]['optional_tags']
 
 

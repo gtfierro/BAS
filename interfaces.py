@@ -17,17 +17,17 @@ class IAH(Interface):
   _required_tags = Dict(
                     title = u'Required Tags for Air Handler',
                     required=True,
-                    min_length = len(type_dict['AH']['required_tags']),
-                    max_length = len(type_dict['AH']['required_tags']),
-                    key_type = Choice(values = tuple(len(type_dict['AH']['required_tags'])))
+                    min_length = len(get_required_tags('AH')),
+                    max_length = len(get_required_tags('AH')),
+                    key_type = Choice(values = tuple(get_required_tags('AH')))
                    )
 
   _optional_tags = Dict(
                     title = u'Optional Tags for Air Handler',
-                    optional=True,
-                    min_length = len(type_dict['AH']['optional_tags']),
-                    max_length = len(type_dict['AH']['optional_tags']),
-                    key_type = Choice(values = tuple(len(type_dict['AH']['optional_tags'])))
+                    required=True,
+                    min_length = len(get_optional_tags('AH')),
+                    max_length = len(get_optional_tags('AH')),
+                    key_type = Choice(values = tuple(get_optional_tags('AH')))
                    )
 
   #high level methods will take form of:
