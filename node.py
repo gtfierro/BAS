@@ -65,7 +65,7 @@ class Container(object):
         obj.container = self
         self._nk.add_node(obj)
 
-  def draw_graph(self, filename="out.png")
+  def draw_graph(self, filename="out.png"):
     """
     Uses matplotlib.pyplot and nx.draw_circular to make a graph and saves it as "out.png"
     """
