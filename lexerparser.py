@@ -1,3 +1,4 @@
+import sys
 from ply.lex import lex
 from ply.yacc import yacc
 from node import *
@@ -44,7 +45,8 @@ class Lexer(object):
 
 class Parser(object):
 
-  def __init__(self):
+  def __init__(self,debug_flag=False):
+    self.debug = debug_flag
     self.lexer = lex(module=Lexer())
     self.relationals = [test.x]
     self.domain = []
@@ -73,33 +75,33 @@ class Parser(object):
     """
     relative_fxn = lambda x: getattr(x.container._nk, direction)(x)
 
-    print "Starting Search: node:",node,"target:",[i.name for i in target]
-    print "-"*20
+    if self.debug: print "Starting Search: node:",node,"target:",[i.name for i in target]
+    if self.debug: print "-"*20
     queue = deque()
     queue.appendleft(node)
     already_visited_containers = [node.container]
     while queue:
-      print "QUEUE:",[i.name for i in queue]
+      if self.debug: print "QUEUE:",[i.name for i in queue]
       current = queue.pop()
       if current in target: 
-        print "returning",node
-        print "+"*20
+        if self.debug: print "returning",node
+        if self.debug: print "+"*20
         return node
       if isinstance(current, Container):
         if current not in already_visited_containers:
-          print "adding nodes in",current.name
+          if self.debug: print "adding nodes in",current.name
           for n in current._nk.nodes():
             queue.appendleft(n)
       for n in relative_fxn(current):
       #for n in current.container._nk.successors(current):
-        print "adding node",n.name
+        if self.debug: print "adding node",n.name
         queue.appendleft(n)
       if not isinstance(current.container, Relational):
         if current.container not in queue and current.container not in already_visited_containers:
-          print "adding",current.name,"'s container",current.container.name
+          if self.debug: print "adding",current.name,"'s container",current.container.name
           already_visited_containers.append(current.container)
           queue.appendleft(current.container)
-    print "*"*20
+    if self.debug: print "*"*20
     return None
     
   def p_query(self,p):
@@ -113,7 +115,7 @@ class Parser(object):
     else:
       next_domain = [self.search_relatives(node, p[3],"predecessors") for node in p[1]]
     next_domain = filter(lambda x: x, next_domain)
-    print ">>",[i.name for i in next_domain]
+    if debug: print ">>",[i.name for i in next_domain]
     #p[0] now contains p[3] found from the domain of p[1]
     p[0] = self.filter_dup_uids(next_domain)
 
@@ -151,17 +153,22 @@ class Parser(object):
   tokens = Lexer.tokens
 
 if __name__ == '__main__':
-      lexer = lex(module=Lexer())
-
-      # Tokenize
-#      while True:
-#        data = raw_input("test> ")
-#        lexer.input(data)
-#        while True:
-#          tok = lexer.token()
-#          if not tok: break      # No more input
-#          print tok
-      parser = yacc(module=Parser(), write_tables=0)
-      while True:
-        for res in parser.parse(raw_input("query> ")):
-          print res.name,res.uid
+  debug= int(sys.argv[1]) if len(sys.argv) > 1 else 0
+  lexer = lex(module=Lexer())
+  parser = yacc(module=Parser(debug_flag=debug), write_tables=0)
+  while True:
+    query = raw_input("query> ")
+    if not query:
+      continue
+    text = {
+      'help': """ help: returns help \n tags: returns list of valid tags \n commands: returns list of valid commands""",
+      'tags': """tags coming""",
+      'commands': """commands coming""",
+    }
+    if query in text.keys():
+      print text[query]
+      continue
+    else:
+      for res in parser.parse(query):
+        print res.name,res.uid
+        continue

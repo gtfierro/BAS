@@ -1,5 +1,3 @@
-#TODO: have bacnet_classes use this to validate the creation of objects/nodes
-#TODO: validation methods
 import json
 from copy import deepcopy
 

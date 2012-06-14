@@ -35,3 +35,40 @@ AH -- Air Handler
   OUT_AIR_FLW_SEN -- Outside Air Flow Sensor
   OUT_AIR_FLW_STP_CMD -- Outside Air Flow SetPoint cmd 
   EXH_AIR_FAN_CMD -- Exhaust Air Fan cmd
+
+CWL -- Chilled Water Loop
+#  The way this loop functions, we have 'chilled water entering' the chiller, which has
+#  an exit point of 'condensed water exiting' which turns into 'condensed water entering' the 
+#  cooling tower, which has an exit point of 'condensed water exiting' which turns into 
+#  'condensed water entering' the chiller which has an exit point of 'chilled water exiting'
+
+#maybe extend these tags with what they're entering/leaving: cooling tower CTW or chiller CHR
+#The abbreviations don't need to be *incredibly* intuitive because we have the lookup dictionary
+
+  CHL_WTR_LEA_TMP_SEN -- Chilled Water Leaving Temp Sensor
+  CHL_WTR_LEA_TMP_STP -- Chilled Water Leaving Temp Setpoint
+  CHL_WTR_LEA_FLW_SEN -- Chilled Water Leaving Flow Sensor
+  CHL_WTR_LEA_PRS_SEN -- Chilled Water Leaving Pressure Sensor
+  CHL_WTR_ENT_TMP_SEN -- Chilled Water Entering Temp Sensor
+  CHL_WTR_ENT_PRS_SEN -- Chilled Water Entering Pressure Sensor
+  CHL_WTR_DLT_TMP_SEN -- Chilled Water Delta Temp Sensor
+  CHL_WTR_DLT_FLW_SEN -- Chilled Water Delta Flow Sensor
+  CHL_WTR_DLT_PRS_SEN -- Chilled Water Delta Pressure Sensor
+  CHL_WTR_DLT_PRS_STP -- Chilled Water Delta Pressure Setpoint
+
+  CND_WTR_LEA_TMP_SEN -- Condensed Water Leaving Temp Sensor
+  CND_WTR_LEA_TMP_STP -- Condensed Water Leaving Temp Setpoint
+  CND_WTR_LEA_FLW_SEN -- Condensed Water Leaving Flow Sensor
+  CND_WTR_LEA_PRS_SEN -- Condensed Water Leaving Pressure Sensor
+  CND_WTR_ENT_TMP_SEN -- Condensed Water Entering Temp Sensor
+  CND_WTR_ENT_PRS_SEN -- Condensed Water Entering Pressure Sensor
+  CND_WTR_DLT_TMP_SEN -- Condensed Water Delta Temp Sensor
+  CND_WTR_DLT_FLW_SEN -- Condensed Water Delta Flow Sensor
+  CND_WTR_DLT_PRS_SEN -- Condensed Water Delta Pressure Sensor
+  CND_WTR_DLT_PRS_STP -- Condensed Water Delta Pressure Setpoint
+
+#TODO: filter the above into the two lower categories. Add more points? Take some away?
+  **required** 
+  **optional**
+
+HWL -- Hot Water Loop
