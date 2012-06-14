@@ -14,7 +14,6 @@ class Lexer(object):
       'LPAREN','RPAREN',
       )
 
-
   #Tokens
 
   t_UPSTREAM    = r'>' 
@@ -49,6 +48,16 @@ class Parser(object):
     self.lexer = lex(module=Lexer())
     self.relationals = [test.x]
     self.domain = []
+
+  def filter_dup_uids(self, target):
+    """
+    Given a [target] list, returns a list where all components are unique by their uid
+    """
+    ret = []
+    for item in target:
+      if item.uid not in map(lambda x: x.uid, ret):
+        ret.append(item)
+    return ret
 
   def search_relatives(self, node, target, direction):
     """
@@ -93,11 +102,6 @@ class Parser(object):
     print "*"*20
     return None
     
-
-  #TODO: define all_successors, all_predecessors for graph traversal in p_query
-  #use a combination of collection.deque and the _nk.successors/predecessors
-  #use generators where possible so that we don't hold stuff in memory
-
   def p_query(self,p):
     '''query : query UPSTREAM set
              | query DOWNSTREAM set'''
@@ -111,11 +115,11 @@ class Parser(object):
     next_domain = filter(lambda x: x, next_domain)
     print ">>",[i.name for i in next_domain]
     #p[0] now contains p[3] found from the domain of p[1]
-    p[0] = next_domain
+    p[0] = self.filter_dup_uids(next_domain)
 
   def p_query_set(self,p):
     '''query : set'''
-    p[0] = p[1]
+    p[0] = self.filter_dup_uids(p[1])
 
   def p_set_name(self,p):
     'set : NAME'
@@ -123,7 +127,7 @@ class Parser(object):
     domain = p[0] if p[0] else self.relationals
     for r in self.relationals:
       res = r.search(lambda x: x.name == name_lookup)
-    p[0] = res
+    p[0] = self.filter_dup_uids(res)
 
   def p_set_type(self,p):
     'set : TYPE'
@@ -131,7 +135,7 @@ class Parser(object):
     domain = p[0] if p[0] else self.relationals
     for r in self.relationals:
       res = r.search(lambda x: x.type == type_lookup)
-    p[0] = res
+    p[0] = self.filter_dup_uids(res)
 
   def p_set_uuid(self,p):
     'set : UUID'
@@ -159,4 +163,5 @@ if __name__ == '__main__':
 #          print tok
       parser = yacc(module=Parser(), write_tables=0)
       while True:
-        print [i.name for i in parser.parse(raw_input("query> "))]
+        for res in parser.parse(raw_input("query> ")):
+          print res.name,res.uid

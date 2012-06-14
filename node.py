@@ -162,9 +162,4 @@ class Relational(Container):
     self.name = name
     Container.__init__(self, objects)
 
-  #TODO: need this for queries?
-  def extend_by_unique_uid(self, target, extend):
-    extend = [extend] if type(extend) != list else extend
-    to_add = [t for t in extend if t.uid not in map(lambda x: x.uid, target)]
-    target.extend(to_add)
 
