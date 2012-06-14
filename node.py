@@ -70,8 +70,8 @@ class Container(object):
     Uses matplotlib.pyplot and nx.draw_circular to make a graph and saves it as "out.png"
     """
     import matplotlib.pyplot as plt
-    nx.draw_circular(self._nk, fileanem)
-    plt.show()
+    nx.draw_circular(self._nk)
+    plt.savefig(filename)
 
   def add_node_child(self, node, child):
     """

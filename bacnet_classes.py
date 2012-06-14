@@ -6,9 +6,6 @@ import interfaces
 from zope.interface import implements
 from zope.schema import getValidationErrors
 
-#TODO: use getValidationErrors with these classes and their interfaces in order to make sure
-#      the type dictionaries are valid
-
 class BacNetAH(node.Obj):
   implements(node_types.get_interface('AH'))
   #TODO: replace 'actuation point' with the actual sMAP point
