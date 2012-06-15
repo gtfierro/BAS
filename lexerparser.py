@@ -1,18 +1,19 @@
 import sys
+import test
+import networkx as nx
 from ply.lex import lex
 from ply.yacc import yacc
 from node import *
-import test
-import networkx as nx
+from node_types import *
 from collections import deque
 
 class Lexer(object):
 
-  tokens = (
+  tokens = [
       'NAME','TYPE','UUID',
       'UPSTREAM','DOWNSTREAM',
       'LPAREN','RPAREN',
-      )
+      ]
 
   #Tokens
 
@@ -37,6 +38,18 @@ class Lexer(object):
     r'\%[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}[ ]?'
     t.value = t.value.strip()
     return t
+
+  def t_keyword(self, t):
+    r'\bhelp\b|\btypes\b|\bprefixes\b|\bexamples\b'
+    if t.value == 'help':
+      print " help: returns this help list \n types: returns list of types you can query \n prefixes: returns list of prefixes for types \n examples: lists some example queries"
+    elif t.value == 'types':
+      print list_types()
+    elif t.value == 'prefixes':
+      print " #TYPE: designates set of all objects with type [TYPE] \n $Name Of Object: designates set of all objects named [Name of Object] (case sensitive \n %ab61b939-a133-4d76-b9c4-a5d6fab7abf5: designates object tagged with uuid"
+    elif t.value == 'examples':
+      print " #DMP < $Return Air Handler: give me all dampers downstream of the Return Air Handler"
+    t.lexer.skip(1)
 
   def t_error(self,t):
     print "Illegal character '%s'" % t.value[0]
@@ -151,7 +164,8 @@ class Parser(object):
     p[0] = res
 
   def p_error(self,p):
-    print "Syntax error!",p
+    if p:
+      print "Syntax error!",p
 
   tokens = Lexer.tokens
 
@@ -159,21 +173,12 @@ if __name__ == '__main__':
   debug= int(sys.argv[1]) if len(sys.argv) > 1 else 0
   lexer = lex(module=Lexer())
   parser = yacc(module=Parser(debug_flag=debug), write_tables=0)
-  text = {
-    'help': """ help: returns help \n tags: returns list of valid tags \n commands: returns list of valid commands""",
-    'tags': """tags coming""",
-    'commands': """commands coming""",
-  }
+  print "type 'help' for assistance"
   while True:
     query = raw_input("query> ")
     if not query:
       continue
-    if query in text.keys():
-      print text[query]
-      continue
-    else:
-      result = parser.parse(query)
-      if result:
-        for res in result:
-          print res.name,res.uid
-          continue
+    result = parser.parse(query)
+    if result:
+      for res in result:
+        print res.name,res.uid

@@ -152,6 +152,13 @@ def list_interfaces():
       ifaces.append(get_interface(obj+'.'+pt))
   return ifaces
 
+def list_types():
+  """ Returns a list of all supported types indentified in type_dict """
+  types = type_dict.keys()
+  for obj in type_dict.iterkeys():
+    types.extend(type_dict[obj]['allowed_types'].keys())
+  return types
+
 def get_tag_name(tag):
   """ convert something like DIS_AIR_TMP_SEN to Discharge Air Temp Sensor """
   #convert tag to a list 
@@ -166,5 +173,6 @@ def get_required_tags(s):
 def get_optional_tags(s):
   """ Return list of optional tags for a given string e.g. 'AH' """
   return type_dict[s]['optional_tags']
+
 
 

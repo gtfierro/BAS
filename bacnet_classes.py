@@ -94,4 +94,8 @@ def validate():
 if not validate():
   sys.exit(0)
 else:
-  print "everything is okay"
+  print "#"*64
+  print "#"+" "*62+"#"
+  print "# All interfaces implemented in bacnet_classes.py are verified #"
+  print "#"+" "*62+"#"
+  print "#"*64
