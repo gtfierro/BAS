@@ -27,6 +27,37 @@ Run ```python lexerparser.py```, and you'll get a prompt looking something like 
 * ```#DMP > #FAN ```: all dampers upstream of a fan
 * etc..
 
+###Sample Session
+```
+query> #SEN                                                      
+Supply Fan Air Flow Sensor 40beebb2-ce59-482f-a016-581184b87d37  
+Supply Air Temp Sensor 7219e0cb-81f3-48da-82f5-c6617bae3ce6      
+Supply Air Pressure Sensor 1 1e46c1d1-365e-4a09-b158-6a4ee3ae70c2
+Supply Air Pressure Sensor 2 0333ba94-9387-4ed3-bba9-fce78f17682b
+Return Air Temp Sensor 158d3012-11db-4cd3-8dc1-1f9fafb54a49      
+Mixed Air Temp Sensor 845578f0-e1a0-47bb-84ad-3fbb26d4155e       
+Outside Air Temp Sensor 399f8bc0-a7d7-4565-9eda-ab7c7aa47def     
+Return Air Humidity Sensor c1529f94-2bb7-4f75-9371-207cff3a2a00  
+Return Air Flow Sensor bbb74d23-6f9e-4089-990d-67111aefeb92      
+Return Air Pressure Sensor d57310b6-c7e8-4f27-b040-a82f1690cb76  
+query> #SEN > $Return Fan 1                                      
+Return Air Temp Sensor 158d3012-11db-4cd3-8dc1-1f9fafb54a49      
+Return Air Humidity Sensor c1529f94-2bb7-4f75-9371-207cff3a2a00  
+Return Air Flow Sensor bbb74d23-6f9e-4089-990d-67111aefeb92      
+Return Air Pressure Sensor d57310b6-c7e8-4f27-b040-a82f1690cb76  
+query> @sen_feed_to_return_fan = #SEN > $Return Fan 1            
+query> @sen_feed_to_return_fan                                   
+Return Air Temp Sensor 158d3012-11db-4cd3-8dc1-1f9fafb54a49      
+Return Air Humidity Sensor c1529f94-2bb7-4f75-9371-207cff3a2a00  
+Return Air Flow Sensor bbb74d23-6f9e-4089-990d-67111aefeb92      
+Return Air Pressure Sensor d57310b6-c7e8-4f27-b040-a82f1690cb76  
+query> #DMP > @sen_feed_to_return_fan                            
+Return Air Damper b6eb5953-4b71-41c8-8ecc-88a828f03353           
+query> #DMP > #SEN > $Return Fan 1                               
+Return Air Damper b6eb5953-4b71-41c8-8ecc-88a828f03353           
+query>                                                           
+```
+
 ###What's next
 I'm working on expanding the sample graphs so that I can make sure that this works in the edge cases and with broader queries. There are bound to be bugs, but this is an MVP of sorts.
 
