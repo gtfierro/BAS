@@ -10,8 +10,8 @@ from collections import deque
 class Lexer(object):
 
   tokens = [
-      'NAME','TYPE','UUID',
-      'UPSTREAM','DOWNSTREAM',
+      'NAME','TYPE','UUID','VAR',
+      'UPSTREAM','DOWNSTREAM','EQUALS',
       'LPAREN','RPAREN',
       ]
 
@@ -21,6 +21,7 @@ class Lexer(object):
   t_DOWNSTREAM  = r'<'
   t_LPAREN      = r'\('
   t_RPAREN      = r'\)'
+  t_EQUALS      = r'='
   t_ignore      = ' \t'
 
   def t_NAME(self,t):
@@ -39,14 +40,19 @@ class Lexer(object):
     t.value = t.value.strip()
     return t
 
+  def t_VAR(self,t):
+    r'\@[a-zA-Z_][a-zA-Z0-9_]*[ ]?'
+    t.value = t.value.strip()
+    return t
+
   def t_keyword(self, t):
     r'\bhelp\b|\btypes\b|\bprefixes\b|\bexamples\b'
     if t.value == 'help':
-      print " help: returns this help list \n types: returns list of types you can query \n prefixes: returns list of prefixes for types \n examples: lists some example queries"
+      print " help: returns this help list \n types: returns list of types you can query \n prefixes: returns list of prefixes for queries \n examples: lists some example queries"
     elif t.value == 'types':
       print list_types()
     elif t.value == 'prefixes':
-      print " #TYPE: designates set of all objects with type [TYPE] \n $Name Of Object: designates set of all objects named [Name of Object] (case sensitive \n %ab61b939-a133-4d76-b9c4-a5d6fab7abf5: designates object tagged with uuid"
+      print " #TYPE: designates set of all objects with type [TYPE] \n $Name Of Object: designates set of all objects named [Name of Object] (case sensitive \n %ab61b939-a133-4d76-b9c4-a5d6fab7abf5: designates object tagged with uuid \n @var_name: you can assign queries to variables and use them in later queries"
     elif t.value == 'examples':
       print " #DMP < $Return Air Handler: give me all dampers downstream of the Return Air Handler"
     t.lexer.skip(1)
@@ -62,6 +68,7 @@ class Parser(object):
     self.lexer = lex(module=Lexer())
     self.relationals = [test.x]
     self.domain = []
+    self.vars = {}
 
   def filter_dup_uids(self, target):
     """
@@ -115,7 +122,15 @@ class Parser(object):
           queue.appendleft(current.container)
     if self.debug: print "*"*20
     return None
-    
+
+  def p_statement_assign(self,p):
+    '''statement : VAR EQUALS query'''
+    self.vars[p[1]] = p[3]
+
+  def p_statement_query(self,p):
+    '''statement : query'''
+    p[0] = p[1]
+
   def p_query(self,p):
     '''query : query UPSTREAM set
              | query DOWNSTREAM set'''
@@ -162,6 +177,11 @@ class Parser(object):
     for r in self.relationals:
       res = r.search(lambda x: str(x.uid) == uuid_lookup)
     p[0] = res
+
+
+  def p_set_var(self,p):
+    'set : VAR'
+    p[0] = self.vars.get(p[1],[])
 
   def p_error(self,p):
     if p:

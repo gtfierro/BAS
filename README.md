@@ -10,6 +10,7 @@ I'm creating this README file so that I can explain my logic for writing things 
 * collections.deque
 * collections.defaultdict
 * plt
+* pygraphviz
 
 ##Query Language
 Currently the query language has only been tested on the graph in the ```test.py``` file.
