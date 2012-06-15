@@ -8,7 +8,6 @@ from collections import deque
 
 class Lexer(object):
 
-
   tokens = (
       'NAME','TYPE','UUID',
       'UPSTREAM','DOWNSTREAM',
@@ -123,6 +122,10 @@ class Parser(object):
     '''query : set'''
     p[0] = self.filter_dup_uids(p[1])
 
+  def p_set_group(self, p):
+    '''set : LPAREN query RPAREN'''
+    p[0] = p[2]
+
   def p_set_name(self,p):
     'set : NAME'
     name_lookup = p[1][1:].strip()
@@ -156,19 +159,21 @@ if __name__ == '__main__':
   debug= int(sys.argv[1]) if len(sys.argv) > 1 else 0
   lexer = lex(module=Lexer())
   parser = yacc(module=Parser(debug_flag=debug), write_tables=0)
+  text = {
+    'help': """ help: returns help \n tags: returns list of valid tags \n commands: returns list of valid commands""",
+    'tags': """tags coming""",
+    'commands': """commands coming""",
+  }
   while True:
     query = raw_input("query> ")
     if not query:
       continue
-    text = {
-      'help': """ help: returns help \n tags: returns list of valid tags \n commands: returns list of valid commands""",
-      'tags': """tags coming""",
-      'commands': """commands coming""",
-    }
     if query in text.keys():
       print text[query]
       continue
     else:
-      for res in parser.parse(query):
-        print res.name,res.uid
-        continue
+      result = parser.parse(query)
+      if result:
+        for res in result:
+          print res.name,res.uid
+          continue
