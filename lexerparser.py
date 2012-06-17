@@ -46,7 +46,7 @@ class Lexer(object):
     return t
 
   def t_keyword(self, t):
-    r'\bhelp\b|\btypes\b|\bprefixes\b|\bexamples\b'
+    r'\b(help|types|prefixes|examples)\b'
     if t.value == 'help':
       print " help: returns this help list \n types: returns list of types you can query \n prefixes: returns list of prefixes for queries \n examples: lists some example queries"
     elif t.value == 'types':
