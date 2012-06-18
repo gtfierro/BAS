@@ -9,11 +9,12 @@ I'm creating this README file so that I can explain my logic for writing things 
 * matplotlib.pyplot
 * collections.deque
 * collections.defaultdict
-* plt
+* ply
 * pygraphviz
 
 ##Query Language
 Currently the query language has only been tested on the graph in the ```test.py``` file.
+Look in ```latex/query.pdf``` for help.
 
 ###Syntax
 The grammar is all in ```lexerparser.py``` at the top, but essentially your query must consist of at least one **TOKEN** follwed by an arbitrary number of interleaved **DELIMETERS** and **TOKENS**, ending with a **TOKEN**. **TOKEN**s can be 
