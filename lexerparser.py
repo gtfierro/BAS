@@ -98,6 +98,8 @@ class Parser(object):
     if self.debug: print "-"*20
     queue = deque()
     queue.appendleft(node)
+    if not isinstance(node, Container):
+      queue.appendleft(node.container) 
     already_visited_containers = [node.container]
     while queue:
       if self.debug: print "QUEUE:",[i.name for i in queue]
@@ -112,7 +114,6 @@ class Parser(object):
           for n in current._nk.nodes():
             queue.appendleft(n)
       for n in relative_fxn(current):
-      #for n in current.container._nk.successors(current):
         if self.debug: print "adding node",n.name
         queue.appendleft(n)
       if not isinstance(current.container, Relational):
@@ -178,7 +179,6 @@ class Parser(object):
       res = r.search(lambda x: str(x.uid) == uuid_lookup)
     p[0] = res
 
-
   def p_set_var(self,p):
     'set : VAR'
     p[0] = self.vars.get(p[1],[])
@@ -202,3 +202,9 @@ if __name__ == '__main__':
     if result:
       for res in result:
         print res.name,res.uid
+
+def query(string):
+  """returns list of objects as returned by the query language"""
+  lexer = lex(module=Lexer())
+  parser = yacc(module=Parser())
+  return parser.parse(string)
