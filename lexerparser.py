@@ -202,3 +202,9 @@ if __name__ == '__main__':
     if result:
       for res in result:
         print res.name,res.uid
+
+def query(string):
+  """returns list of objects as returned by the query language"""
+  lexer = lex(module=Lexer())
+  parser = yacc(module=Parser())
+  return parser.parse(string)
