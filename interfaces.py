@@ -45,57 +45,57 @@ class IHWL(Interface):
   """
   pass
 
-class IFAN(Interface):
-  """
-  Interface for the FAN node
-  """
-  pass
-
-class ICCV(Interface):
-  """
-  Interface for the CCV node
-  """
-  pass
-
-class IDMP(Interface):
-  """
-  Interface for the DMP node
-  """
-  pass
-
-class ISEN(Interface):
-  """
-  Interface for the SEN node
-  """
-  pass
-
-class ICH(Interface):
-  """
-  Interface for the CH node
-  """
-  pass
-
-class IHX(Interface):
-  """
-  Interface for the HX node
-  """
-  pass
-
-class IPU(Interface):
-  """
-  Interface for the PU node
-  """
-  pass
-
-class ICT(Interface):
-  """
-  Interface for the CT node
-  """
-  pass
-
-class IVV(Interface):
-  """
-  Interface for the VV node
-  """
-  pass
-
+#class IFAN(Interface):
+#  """
+#  Interface for the FAN node
+#  """
+#  pass
+#
+#class ICCV(Interface):
+#  """
+#  Interface for the CCV node
+#  """
+#  pass
+#
+#class IDMP(Interface):
+#  """
+#  Interface for the DMP node
+#  """
+#  pass
+#
+#class ISEN(Interface):
+#  """
+#  Interface for the SEN node
+#  """
+#  pass
+#
+#class ICH(Interface):
+#  """
+#  Interface for the CH node
+#  """
+#  pass
+#
+#class IHX(Interface):
+#  """
+#  Interface for the HX node
+#  """
+#  pass
+#
+#class IPU(Interface):
+#  """
+#  Interface for the PU node
+#  """
+#  pass
+#
+#class ICT(Interface):
+#  """
+#  Interface for the CT node
+#  """
+#  pass
+#
+#class IVV(Interface):
+#  """
+#  Interface for the VV node
+#  """
+#  pass
+#

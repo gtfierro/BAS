@@ -30,47 +30,47 @@ type_dict = {
 
     'points': {
       'FAN': {
-        'interface' : 'IFAN',
+        'interface' : 'DFAN',
         'required_setpoints'  : ['SPD'],
         'required_points' : ['POW'],
         },
       'CCV':  {
-        'interface' : 'ICCV',
+        'interface' : 'DCCV',
         'required_setpoints'  : [], # % open?
         'required_points' : [],
         },
       'DMP':  {
-        'interface' : 'IDMP',
+        'interface' : 'DDMP',
         'required_setpoints'  : [], # % open?
         'required_points' : [],
         },
       'SEN' : {
-        'interface' : 'ISEN',
+        'interface' : 'DSEN',
         'required_setpoints'  : [],
         'required_points' : [],
         },
       'CHR' : {
-        'interface' : 'ICHR',
+        'interface' : 'DCHR',
         'required_setpoints'  : [],
         'required_points' : [],
         },
       'PMP' : {
-        'interface' : 'IPMP',
+        'interface' : 'DPMP',
         'required_setpoints'  : [],
         'required_points' : [],
        },
       'TOW' : {
-        'interface' : 'ITOW',
+        'interface' : 'DTOW',
         'required_setpoints'  : [],
         'required_points' : [],
         },
       'VLV' : {
-        'interface' : 'IVLV',
+        'interface' : 'DVLV',
         'required_setpoints'  : [],
         'required_points' : [],
         },
       'HX'  : {
-        'interface' : 'IHX',
+        'interface' : 'DHX',
         'required_setpoints'  : [],
         'required_points' : [],
         },
