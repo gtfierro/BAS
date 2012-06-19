@@ -30,47 +30,47 @@ type_dict = {
 
     'points': {
       'FAN': {
-        'interface' : 'DFAN',
+        'driver' : 'DFAN',
         'required_setpoints'  : ['SPD'],
         'required_points' : ['POW'],
         },
       'CCV':  {
-        'interface' : 'DCCV',
+        'driver' : 'DCCV',
         'required_setpoints'  : [], # % open?
         'required_points' : [],
         },
       'DMP':  {
-        'interface' : 'DDMP',
+        'driver' : 'DDMP',
         'required_setpoints'  : [], # % open?
         'required_points' : [],
         },
       'SEN' : {
-        'interface' : 'DSEN',
+        'driver' : 'DSEN',
         'required_setpoints'  : [],
         'required_points' : [],
         },
       'CHR' : {
-        'interface' : 'DCHR',
+        'driver' : 'DCHR',
         'required_setpoints'  : [],
         'required_points' : [],
         },
       'PMP' : {
-        'interface' : 'DPMP',
+        'driver' : 'DPMP',
         'required_setpoints'  : [],
         'required_points' : [],
        },
       'TOW' : {
-        'interface' : 'DTOW',
+        'driver' : 'DTOW',
         'required_setpoints'  : [],
         'required_points' : [],
         },
       'VLV' : {
-        'interface' : 'DVLV',
+        'driver' : 'DVLV',
         'required_setpoints'  : [],
         'required_points' : [],
         },
       'HX'  : {
-        'interface' : 'DHX',
+        'driver' : 'DHX',
         'required_setpoints'  : [],
         'required_points' : [],
         },
