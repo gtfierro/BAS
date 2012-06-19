@@ -42,6 +42,10 @@ class BacNetAH(node.Obj):
                     'EXH_AIR_FAN_CMD'     : 'actuation point',
                   }
 
+  def set_airflow(self, airflow):
+    #TODO: implement logic
+    pass
+
 class BacNetFAN(node.Point):
   implements(node_types.get_interface('AH.FAN'))
 

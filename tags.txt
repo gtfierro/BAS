@@ -4,8 +4,44 @@ If a point ends with "CMD", then we know we can write to it (it's some sort of s
 input point that we can use to control it), *but* we can also read from that point to get the
 current value of it
 
+For objects, we require they have dictionaries of the following:
+  required setpoints/writeables: for an airhandler, this would be the zone air temperature setpoint.
+                            basically stuff that is a higher level attribute of the holistic
+                            air handler
+  requried points: for an air handler, this would be everything in test.py (assuming that's
+                  the minimum set of points
+
+for points, we require they have dictionaries of the following:
+  required setpoints: writeables
+  required attributes: readables
+
+It's important to maintain
+the following structure:
+object (node in graph)
+|
+point (node in graph)
+|
+attributes (key in dict)
+
+Maybe for each *type* we have a list of required attributes + a list of required physical points
+(if it is an object).
+AH:
+  interface: 'IAH' #air handler interface
+  required_points: outside air damper, supply fan, etc.
+  required_attributes: none
+
+SUP_FAN: #supply fan
+  interface: 'IFAN' #fan interface
+  required_points: none
+  required_attributes: 
+
+maybe this:
+if it is an object, the required are points or setpoints
+if it is a point, the required are attributes
+
 from http://project-haystack.org/doc/AHUs
 AH -- Air Handler
+  #CONFIRMED
   **required**
   DIS_AIR_TMP_SEN -- Discharge Air Temp Sensor
   DIS_AIR_FAN_SPD_CMD -- Discharge Air Fan Speed cmd
@@ -37,38 +73,33 @@ AH -- Air Handler
   EXH_AIR_FAN_CMD -- Exhaust Air Fan cmd
 
 CWL -- Chilled Water Loop
-#  The way this loop functions, we have 'chilled water entering' the chiller, which has
-#  an exit point of 'condensed water exiting' which turns into 'condensed water entering' the 
-#  cooling tower, which has an exit point of 'condensed water exiting' which turns into 
-#  'condensed water entering' the chiller which has an exit point of 'chilled water exiting'
-
-#maybe extend these tags with what they're entering/leaving: cooling tower CTW or chiller CHR
-#The abbreviations don't need to be *incredibly* intuitive because we have the lookup dictionary
-
-  CHL_WTR_LEA_TMP_SEN -- Chilled Water Leaving Temp Sensor
-  CHL_WTR_LEA_TMP_STP -- Chilled Water Leaving Temp Setpoint
-  CHL_WTR_LEA_FLW_SEN -- Chilled Water Leaving Flow Sensor
-  CHL_WTR_LEA_PRS_SEN -- Chilled Water Leaving Pressure Sensor
-  CHL_WTR_ENT_TMP_SEN -- Chilled Water Entering Temp Sensor
-  CHL_WTR_ENT_PRS_SEN -- Chilled Water Entering Pressure Sensor
-  CHL_WTR_DLT_TMP_SEN -- Chilled Water Delta Temp Sensor
-  CHL_WTR_DLT_FLW_SEN -- Chilled Water Delta Flow Sensor
-  CHL_WTR_DLT_PRS_SEN -- Chilled Water Delta Pressure Sensor
-  CHL_WTR_DLT_PRS_STP -- Chilled Water Delta Pressure Setpoint
-
-  CND_WTR_LEA_TMP_SEN -- Condensed Water Leaving Temp Sensor
-  CND_WTR_LEA_TMP_STP -- Condensed Water Leaving Temp Setpoint
-  CND_WTR_LEA_FLW_SEN -- Condensed Water Leaving Flow Sensor
-  CND_WTR_LEA_PRS_SEN -- Condensed Water Leaving Pressure Sensor
-  CND_WTR_ENT_TMP_SEN -- Condensed Water Entering Temp Sensor
-  CND_WTR_ENT_PRS_SEN -- Condensed Water Entering Pressure Sensor
-  CND_WTR_DLT_TMP_SEN -- Condensed Water Delta Temp Sensor
-  CND_WTR_DLT_FLW_SEN -- Condensed Water Delta Flow Sensor
-  CND_WTR_DLT_PRS_SEN -- Condensed Water Delta Pressure Sensor
-  CND_WTR_DLT_PRS_STP -- Condensed Water Delta Pressure Setpoint
-
-#TODO: filter the above into the two lower categories. Add more points? Take some away?
+  #PROPOSED
+  #how do we want to connect this to the cooling coil valve?
   **required** 
-  **optional**
+  CON_WAT_COO_TOW     -- Condensed Water Cooling Tower
+  CON_WAT_SUP_TMP_SEN -- Condensed Water Supply Temp Sensor
+  CON_WAT_PMP         -- Condensed Water Pump
+  CON_CHL_WAT_CHR     -- Condensed Chilled Water Chiller
+  CON_WAT_RET_TMP_SEN -- Condensed Water Return Temp Sensor
+  CHL_WAT_SUP_TMP_SEN -- Chilled Water Supply Temp Sensor
+  CHL_WAT_RET_TMP_SEN -- Chilled Water Return Temp Sensor
+  CHL_WAT_PMP         -- Chilled Water Pump
+  CHL_WAT_PRS_DIF_SEN -- Chilled Water Pressure Difference Sensor
+  CHL_WAT_PRS_DIF_STP_CMD -- Chilled Water Pressure Difference Setpoint
 
 HWL -- Hot Water Loop
+  #PROPOSED
+  **required**
+  HX                  -- Heat Exchanger
+  HOT_WAT_RET_TMP_SEN -- Hot Water Returning Temp Sen
+  HOT_WAT_RET_TMP_STP_CMD -- Hot Water Returning Temp Setpoint cmd
+  HOT_WAT_PRS_DIF_SEN -- Hot Water Pressure Difference Sensor
+  HOT_WAT_PRS_DIF_STP_CMD -- Hot Water Pressure Difference Setpoint cmd
+  HOT_WAT_PMP         -- Hot Water Pump
+  HOT_WAT_SUP_TMP_SEN -- Hot Water Supply Temp Sensor
+  HOT_WAT_SUP_TMP_STP_CMD -- Hot Water Supply Temp Setpoint cmd
+
+  **optional**
+  Steam valve
+  cp-1/cp-2 (condenser pumps?)
+  

@@ -6,27 +6,26 @@ from node_types import *
 
 #TODO: do what I did for IAH for all other interfaces, both here, in tags.txt and in node_types.py
 
-class IAH(Interface):
+class IAHU(Interface):
   """
-  Interface for all Air Handler objects (type AH)
+  Interface for all Air Handler objects (type AHU)
 
   All Air Handlers must have 2 dictionaries, _required_tags and _optional_tags with keys
   that are the abbreviated tag names listed in node_types.type_dict and values that correspond
   to the smap lookup/actuation points for those tags
   """
-  _required_tags = Dict(
-                    title = u'Required Tags for Air Handler',
+  _required_points = Dict(
+                    title = u'Required points for Air Handler',
                     required=True,
-                    min_length = len(get_required_tags('AH')),
-                    max_length = len(get_required_tags('AH')),
-                    key_type = Choice(values = tuple(get_required_tags('AH')))
+                    min_length = len(get_required_points('AHU')),
+                    max_length = len(get_required_points('AHU')),
+                    key_type = Choice(values = tuple(get_required_points('AHU')))
                    )
 
-  _optional_tags = Dict(
-                    title = u'Optional Tags for Air Handler',
-                    required=True,
-                    key_type = Choice(values = tuple(get_optional_tags('AH')))
-                   )
+  #higher level functions
+
+  def set_airflow(airflow):
+    """sets the airflow to all derivative VAVs for this Air Handler to be [airflow]"""
 
   #high level methods will take form of:
   #def high_level_method(arg, arg, arg):

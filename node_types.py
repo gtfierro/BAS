@@ -6,86 +6,77 @@ type_dict defines the allowed types of objects, and the allowed types of nodes
 for each of those objects. There's some redundancy
 """
 type_dict = {
-            "AH": {                                         #type declaration for BObj
-                  "name": "Air Handler",                    #what the type means
-                  "interface": 'IAH',                         #reference to the interface we need to implement
-                  "required_tags": ['DIS_AIR_TMP_SEN','DIS_AIR_FAN_SPD_CMD','RET_AIR_FAN_SPD_CMD', # list of required tags for lookup dict
-                                    'MIX_AIR_TMP_SEN','ZON_AIR_TMP_SEN','ZON_AIR_SPT_CMD','OUT_AIR_DMP_CMD',
-                                    'EXH_AIR_DMP_CMD'],
-                  "optional_tags": ['DIS_AIR_HUM_SEN','DIS_AIR_PRS_SEN','DIS_AIR_FLW_SEN','DIS_AIR_FAN_POW_SEN', # list of optional tags for lookup dict
-                                    'RET_AIR_TMP_SEN','RET_AIR_HUM_SEN','RET_AIR_PRS_SEN','RET_AIR_FLW_SEN',
-                                    'RET_AIR_CO2_SEN','RET_AIR_FAN_POW_SEN','ZON_AIR_HUM_SEN','ZON_AIR_CO2_SEN',
-                                    'OUT_AIR_TMP_SEN','OUT_AIR_HUM_SEN','OUT_AIR_PRS_SEN','OUT_AIR_FLW_SEN',
-                                    'OUT_AIR_FLW_STP_CMD','EXH_AIR_FAN_CMD'],
-                  "allowed_types": {                        #allowed types for this object's nodes
-                                    "FAN" : {                           #type declaration for BNode
-                                              "name"      : "Fan",      #what the type means
-                                              "interface" : 'IFAN'        #reference to the interface we need to implement
-                                            },
-                                    "CCV" : {
-                                              "name"      : "Cooling Coil",
-                                              "interface" : 'ICCV'
-                                            },
-                                    "DMP" : {
-                                              "name"      : "Damper",
-                                              "interface" : 'IDMP'
-                                            },
-                                    "SEN" : { 
-                                              "name"      : "Sensor",
-                                              "interface" : 'ISEN'
-                                            }
-                                   }
-                  },
-            "CWL": {
-                    "name": "Chilled Water Loop",
-                    "interface":'ICWL',
-                    "allowed_types": {
-                                      "CH"  : {
-                                                "name"     :  "Chiller",
-                                                "interface":  'ICH'
-                                              },
-                                      "PU"  : {
-                                                "name"      : "Pump",
-                                                "interface" : 'IPU'
-                                              },
-                                      "CT"  : {
-                                                "name"      : "Cooling Tower",
-                                                "interface" : 'ICT'
-                                              },
-                                      "VV"  : {
-                                                "name"      : "Valve",
-                                                "interface" : 'IVV'
-                                              },
-                                      "SEN" : {
-                                                "name"      : "Sensor",
-                                                "interface" : 'ISEN'
-                                              },
-                                     }
-                   },
-            "HWL": {
-                    "name": "Hot Water Loop",
-                    "interface":'IHWL',
-                    "allowed_types": {
-                                      "HX"  : {
-                                                "name"      : "Heat Exchanger",
-                                                "interface" : 'IHX'
-                                              },
-                                      "PU"  : {
-                                                "name"      : "Pump",
-                                                "interface" : 'IPU'
-                                              },
-                                      "VV"  : {
-                                                "name"      : "Valve",
-                                                "interface" : 'IVV'
-                                              },
-                                      "SEN" : {
-                                                "name"      : "Sensor",
-                                                "interface" : 'ISEN'
-                                              },
-                                     }
-                   }
-            }
+    'objects': {
+      'AHU': {
+        'interface' : 'IAHU',
+        'required_setpoints'  : ['ZON_AIR_STP_CMD'], 
+        'required_points'     : ['OUT_AIR_DMP', 'OUT_AIR_TMP_SEN', 'MIX_AIR_TMP_SEN', 'RET_FAN', 'RET_AIR_FLW_SEN',
+                                 'EXH_AIR_DMP', 'RET_AIR_HUM_SEN', 'RET_AIR_TMP_SEN', 'RET_AIR_DMP', 'RET_AIR_PRS_SEN',
+                                 'COO_VLV', 'SUP_AIR_FAN', 'SUP_AIR_FLW_SEN','SUP_AIR_TMP_SEN','SUP_AIR_PRS_SEN'],
+        },
+      'CWL': {
+        'interface':  'ICWL',
+        'required_setpoints'  : ['CHL_WAT_PRS_DIF_STP'],
+        'required_points'     : ['CON_WAT_COO_TOW','CON_WAT_SUP_TMP_SEN','CON_WAT_PMP','CON_CHL_WAT_CHR',
+                                 'CON_WAT_RET_TMP_SEN','CHL_WAT_SUP_TMP_SEN','CHL_WAT_RET_TMP_SEN',
+                                 'CHL_WAT_PMP','CHL_WAT_PRS_DIF_SEN'],
+        },
+      'HWL': {
+        'interface' : 'IHWL',
+        'required_setpoints'  : ['HOT_WAT_RET_TMP_STP','HOT_WAT_PRS_DIF_STP','HOT_WAT_SUP_TMP_STP'], 
+        'required_points' : ['HX','HOT_WAT_RET_TMP_SEN','HOT_WAT_PRS_DIF_SEN','HOT_WAT_PMP','HOT_WAT_SUP_TMP_SEN'],
+        },
+      },
 
+    'points': {
+      'FAN': {
+        'interface' : 'IFAN',
+        'required_setpoints'  : ['SPD'],
+        'required_points' : ['POW'],
+        },
+      'CCV':  {
+        'interface' : 'ICCV',
+        'required_setpoints'  : [], # % open?
+        'required_points' : [],
+        },
+      'DMP':  {
+        'interface' : 'IDMP',
+        'required_setpoints'  : [], # % open?
+        'required_points' : [],
+        },
+      'SEN' : {
+        'interface' : 'ISEN',
+        'required_setpoints'  : [],
+        'required_points' : [],
+        },
+      'CHR' : {
+        'interface' : 'ICHR',
+        'required_setpoints'  : [],
+        'required_points' : [],
+        },
+      'PMP' : {
+        'interface' : 'IPMP',
+        'required_setpoints'  : [],
+        'required_points' : [],
+       },
+      'TOW' : {
+        'interface' : 'ITOW',
+        'required_setpoints'  : [],
+        'required_points' : [],
+        },
+      'VLV' : {
+        'interface' : 'IVLV',
+        'required_setpoints'  : [],
+        'required_points' : [],
+        },
+      'HX'  : {
+        'interface' : 'IHX',
+        'required_setpoints'  : [],
+        'required_points' : [],
+        },
+
+    }
+   }
 abbreviations = {
     'DIS' : 'Discharge',
     'AIR' : 'Air',
@@ -106,6 +97,12 @@ abbreviations = {
     'CO2' : 'Carbon Dioxide',
     'EXH' : 'Exhaust',
     'FAN' : 'Fan',
+    'COO' : 'Cooling',
+    'VLV' : 'Valve',
+    'AHU' : 'Air Handler',
+    'CCV' : 'Cooling Coil',
+    'CWL' : 'Cold Water Loop',
+    'HWL' : 'Hot Water Loop',
     }
 
 
@@ -135,44 +132,31 @@ def import_json(j):
   return tmp_dict
 
 def get_interface(s):
-  """ Get the interface for a given string, e.g. 'AH' or 'AH.FAN' """
+  """ Get the interface for a given string, e.g. 'AHU' """
   import interfaces
-  keys = s.split('.')
-  if len(keys) == 1:
-      return getattr(interfaces,type_dict[keys[0]]['interface'])
-  elif len(keys) == 2:
-      return getattr(interfaces,type_dict[keys[0]]['allowed_types'][keys[1]]['interface'])
+  return getattr(interfaces, type_dict['objects'][s]['interface'])
 
 def list_interfaces():
   """ Returns a list of all supported interfaces identified in type_dict """
   ifaces = []
-  for obj in type_dict.iterkeys():
+  for obj in type_dict['objects'].iterkeys():
     ifaces.append(get_interface(obj))
-    for pt in type_dict[obj]['allowed_types'].iterkeys():
-      ifaces.append(get_interface(obj+'.'+pt))
   return ifaces
-
-def list_types():
-  """ Returns a list of all supported types indentified in type_dict """
-  types = type_dict.keys()
-  for obj in type_dict.iterkeys():
-    types.extend(type_dict[obj]['allowed_types'].keys())
-  return types
 
 def get_tag_name(tag):
   """ convert something like DIS_AIR_TMP_SEN to Discharge Air Temp Sensor """
   #convert tag to a list 
   tag = tag.split("_") if "_" in tag else [tag]
-  classification = [abbreviations[prefix] for prefix in tag]
+  classification = [abbreviations[prefix] for prefix in tag if prefix in abbreviations ]
   return " ".join(classification)
 
-def get_required_tags(s):
-  """ Return list of required tags for a given string e.g. 'AH' """
-  return type_dict[s]['required_tags']
+def get_required_setpoints(s):
+  """ Return list of required setpoints for a given string e.g. 'AH' """
+  return type_dict['objects'][s]['required_setpoints']
 
-def get_optional_tags(s):
-  """ Return list of optional tags for a given string e.g. 'AH' """
-  return type_dict[s]['optional_tags']
+def get_required_points(s):
+  """ Return list of required points for a given string e.g. 'AH' """
+  return type_dict['objects'][s]['required_points']
 
 
 
