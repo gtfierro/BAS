@@ -40,31 +40,6 @@ class BacNetHWL(node.Point):
 class BacNetHX(node.Point):
   implements(node_types.get_interface('HWL.HX'))
 
-class BacNetLIGHT(node.Obj):
-  implements(node_types.get_interface('LIGHT'))
-
-  def get_relays(self):
-      low = [ pt for pt in self.nodes if pt.type == 'RELAY' and pt['type'] == 'low' ]
-      high = [ pt for pt in self.nodes if pt.type == 'RELAY' and pt['type'] == 'high' ]
-      return low[0], high[0]
-
-  def get_level(self):
-    """
-    Retrieves the current level of the light.
-    """
-    low, high = self.get_relays()
-    low_value = int(read_point(low['point']))
-    high_value = int(read_point(high['point']))
-    return low_value + 2*high_value
-
-  def set_level(self, level):
-    """
-    Sets the level of the light.
-    """
-    low, high = self.get_relays()
-    write_multiple_points({high['point']: dict(value=level % 2, type='enumerated'),
-                            low['point']: dict(value=level // 2, type='enumerated')})
-
 
 class BacNetRELAY(node.Point):
   implements(node_types.get_interface('LIGHT.RELAY'))

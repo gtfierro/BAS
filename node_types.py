@@ -152,11 +152,17 @@ def get_tag_name(tag):
 
 def get_required_setpoints(s):
   """ Return list of required setpoints for a given string e.g. 'AH' """
-  return type_dict['objects'][s]['required_setpoints']
+  if s in type_dict['objects'].keys():
+    return type_dict['objects'][s]['required_setpoints']
+  else:
+    return type_dict['points'][s]['required_setpoints']
 
 def get_required_points(s):
   """ Return list of required points for a given string e.g. 'AH' """
-  return type_dict['objects'][s]['required_points']
+  if s in type_dict['objects'].keys():
+    return type_dict['objects'][s]['required_points']
+  else:
+    return type_dict['points'][s]['required_points']
 
 
 
