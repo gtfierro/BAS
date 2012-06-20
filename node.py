@@ -50,9 +50,9 @@ class Node(object):
   @property
   def type(self):
     for interface in zope.interface.providedBy(self):
-      if interface.__name__.startswith('I'):
+      if interface.__name__.startswith('D'):
         return interface.__name__[1:]
-    return ''
+    return self.__class__.__name__
 
 
 class Container(object):
