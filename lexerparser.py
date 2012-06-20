@@ -11,7 +11,7 @@ from collections import deque
 class Lexer(object):
 
   tokens = [
-      'NAME','TYPE','UUID','VAR',
+      'NAME','TYPE','UUID','VAR','TAG',
       'UPSTREAM','DOWNSTREAM','EQUALS',
       'LPAREN','RPAREN',
       ]
@@ -43,6 +43,11 @@ class Lexer(object):
 
   def t_VAR(self,t):
     r'\@[a-zA-Z_][a-zA-Z0-9_]*[ ]?'
+    t.value = t.value.strip()
+    return t
+
+  def t_TAG(self,t):
+    r'\&[A-Z_]+[ ]?'
     t.value = t.value.strip()
     return t
 
@@ -186,6 +191,10 @@ class Parser(object):
   def p_set_var(self,p):
     'set : VAR'
     p[0] = self.vars.get(p[1],[])
+
+  def p_set_tag(self,p):
+    'set : TAG'
+    p[0] = None
 
   def p_error(self,p):
     if p:
