@@ -41,7 +41,7 @@ def validate(obj, points):
     raise NotImplementedError
   for reqpt in required_points:
     if reqpt not in points.keys():
-      raise NotImplementedError
+      raise NotImplementedError(reqpt+" is not provided")
   return points
 
 
@@ -50,12 +50,13 @@ class AHU(node.Obj):
   Logic for Air Handlers
   """
 
-  def __init__(self, devices):
+  def __init__(self, container, name, devices):
     """
     [devices] should be a dictionary mapping the expected points in node_types.get_required_points()
     to the device instantiations from bacnet_devices (or whatever)
     """
-    pass
+    self.points = validate(self, devices)
+    node.Obj.__init__(self,container, name, self.points.values())
 
   def get_airflow():
     pass

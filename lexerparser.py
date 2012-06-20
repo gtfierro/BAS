@@ -1,5 +1,6 @@
 import sys
 import test
+import inspect
 import networkx as nx
 from ply.lex import lex
 from ply.yacc import yacc
@@ -66,7 +67,7 @@ class Parser(object):
   def __init__(self,debug_flag=False):
     self.debug = debug_flag
     self.lexer = lex(module=Lexer())
-    self.relationals = [test.l]
+    self.relationals = [getattr(test, i) for i in test.__dict__ if isinstance(getattr(test,i), Relational)]
     self.domain = []
     self.vars = {}
 
@@ -141,7 +142,6 @@ class Parser(object):
       #res.extend(filter(lambda node: set([item for sublist in nx.dfs_successors(node.container._nk.node).values()]).intersection(set(p[3])),p[1]))
       next_domain = [self.search_relatives(node, p[3],"successors") for node in p[1]]
     else:
-      print p[1], p[3]
       next_domain = [self.search_relatives(node, p[3],"predecessors") for node in p[1]]
     next_domain = filter(lambda x: x, next_domain)
     if self.debug: print ">>",[i.name for i in next_domain]
@@ -160,24 +160,27 @@ class Parser(object):
     'set : NAME'
     name_lookup = p[1][1:].strip()
     domain = p[0] if p[0] else self.relationals
+    res = []
     for r in self.relationals:
-      res = r.search(lambda x: x.name == name_lookup)
+      res.extend(r.search(lambda x: x.name == name_lookup))
     p[0] = self.filter_dup_uids(res)
 
   def p_set_type(self,p):
     'set : TYPE'
     type_lookup = p[1][1:].strip()
     domain = p[0] if p[0] else self.relationals
+    res = []
     for r in self.relationals:
-      res = r.search(lambda x: x.type == type_lookup)
+      res.extend(r.search(lambda x: x.type == type_lookup))
     p[0] = self.filter_dup_uids(res)
 
   def p_set_uuid(self,p):
     'set : UUID'
     uuid_lookup = p[1][1:].strip()
     domain = p[0] if p[0] else self.relationals
+    res = []
     for r in self.relationals:
-      res = r.search(lambda x: str(x.uid) == uuid_lookup)
+      res.extend(r.search(lambda x: str(x.uid) == uuid_lookup))
     p[0] = res
 
   def p_set_var(self,p):

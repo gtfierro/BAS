@@ -37,7 +37,7 @@ class DSEN(Interface):
   """
   pass
 
-class DCH(Interface):
+class DCHR(Interface):
   """
  Driver for the CH node
   """
@@ -49,21 +49,21 @@ class DHX(Interface):
   """
   pass
 
-class DPU(Interface):
+class DPMP(Interface):
   """
- Driver for the PU node
-  """
-  pass
-
-class DCT(Interface):
-  """
- Driver for the CT node
+ Driver for the PMP node
   """
   pass
 
-class DVV(Interface):
+class DTOW(Interface):
   """
- Driver for the VV node
+ Driver for the TOW node
+  """
+  pass
+
+class DVLV(Interface):
+  """
+ Driver for the VLV node
   """
   pass
 

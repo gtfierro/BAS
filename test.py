@@ -23,6 +23,26 @@ lightbank5 = LIG(l, 'Light Bank 5', {
                       'LO_REL' : BACnetREL( "Low Relay", "/WS86007/RELAY05"),
                       'HI_REL' : BACnetREL( "High Relay", "/WS86007/RELAY06")
                       })
+
+hvac = Relational('HVAC')
+ah1 = AHU(hvac, 'Air Handler 1', {
+            'OUT_AIR_DMP': BACnetDMP('Outside Air Damper','BACnet point name'),
+            'OUT_AIR_TMP_SEN': BACnetSEN('Outside Air Temp Sensor','BACnet point name'),
+            'MIX_AIR_TMP_SEN': BACnetSEN('Mixed Air Temp Sensor','BACnet point name'),
+            'RET_FAN': BACnetFAN('Return Fan','BACnet point name'),
+            'EXH_AIR_DMP': BACnetDMP('Exhaust Air Damper','BACnet point name'),
+            'RET_AIR_HUM_SEN': BACnetSEN('Return Air Humidity Sensor','BACnet point name'),
+            'RET_AIR_TMP_SEN': BACnetSEN('Return Air Temp Sensor','BACnet point name'),
+            'RET_AIR_DMP': BACnetDMP('Return Air Damper','BACnet point name'),
+            'RET_AIR_PRS_SEN': BACnetSEN('Return Air Pressure Sensor','BACnet point name'),
+            'RET_AIR_FLW_SEN': BACnetSEN('Return Air Flow Sensor','BACnet point name'),
+            'COO_VLV': BACnetVLV('Cooling Valve','BACnet point name'),
+            'SUP_AIR_FAN': BACnetFAN('Supply Air Fan','BACnet point name'),
+            'SUP_AIR_FLW_SEN': BACnetSEN('Supply Air Flow Sensor','BACnet point name'),
+            'SUP_AIR_TMP_SEN': BACnetSEN('Supply Air Temp Sensor','BACnet point name'),
+            'SUP_AIR_PRS_SEN': BACnetSEN('Supply Air Pressure Sensor','BACnet point name'),
+          })
+
 #x = Relational('Everything')
 #ah1 = BacNetAH(x, 'Air Handler 1')
 #
