@@ -1,6 +1,7 @@
 import node
 import node_types
 import requests
+import json
 from zope.interface import implements
 
 from smap_wrapper import read_point, write_multiple_points
@@ -49,16 +50,10 @@ class BACnetREL(node.Point):
 
   def get_json(self, value):
       return json.dumps({self.point: {'type': 'enumerated', 'value': value}})
+ 
+  def set_brightness(self, value):
+    requests.post(ROOT+'/write',self.get_json(value))
 
-  def turn_on(self):
-    self.json
-    requests.post(ROOT+'/write',get_json(1))
-
-  def turn_off(self):
-    requests.post(ROOT+'/write',get_json(0))
-
-  def get_level(self):
-    time, reading = json.loads(requests.get(root + self.point))['Readings'][-1]
-
-
-
+  def get_brightness(self):
+    time, reading = requests.get(ROOT + self.point).json['Readings'][-1]
+    return reading

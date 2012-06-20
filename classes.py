@@ -84,13 +84,16 @@ class LIG(node.Obj):
     self.points = validate(self, devices)
     node.Obj.__init__(self,container, name, self.points.values())
 
+  def get_relays(self):
+    return filter(lambda x: x.type == "REL", self._nk.nodes())
+
   def get_level(self):
     """
     Retrieves the current level of the light.
     """
     low, high = self.get_relays()
-    low_value = int(read_point(low['point']))
-    high_value = int(read_point(high['point']))
+    low_value = int(low.get_brightness())
+    high_value = int(high.get_brightness())
     return low_value + 2*high_value
 
   def set_level(self, level):
@@ -98,6 +101,5 @@ class LIG(node.Obj):
     Sets the level of the light.
     """
     low, high = self.get_relays()
-    write_multiple_points({high['point']: dict(value=level % 2, type='enumerated'),
-                            low['point']: dict(value=level // 2, type='enumerated')})
-
+    low.set_brightness(level % 2)
+    high.set_brightness(level // 2)

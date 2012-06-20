@@ -4,10 +4,25 @@ from bacnet_drivers import *
 
 l = Relational('Lights')
 lightbank1 = LIG(l, 'Light Bank 1', {
+                      'LO_REL' : BACnetREL( "Low Relay", "/WS86007/RELAY11"),
+                      'HI_REL' : BACnetREL( "High Relay", "/WS86007/RELAY12")
+                      })
+lightbank2 = LIG(l, 'Light Bank 2', {
+                      'LO_REL' : BACnetREL( "Low Relay", "/WS86007/RELAY09"),
+                      'HI_REL' : BACnetREL( "High Relay", "/WS86007/RELAY10")
+                      })
+lightbank3 = LIG(l, 'Light Bank 3', {
+                      'LO_REL' : BACnetREL( "Low Relay", "/WS86007/RELAY07"),
+                      'HI_REL' : BACnetREL( "High Relay", "/WS86007/RELAY08")
+                      })
+lightbank4 = LIG(l, 'Light Bank 4', {
+                      'LO_REL' : BACnetREL( "Low Relay", "/WS86007/RELAY03"),
+                      'HI_REL' : BACnetREL( "High Relay", "/WS86007/RELAY04")
+                      })
+lightbank5 = LIG(l, 'Light Bank 5', {
                       'LO_REL' : BACnetREL( "Low Relay", "/WS86007/RELAY05"),
                       'HI_REL' : BACnetREL( "High Relay", "/WS86007/RELAY06")
                       })
-
 #x = Relational('Everything')
 #ah1 = BacNetAH(x, 'Air Handler 1')
 #

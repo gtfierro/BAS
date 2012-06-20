@@ -16,7 +16,6 @@ class Node(object):
     name: string name of this object
     """
     self.name = name
-    self.container = ''
     self.uid = uuid.uuid4()
     self.metadata = {}
 
@@ -46,7 +45,6 @@ class Node(object):
     """
     self.container.add_node_parent(self, parent)
 
-  #TODO: still necessary?
   @property
   def type(self):
     for interface in zope.interface.providedBy(self):
@@ -157,7 +155,7 @@ class Obj(Node, Container):
     self.container = container
     Node.__init__(self, name)
     Container.__init__(self, objects)
-    container._nk.add_node(self)
+    self.container._nk.add_node(self)
     print ">>>Object",self.name, self.uid
 
 class Relational(Container):

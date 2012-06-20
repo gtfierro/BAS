@@ -8,14 +8,10 @@ class DREL(Interface):
   """
   Driver for the Relay nodes
   """
-  def turn_on():
-    """Turn this light relay on"""
-
-  def turn_off():
-    """Turn this light relay off"""
-
-  def get_level():
-    """Get current level of the relay"""
+  def get_brightness():
+    """Get brightness level"""
+  def set_brightness(value):
+    """set brightness to value"""
 
 class DFAN(Interface):
   """

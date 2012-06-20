@@ -141,9 +141,10 @@ class Parser(object):
       #res.extend(filter(lambda node: set([item for sublist in nx.dfs_successors(node.container._nk.node).values()]).intersection(set(p[3])),p[1]))
       next_domain = [self.search_relatives(node, p[3],"successors") for node in p[1]]
     else:
+      print p[1], p[3]
       next_domain = [self.search_relatives(node, p[3],"predecessors") for node in p[1]]
     next_domain = filter(lambda x: x, next_domain)
-    if debug: print ">>",[i.name for i in next_domain]
+    if self.debug: print ">>",[i.name for i in next_domain]
     #p[0] now contains p[3] found from the domain of p[1]
     p[0] = self.filter_dup_uids(next_domain)
 
