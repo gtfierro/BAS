@@ -4,41 +4,58 @@ Each of these classes should be initialized with the specific instantiations of 
 they expect in order to provide the full functionality of the class. The drivers they expect can 
 be found in node_types.get_required_setpoints('AHU'), node_types.get_required_points('AHU'), etc
 """
+import sys
 import node
 import node_types
 from zope.interface import implements
 
-class DriverValidator(object):
+#try:
+#  import bacnet_drivers
+#except:
+#  #bacnet_drivers do not correctly implement interfaces
+#  sys.exit(0)
+
+def validate(obj, points):
   """
-  Upon initalizing this class with a string that references the object in 
-  node_types.type_dict['objects'], it validates the *drivers list of input points
-  to make sure they are all of the supported type.
-
-  For example, if we had an object Foo that had required_points of 'bar' and 'baz',
-  we'd initialize our class below with DriverValidator('Foo','bar','baz'), which would
-  only pass initialization if 'bar' and 'baz' were valid, which they are.
+  If the object that calls this this an object, then we look at the list of self._nk.nodes
+  to make sure that we have all required points and set points there
+  If the object that calls this is a point, then we look at the attributes and make sure
+  that all required points/setpoitns are there
   """
-
-  def __init__(self, type, *drivers):
-    """
-    [type] is a string describing one of the classes listed below that is *also* in
-    node_types.type_dict['objects']
-    [drivers] is a list of instantiated drivers that should cover the minimum set of points 
-    provided by the object/point's required_setpoints, required_points
-    """
-    # get the required points
-    self.required_setpoints = node_types.get_required_setpoints(type)
-    self.required_points = node_types.get_required_points(type)
-
-    # check the provided points against the provided minimum set 
-    for driver in drivers:
-
+  if isinstance(obj, node.Obj):
+    #check obj._nk.nodes to make sure everything from node_types is there
+    try:
+      required_points = node_types.get_required_points(obj.__class__.__name__)
+    except:
+      print "No list of required points for %s in node_types.type_dict['objects'][%s]" % (obj.__class__.__name__, obj.__class__.__name__)
+      required_points = None
+  elif isinstance(obj, node.Point):
+    #check obj.attributes
+    try:
+      required_points = nodes_types.get_required_points(obj.__class__.__name__)
+    except:
+      print "No list of required points for %s in node_types.type_dict['points'][%s]" % (obj.__class__.__name__, obj.__class__.__name__)
+      required_points = None
+  #now make sure that all points in required_points are in the points dict
+  if not required_points:
+    raise NotImplementedError
+  for reqpt in required_points:
+    if reqpt not in points.keys():
+      raise NotImplementedError
+  return points
 
 
 class AHU(node.Obj):
   """
   Logic for Air Handlers
   """
+
+  def __init__(self, devices):
+    """
+    [devices] should be a dictionary mapping the expected points in node_types.get_required_points()
+    to the device instantiations from bacnet_devices (or whatever)
+    """
+    pass
 
   def get_airflow():
     pass
@@ -49,14 +66,23 @@ class AHU(node.Obj):
   def set_zone_temp():
     pass
 
+class CWL(node.Obj):
+  pass
 
-#TODO: plug in the expected points for this type
-class Light(node.Obj):
+class HWL(node.Obj):
+  pass
 
-  def get_relays(self):
-      low = [ pt for pt in self.nodes if pt.type == 'RELAY' and pt['type'] == 'low' ]
-      high = [ pt for pt in self.nodes if pt.type == 'RELAY' and pt['type'] == 'high' ]
-      return low[0], high[0]
+
+class LIG(node.Obj):
+
+  def __init__(self,container, name, devices):
+    """
+    Devices is a dictionary of mappings from required points to instantiations of them
+    e.g. {'relay_low':BACnetREL('low relay','/WS86007/RELAY05'),
+          'relay_hi' :BACnetREL('hi relay','/WS86007/RELAY06')}
+    """
+    self.points = validate(self, devices)
+    node.Obj.__init__(self,container, name, self.points.values())
 
   def get_level(self):
     """

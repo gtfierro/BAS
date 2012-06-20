@@ -9,18 +9,18 @@ class Node(object):
   Supports methods add_child, add_parent
   """
 
-  def __init__(self, container, name):
+  def __init__(self, name):
     """
     obj_type: string that conforms to the list of recognized object types
     container: Obj or Relational of which this object is a part
     name: string name of this object
     """
     self.name = name
-    self.container = container
+    self.container = ''
     self.uid = uuid.uuid4()
     self.metadata = {}
 
-    self.container.add_nodes(self)
+    #self.container.add_nodes(self)
 
   def __str__(self):
     return self.name
@@ -46,6 +46,7 @@ class Node(object):
     """
     self.container.add_node_parent(self, parent)
 
+  #TODO: still necessary?
   @property
   def type(self):
     for interface in zope.interface.providedBy(self):
@@ -135,9 +136,9 @@ class Point(Node):
   Internal components of a larger object
   """
 
-  def __init__(self, container, name):
+  def __init__(self, name):
     self.attributes = {}
-    Node.__init__(self,container,name)
+    Node.__init__(self,name)
     print "Point",self.name, self.uid
 
   def set_attribute(self, att, value):
@@ -153,8 +154,10 @@ class Obj(Node, Container):
 
   def __init__(self, container, name, objects=[]):
     self.nodes = []
-    Node.__init__(self, container, name)
+    self.container = container
+    Node.__init__(self, name)
     Container.__init__(self, objects)
+    container._nk.add_node(self)
     print ">>>Object",self.name, self.uid
 
 class Relational(Container):

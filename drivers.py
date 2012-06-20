@@ -4,98 +4,70 @@ from zope.schema import Dict, Choice
 from zope.schema import getValidationErrors
 from node_types import *
 
-#TODO: do what I did for IAH for all other interfaces, both here, in tags.txt and in node_types.py
-
-class IAHU(Interface):
+class DREL(Interface):
   """
-  Interface for all Air Handler objects (type AHU)
-
-  All Air Handlers must have 2 dictionaries, _required_tags and _optional_tags with keys
-  that are the abbreviated tag names listed in node_types.type_dict and values that correspond
-  to the smap lookup/actuation points for those tags
+  Driver for the Relay nodes
   """
-  _required_points = Dict(
-                    title = u'Required points for Air Handler',
-                    required=True,
-                    min_length = len(get_required_points('AHU')),
-                    max_length = len(get_required_points('AHU')),
-                    key_type = Choice(values = tuple(get_required_points('AHU')))
-                   )
+  def turn_on():
+    """Turn this light relay on"""
 
-  #higher level functions
+  def turn_off():
+    """Turn this light relay off"""
 
-  def set_airflow(airflow):
-    """sets the airflow to all derivative VAVs for this Air Handler to be [airflow]"""
+  def get_level():
+    """Get current level of the relay"""
 
-  #high level methods will take form of:
-  #def high_level_method(arg, arg, arg):
-  # stuff
-  # here
-  # -> don't need to use "self" bc of how zope works
-
-class ICWL(Interface):
+class DFAN(Interface):
   """
-  Interface for all Chilled Water Loop objects (type CWL)
+ Driver for the FAN node
   """
   pass
 
-class IHWL(Interface):
+class DCCV(Interface):
   """
-  Interface for all Hot Water Loop objects (type HWL)
+ Driver for the CCV node
   """
   pass
 
-#class IFAN(Interface):
-#  """
-#  Interface for the FAN node
-#  """
-#  pass
-#
-#class ICCV(Interface):
-#  """
-#  Interface for the CCV node
-#  """
-#  pass
-#
-#class IDMP(Interface):
-#  """
-#  Interface for the DMP node
-#  """
-#  pass
-#
-#class ISEN(Interface):
-#  """
-#  Interface for the SEN node
-#  """
-#  pass
-#
-#class ICH(Interface):
-#  """
-#  Interface for the CH node
-#  """
-#  pass
-#
-#class IHX(Interface):
-#  """
-#  Interface for the HX node
-#  """
-#  pass
-#
-#class IPU(Interface):
-#  """
-#  Interface for the PU node
-#  """
-#  pass
-#
-#class ICT(Interface):
-#  """
-#  Interface for the CT node
-#  """
-#  pass
-#
-#class IVV(Interface):
-#  """
-#  Interface for the VV node
-#  """
-#  pass
-#
+class DDMP(Interface):
+  """
+ Driver for the DMP node
+  """
+  pass
+
+class DSEN(Interface):
+  """
+ Driver for the SEN node
+  """
+  pass
+
+class DCH(Interface):
+  """
+ Driver for the CH node
+  """
+  pass
+
+class DHX(Interface):
+  """
+ Driver for the HX node
+  """
+  pass
+
+class DPU(Interface):
+  """
+ Driver for the PU node
+  """
+  pass
+
+class DCT(Interface):
+  """
+ Driver for the CT node
+  """
+  pass
+
+class DVV(Interface):
+  """
+ Driver for the VV node
+  """
+  pass
+

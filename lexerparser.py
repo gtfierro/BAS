@@ -66,7 +66,7 @@ class Parser(object):
   def __init__(self,debug_flag=False):
     self.debug = debug_flag
     self.lexer = lex(module=Lexer())
-    self.relationals = [test.x]
+    self.relationals = [test.l]
     self.domain = []
     self.vars = {}
 
