@@ -9,18 +9,17 @@ class Node(object):
   Supports methods add_child, add_parent
   """
 
-  def __init__(self, container, name):
+  def __init__(self, name):
     """
     obj_type: string that conforms to the list of recognized object types
     container: Obj or Relational of which this object is a part
     name: string name of this object
     """
     self.name = name
-    self.container = container
     self.uid = uuid.uuid4()
     self.metadata = {}
 
-    self.container.add_nodes(self)
+    #self.container.add_nodes(self)
 
   def __str__(self):
     return self.name
@@ -49,9 +48,9 @@ class Node(object):
   @property
   def type(self):
     for interface in zope.interface.providedBy(self):
-      if interface.__name__.startswith('I'):
+      if interface.__name__.startswith('D'):
         return interface.__name__[1:]
-    return ''
+    return self.__class__.__name__
 
 
 class Container(object):
@@ -65,13 +64,20 @@ class Container(object):
         obj.container = self
         self._nk.add_node(obj)
 
+  def __getitem__(self, key):
+    if key in self.points:
+      return self.points[key]
+    else:
+      return self.search(lambda x: x.name == key or x.type == key)
+
   def draw_graph(self, filename="out.png"):
     """
     Uses matplotlib.pyplot and nx.draw_circular to make a graph and saves it as "out.png"
     """
     import matplotlib.pyplot as plt
-    nx.draw_circular(self._nk)
-    plt.show()
+    plt.clf()
+    nx.draw_graphviz(self._nk)
+    plt.savefig(filename)
 
   def add_node_child(self, node, child):
     """
@@ -143,9 +149,9 @@ class Point(Node):
   Internal components of a larger object
   """
 
-  def __init__(self, container, name):
+  def __init__(self, name):
     self.attributes = {}
-    Node.__init__(self,container,name)
+    Node.__init__(self,name)
     print "Point",self.name, self.uid
 
   def set_attribute(self, att, value):
@@ -169,9 +175,11 @@ class Point(Node):
 class Obj(Node, Container):
 
   def __init__(self, container, name, objects=[]):
-    self._nodes = []
-    Node.__init__(self, container, name)
+    self.nodes = []
+    self.container = container
+    Node.__init__(self, name)
     Container.__init__(self, objects)
+    self.container._nk.add_node(self)
     print ">>>Object",self.name, self.uid
 
 class Relational(Container):
@@ -180,9 +188,4 @@ class Relational(Container):
     self.name = name
     Container.__init__(self, objects)
 
-  #TODO: need this for queries?
-  def extend_by_unique_uid(self, target, extend):
-    extend = [extend] if type(extend) != list else extend
-    to_add = [t for t in extend if t.uid not in map(lambda x: x.uid, target)]
-    target.extend(to_add)
 
