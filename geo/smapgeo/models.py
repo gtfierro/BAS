@@ -7,15 +7,6 @@ from inkscape import geoutil
 from math import sqrt, asin, degrees
 import os
 
-try:
-    from smap.models import Stream
-except ImportError:
-    class Stream(models.Model):
-        id = models.AutoField(primary_key=True)
-        uuid = models.CharField(unique=True, max_length=36)
-        class Meta:
-            db_table = u'stream'
-
 def find_or_create(cls, save, **kwargs):
     try:
         return cls.objects.get(**kwargs)
@@ -24,6 +15,10 @@ def find_or_create(cls, save, **kwargs):
         if save:
             ret.save()
         return ret
+
+class NodeLink(models.Model):
+    id = models.AutoField(primary_key=True)
+    uuid = models.CharField(unique=True, max_length=36)
 
 class Building(models.Model, Serializable):
     name = models.CharField(max_length=50, unique=True)
@@ -216,7 +211,12 @@ class Area(models.Model, Serializable):
     name = models.CharField(max_length=50)
     regions = models.MultiPolygonField()
     floor = models.ForeignKey(Floor, related_name='areas')
-    streams = models.ManyToManyField(Stream, related_name='areas', blank=True)
+    nodes = models.ManyToManyField(NodeLink, related_name='areas', blank=True)
+
+    @property
+    def streams(self):
+        '''Backwards compatibility for when we were linking against sMAP streams'''
+        return self.nodes
 
     def get_regions(self, view=None):
         regions = [[[y[0], y[1]] for y in x[0]] for x in self.regions.coords]
@@ -265,7 +265,7 @@ class Area(models.Model, Serializable):
         a.streams.clear()
         try:
             for streamuuid in j['streams']:
-                a.streams.add(Stream.objects.get(uuid=streamuuid))
+                a.streams.add(NodeLink.objects.get(uuid=streamuuid))
         except:
             pass
         a.save()

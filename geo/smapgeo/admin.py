@@ -1,4 +1,4 @@
-from smapgeo.models import Building, Floor, View, Area, AreaMetadata
+from smapgeo.models import Building, Floor, View, Area, AreaMetadata, NodeLink
 from django.contrib.gis import admin
 from olwidget.admin import GeoModelAdmin
 
@@ -15,5 +15,5 @@ class GoogleMapsAdmin(GeoModelAdmin):
     }
 
 #admin.site.register([Building, Floor, View, Area], OSMAdmin)
-admin.site.register([Building, Floor, View, Area, AreaMetadata], GoogleMapsAdmin)
+admin.site.register([Building, Floor, View, Area, AreaMetadata, NodeLink], GoogleMapsAdmin)
 

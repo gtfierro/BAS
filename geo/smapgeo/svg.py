@@ -3,7 +3,7 @@ from django.conf import settings
 from inkscape.inkex import NSS, addNS, etree
 from inkscape import simplepath, simpletransform, cubicsuperpath, cspsubdiv
 from inkscape import geoutil
-from models import Building, Floor, Area, View, AreaMetadata, Stream, find_or_create
+from models import Building, Floor, Area, View, AreaMetadata, NodeLink, find_or_create
 import StringIO
 from PIL import Image
 import os
@@ -228,7 +228,7 @@ def parse_path(f, node):
     a.streams.clear()
     for uuid in streams:
         try:
-            stream = Stream.objects.get(uuid=uuid)
+            stream = NodeLink.objects.get(uuid=uuid)
             a.streams.add(stream)
         except:
             print "sMAP stream {} not found".format(uuid)

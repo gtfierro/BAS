@@ -1,4 +1,4 @@
-from models import Building, Floor, Area, View, AreaMetadata, Stream, find_or_create
+from models import Building, Floor, Area, View, AreaMetadata, NodeLink, find_or_create
 from inkscape.inkex import NSS, addNS, etree
 SubElement = etree.SubElement
 
@@ -113,7 +113,7 @@ def kml_to_buildings(s):
                     a.streams.clear()
                     for stream in data.findall(addNS('stream', 'geo')):
                         try:
-                            stream = Stream.objects.get(uuid=stream.text)
+                            stream = NodeLink.objects.get(uuid=stream.text)
                             a.streams.add(stream)
                         except:
                             print "sMAP stream {} not found".format(stream.text)
