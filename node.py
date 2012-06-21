@@ -175,7 +175,6 @@ class Point(Node):
 class Obj(Node, Container):
 
   def __init__(self, container, name, objects=[]):
-    self.nodes = []
     self.container = container
     Node.__init__(self, name)
     Container.__init__(self, objects)
