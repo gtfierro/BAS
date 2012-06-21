@@ -100,16 +100,12 @@ class Parser(object):
     """
     #initialize whether we're looking for successors or predecessors
     relative_fxn = lambda x: getattr(x.container._nk, direction)(x)
-
     #initialize already-visited lists
     already_visited = [node]
-
     #initialize queue
     queue = deque()
-
     #add first node to queue
     queue.appendleft(node)
-
     #add its Container if it isn't already a container
     if not isinstance(node, Container):
       queue.appendleft(node.container)

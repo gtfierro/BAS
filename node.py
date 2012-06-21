@@ -31,7 +31,10 @@ class Node(object):
     return self.uid.__cmp__(other.uid)
 
   def __hash__(self):
-    return hash(self.uid)
+    #hack to get graph copy working
+    if hasattr(self,'uid'):
+      return hash(self.uid)
+    return object.__hash__(self)
 
   def add_child(self, child):
     """
@@ -88,6 +91,24 @@ class Container(object):
     plt.clf()
     nx.draw_graphviz(self._nk)
     plt.savefig(filename)
+
+  def draw_all(self, filename="out.png"):
+    """
+    Connect all the containers so we have one big graph
+    """
+    import matplotlib.pyplot as plt
+    plt.clf()
+    biggraph = self._nk.copy()
+    for n in biggraph.nodes():
+      if n.external_parent:
+        biggraph.add_nodes_from(n.external_parent._nk)
+        biggraph.add_edges_from(n.external_parent._nk.edges())
+      if n.external_child:
+        biggraph.add_nodes_from(n.external_child._nk)
+        biggraph.add_edges_from(n.external_child._nk.edges())
+    nx.draw_graphviz(biggraph,prog='neato',width=1,node_size=400,font_size=6)
+    plt.savefig(filename)
+  
 
   def add_node_child(self, node, child):
     """
@@ -195,6 +216,7 @@ class Relational(Container):
 
   def __init__(self, name, objects=[]):
     self.name = name
+    self.uid = uuid.uuid4()
     Container.__init__(self, objects)
 
 
