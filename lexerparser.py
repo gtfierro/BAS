@@ -1,6 +1,7 @@
 import sys
 import test
 import inspect
+import itertools
 import networkx as nx
 from ply.lex import lex
 from ply.yacc import yacc
@@ -52,13 +53,15 @@ class Lexer(object):
     return t
 
   def t_keyword(self, t):
-    r'\b(help|types|prefixes|examples)\b'
+    r'\b(help|types|prefixes|examples|tags)\b'
     if t.value == 'help':
-      print " help: returns this help list \n types: returns list of types you can query \n prefixes: returns list of prefixes for queries \n examples: lists some example queries"
+      print " help: returns this help list \n types: returns list of types you can query \n tags: returns a list of tags you can query \n prefixes: returns list of prefixes for queries \n examples: lists some example queries"
     elif t.value == 'types':
       print list_types()
+    elif t.value == 'tags':
+      print list_tags()
     elif t.value == 'prefixes':
-      print " #TYPE: designates set of all objects with type [TYPE] \n $Name Of Object: designates set of all objects named [Name of Object] (case sensitive \n %ab61b939-a133-4d76-b9c4-a5d6fab7abf5: designates object tagged with uuid \n @var_name: you can assign queries to variables and use them in later queries"
+      print " #TYPE: designates set of all objects with type [TYPE] \n $Name Of Object: designates set of all objects named [Name of Object] (case sensitive \n %ab61b939-a133-4d76-b9c4-a5d6fab7abf5: designates object tagged with uuid \n @var_name: you can assign queries to variables and use them in later queries \n &TAG designates set of all objects tagged as TAG"
     elif t.value == 'examples':
       print " #DMP < $Return Air Handler: give me all dampers downstream of the Return Air Handler"
     t.lexer.skip(1)
@@ -208,7 +211,12 @@ class Parser(object):
     'set : TAG'
     tag_lookup = p[1][1:].strip()
     domain = p[0] if p[0] else self.relationals
+    domain = [r._nk.nodes() if isinstance(r,Relational) else r for r in domain]
+    domain = list(itertools.chain(*domain))
     res = []
+    for d in domain:
+      if d[tag_lookup]:
+        res.append(d[tag_lookup]) 
     p[0] = res
 
   def p_error(self,p):

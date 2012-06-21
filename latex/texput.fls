@@ -1,0 +1,5 @@
+PWD /Users/gabe/Documents/LoCal/LoCalProjects/appstack/latex
+INPUT /usr/local/texlive/2011/texmf.cnf
+INPUT /usr/local/texlive/2011/texmf/web2c/texmf.cnf
+INPUT /usr/local/texlive/2011/texmf-var/web2c/pdftex/pdfetex.fmt
+OUTPUT texput.log
