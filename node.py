@@ -16,6 +16,8 @@ class Node(object):
     name: string name of this object
     """
     self.name = name
+    self.external_parent = None
+    self.external_child = None
     self.uid = uuid.uuid4()
     self.metadata = {}
 
@@ -26,7 +28,6 @@ class Node(object):
 
   def __cmp__(self, other):
     # use self.uuid to compare to other objects
-    print other
     return self.uid.__cmp__(other.uid)
 
   def __hash__(self):
@@ -36,20 +37,28 @@ class Node(object):
     """
     Give this node a child w/n the context of it's container graph
     child: Point or Obj (which ever this object's type is)
+    if the target child is part of an external container, then this
+    node makes note of that
     """
+    if child.container != self.container:
+      self.external_child = child.container
     self.container.add_node_child(self, child)
 
   def add_parent(self, parent):
     """
     Give this node a parent w/n the context of it's container graph
     parent: Point or Obj (which ever this object's type is)
+    if the target parent is part of an external container, then this
+    node makes note of that
     """
+    if parent.container != self.container:
+      self.external_parent = parent.container
     self.container.add_node_parent(self, parent)
 
   @property
   def type(self):
     for interface in zope.interface.providedBy(self):
-      if interface.__name__.startswith('D'):
+      if interface.__name__.startswith('D') or interface.__name__.startswith('I'):
         return interface.__name__[1:]
     return self.__class__.__name__
 

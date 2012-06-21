@@ -8,6 +8,7 @@ import sys
 import node
 import node_types
 import interfaces
+import inspect
 from zope.interface import implements
 
 #try:
@@ -107,15 +108,15 @@ class LIG(node.Obj):
   def get_relays(self):
     return filter(lambda x: x.type == "REL", self._nk.nodes())
 
-#  def get_level(self):
-#    """
-#    Retrieves the current level of the light.
-#    """
-#    low, high = self.get_relays()
-#    low_value = int(low.get_brightness())
-#    high_value = int(high.get_brightness())
-#    return low_value + 2*high_value
-#
+  def get_level(self):
+    """
+    Retrieves the current level of the light.
+    """
+    low, high = self.get_relays()
+    low_value = int(low.get_brightness())
+    high_value = int(high.get_brightness())
+    return low_value + 2*high_value
+
   def set_level(self, level):
     """
     Sets the level of the light.
@@ -123,3 +124,20 @@ class LIG(node.Obj):
     low, high = self.get_relays()
     low.set_brightness(level % 2)
     high.set_brightness(level // 2)
+
+""" 
+Double checks to make sure all of the user-provided implementations correctly
+implement the classes
+"""
+classes = [i[1] for i in inspect.getmembers(sys.modules[__name__], inspect.isclass)]
+ifaces = node_types.list_interfaces()
+error = False
+for i in ifaces:
+  for cl in classes:
+    if i.implementedBy(cl):
+      if getValidationErrors(i,cl):
+        error = True
+        print cl.__name__,"does not correctly implement",i.__name__,getValidationErrors(i,cl)
+if error:
+  print "Something is wrong! Double-check your interface implementations"
+  sys.exit(0)

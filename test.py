@@ -116,6 +116,6 @@ cwl['CHL_WAT_PMP'].add_child(cwl['CON_CHL_WAT_CHR'])
 cwl['CHL_WAT_SUP_TMP_SEN'].add_child(ah1['COO_VLV'])
 cwl['CHL_WAT_SUP_TMP_SEN'].add_child(ah2['COO_VLV'])
 
-cwl.add_child(ah1)
-cwl.add_child(ah2)
+#cwl.add_child(ah1)
+#cwl.add_child(ah2)
 
