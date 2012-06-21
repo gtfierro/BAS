@@ -11,12 +11,6 @@ import interfaces
 import inspect
 from zope.interface import implements
 
-#try:
-#  import bacnet_drivers
-#except:
-#  #bacnet_drivers do not correctly implement interfaces
-#  sys.exit(0)
-
 def validate(obj, points):
   """
   If the object that calls this this an object, then we look at the list of self._nk.nodes
