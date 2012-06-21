@@ -4,34 +4,13 @@ from zope.schema import Dict, Choice
 from zope.schema import getValidationErrors
 from node_types import *
 
-#TODO: do what I did for IAH for all other interfaces, both here, in tags.txt and in node_types.py
-
 class IAHU(Interface):
   """
   Interface for all Air Handler objects (type AHU)
-
-  All Air Handlers must have 2 dictionaries, _required_tags and _optional_tags with keys
-  that are the abbreviated tag names listed in node_types.type_dict and values that correspond
-  to the smap lookup/actuation points for those tags
   """
-  _required_points = Dict(
-                    title = u'Required points for Air Handler',
-                    required=True,
-                    min_length = len(get_required_points('AHU')),
-                    max_length = len(get_required_points('AHU')),
-                    key_type = Choice(values = tuple(get_required_points('AHU')))
-                   )
-
-  #higher level functions
 
   def set_airflow(airflow):
     """sets the airflow to all derivative VAVs for this Air Handler to be [airflow]"""
-
-  #high level methods will take form of:
-  #def high_level_method(arg, arg, arg):
-  # stuff
-  # here
-  # -> don't need to use "self" bc of how zope works
 
 class ICWL(Interface):
   """
@@ -45,57 +24,14 @@ class IHWL(Interface):
   """
   pass
 
-#class IFAN(Interface):
-#  """
-#  Interface for the FAN node
-#  """
-#  pass
-#
-#class ICCV(Interface):
-#  """
-#  Interface for the CCV node
-#  """
-#  pass
-#
-#class IDMP(Interface):
-#  """
-#  Interface for the DMP node
-#  """
-#  pass
-#
-#class ISEN(Interface):
-#  """
-#  Interface for the SEN node
-#  """
-#  pass
-#
-#class ICH(Interface):
-#  """
-#  Interface for the CH node
-#  """
-#  pass
-#
-#class IHX(Interface):
-#  """
-#  Interface for the HX node
-#  """
-#  pass
-#
-#class IPU(Interface):
-#  """
-#  Interface for the PU node
-#  """
-#  pass
-#
-#class ICT(Interface):
-#  """
-#  Interface for the CT node
-#  """
-#  pass
-#
-#class IVV(Interface):
-#  """
-#  Interface for the VV node
-#  """
-#  pass
-#
+class ILIG(Interface):
+  """
+  Interface for all the lightbanks
+  """
+
+  def get_level():
+    """get the level of the lightbank"""
+
+  def set_level(level):
+    """set the level of the lightbank"""
+

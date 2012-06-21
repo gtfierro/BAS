@@ -166,7 +166,7 @@ class Parser(object):
     name_lookup = p[1][1:].strip()
     domain = p[0] if p[0] else self.relationals
     res = []
-    for r in self.relationals:
+    for r in domain:
       res.extend(r.search(lambda x: x.name == name_lookup))
     p[0] = self.filter_dup_uids(res)
 
@@ -175,7 +175,7 @@ class Parser(object):
     type_lookup = p[1][1:].strip()
     domain = p[0] if p[0] else self.relationals
     res = []
-    for r in self.relationals:
+    for r in domain:
       res.extend(r.search(lambda x: x.type == type_lookup))
     p[0] = self.filter_dup_uids(res)
 
@@ -184,7 +184,7 @@ class Parser(object):
     uuid_lookup = p[1][1:].strip()
     domain = p[0] if p[0] else self.relationals
     res = []
-    for r in self.relationals:
+    for r in domain:
       res.extend(r.search(lambda x: str(x.uid) == uuid_lookup))
     p[0] = res
 
@@ -194,7 +194,10 @@ class Parser(object):
 
   def p_set_tag(self,p):
     'set : TAG'
-    p[0] = None
+    tag_lookup = p[1][1:].strip()
+    domain = p[0] if p[0] else self.relationals
+    res = []
+    p[0] = res
 
   def p_error(self,p):
     if p:

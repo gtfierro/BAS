@@ -26,6 +26,7 @@ class Node(object):
 
   def __cmp__(self, other):
     # use self.uuid to compare to other objects
+    print other
     return self.uid.__cmp__(other.uid)
 
   def __hash__(self):
@@ -175,7 +176,6 @@ class Point(Node):
 class Obj(Node, Container):
 
   def __init__(self, container, name, objects=[]):
-    self.nodes = []
     self.container = container
     Node.__init__(self, name)
     Container.__init__(self, objects)

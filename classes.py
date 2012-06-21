@@ -7,6 +7,7 @@ be found in node_types.get_required_setpoints('AHU'), node_types.get_required_po
 import sys
 import node
 import node_types
+import interfaces
 from zope.interface import implements
 
 #try:
@@ -49,6 +50,7 @@ class AHU(node.Obj):
   """
   Logic for Air Handlers
   """
+  implements(interfaces.IAHU)
 
   def __init__(self, container, name, devices):
     """
@@ -68,13 +70,30 @@ class AHU(node.Obj):
     pass
 
 class CWL(node.Obj):
-  pass
+  implements(interfaces.ICWL)
+
+  def __init__(self, container, name, devices):
+    """
+    [devices] should be a dictionary mapping the expected points in node_types.get_required_points()
+    to the device instantiations from bacnet_devices (or whatever)
+    """
+    self.points = validate(self, devices)
+    node.Obj.__init__(self,container, name, self.points.values())
+
 
 class HWL(node.Obj):
-  pass
+  implements(interfaces.IHWL)
 
+  def __init__(self, container, name, devices):
+    """
+    [devices] should be a dictionary mapping the expected points in node_types.get_required_points()
+    to the device instantiations from bacnet_devices (or whatever)
+    """
+    self.points = validate(self, devices)
+    node.Obj.__init__(self,container, name, self.points.values())
 
 class LIG(node.Obj):
+  implements(interfaces.ILIG)
 
   def __init__(self,container, name, devices):
     """
@@ -88,15 +107,15 @@ class LIG(node.Obj):
   def get_relays(self):
     return filter(lambda x: x.type == "REL", self._nk.nodes())
 
-  def get_level(self):
-    """
-    Retrieves the current level of the light.
-    """
-    low, high = self.get_relays()
-    low_value = int(low.get_brightness())
-    high_value = int(high.get_brightness())
-    return low_value + 2*high_value
-
+#  def get_level(self):
+#    """
+#    Retrieves the current level of the light.
+#    """
+#    low, high = self.get_relays()
+#    low_value = int(low.get_brightness())
+#    high_value = int(high.get_brightness())
+#    return low_value + 2*high_value
+#
   def set_level(self, level):
     """
     Sets the level of the light.
