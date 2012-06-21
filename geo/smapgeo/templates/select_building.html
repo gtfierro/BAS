@@ -1,0 +1,126 @@
+<!DOCTYPE html> 
+<html>
+  <head>
+{% comment %}
+    <script language="javascript" type="text/javascript" src="/media/jquery-1.5.2/jquery-1.5.2.min.js"></script>
+    <script language="javascript" type="text/javascript" src="/media/graph/js/buttons.js"></script>
+    <link type="text/css" href="/media/jquery-ui/css/redmond/jquery-ui-1.8.11.custom.css" rel="Stylesheet" />
+{% endcomment %}
+
+<style type="text/css">
+  #body {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width:500px;
+  }
+
+  #body_padding {
+    padding: 10px;
+  }
+
+  #head { }
+
+  #menu {
+    width: 50%;
+  }
+
+  #up {
+    float: left;
+    font-size: small;
+    margin-right: 20px;
+  }
+
+  #heading {
+    float: left;
+    font-size: x-large;
+    padding-bottom: 30px;
+  }
+
+  .big_button {
+    display: block;
+    font-size: large;
+    font-style: normal;
+    font-weight: normal;
+  }
+
+  .fg-buttonset {
+    float: right;
+    padding-left: 5px;
+  }
+  .fg-button { outline: 0; margin:0 4px 0 0; padding: .4em 1em; text-decoration:none !important; cursor:pointer; position: relative; text-align: center; zoom: 1; }
+  .fg-buttonset-single .fg-button, 
+  .fg-buttonset-multi .fg-button { margin-right: -1px;}
+
+  div.graph {
+    position: relative;
+    width: 400px;
+    height: 300px;
+  }
+  div.title {
+    text-align: center;
+    font-weight: normal;
+    font-size: large;
+  }
+  div.ylabel {
+    text-align: center;
+    font-weight: normal;
+    font-size: medium;
+  }
+
+  a.darklink:link {color:#000000; text-decoration: none;}
+  a.darklink:visited {color:#000000; text-decoration: none;}
+  a.darklink:hover {color:#000000; text-decoration: underline;}
+</style>
+
+</head>
+<body>
+
+<div id="body">
+<div id="body_padding"> 
+
+<div id="head">
+  {% if url_up %}
+    <a id="up" href="{{ url_up }}" class="fg-button ui-state-default ui-corner-all">&lt;</a>
+  {% endif %}
+
+  <div id="heading">{{ heading }}</div>
+  <div style="clear:both;"></div>
+</div>
+
+
+<div id="menu">
+  <a href="/admin"
+    class="big_button fg-button ui-state-default ui-corner-top ui-corner-bottom
+    ">Go to admin page</a>
+  <a href="{{ url_prefix }}upload"
+    class="big_button fg-button ui-state-default ui-corner-top ui-corner-bottom
+    ">Go to upload page</a>
+{% for building in buildings %}
+  <a href="{{ url_prefix }}{{ building.id }}.svg"
+    class="big_button fg-button ui-state-default
+      {% if forloop.first %} ui-corner-top {% endif %}
+      {% if forloop.last %} ui-corner-bottom {% endif %}
+    ">{{ building.name }} (SVG)</a>
+  <a href="{{ url_prefix }}{{ building.id }}.json"
+    class="big_button fg-button ui-state-default
+      {% if forloop.first %} ui-corner-top {% endif %}
+      {% if forloop.last %} ui-corner-bottom {% endif %}
+    ">{{ building.name }} (JSON)</a>
+  <a href="{{ url_prefix }}{{ building.id }}.kml"
+    class="big_button fg-button ui-state-default
+      {% if forloop.first %} ui-corner-top {% endif %}
+      {% if forloop.last %} ui-corner-bottom {% endif %}
+    ">{{ building.name }} (KML)</a>
+{% endfor %}
+</div>
+
+<div style="padding-top: 100px; clear: both;">
+</div>
+
+</div>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+A geospacial query system for sMAP
+
+Setting up geo without sMAP (spacialite backend)
+------------------------------------------------
+1. Install dependencies: geodjango, spacialite, django-olwidget
+2. Change settings.py to:
+    SMAPGEO_DATA_DIR = 'path-to-projects-git-repo/data/'
+3. Run createdb.sh to generate the spacial database
+
+Setting up sMAP + geo
+---------------------
+To install, first set up sMAP:
+1. Install postgres
+2. Create the postgres database
+sudo -u postgres psql
+CREATE USER archiver WITH PASSWORD 'password';
+CREATE DATABASE archiver WITH owner = archiver;
+3. Run the various portions of sMAP
+reading-db: mkdir -p /tmp/data && reading-server -d /tmp/data -c 512 -p 4243
+archiver daemon: twistd -n smap-archiver smap-data/python/conf/archiver.ini
+powerdb2 web service: cd powerdb2 && python manage.py runserver
+
+To launch a postgres prompt:
+sudo -u postgres psql archiver
+
+To run the archiver in a debug configuration:
+cd smap-data/python/smap/archiver && python queryparse.py ../conf/archiver.ini -v
+
+Then set up smap+geo:
+1. Install dependencies: geodjango, postGIS, django-olwidget
+2. Set up postGIS for the sMAP database (see also https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/#ref-gis-install)
+  a. First download and run this script: https://docs.djangoproject.com/en/dev/_downloads/create_template_postgis-debian.sh
+     This adds a template for postGIS spacial databases
+  b. Recreate the sMAP database: $ createdb -O archiver -T template_postgis <db name>
+     (db name is archiver in this case)
+3. Symlink smapgeo application into powerdb2 directory
+4. Change powerdb2/settings.py:
+  DATABASE_ENGINE = 'django.contrib.gis.db.backends.postgis'
+  ADMIN_MEDIA_PREFIX = '/static/admin/'
+  INSTALLED_APPS += ('django.contrib.staticfiles', 'django.contrib.gis', 'olwidget', 'smapgeo',)
+  STATIC_ROOT = ''
+  STATIC_URL = '/static/'
+  SMAPGEO_DATA_DIR = 'path-to-projects-git-repo/data/'
+5. Add smapgeo to powerdb2/urls.py:
+        (r'^smapgeo/', include('smapgeo.urls')),
+6. Old versions of django will give error message saying 'invalid byte sequence for encoding "UTF8": 0x00'. To solve, apply this patch: https://code.djangoproject.com/attachment/ticket/16778/postgis-adapter-2.patch
+
