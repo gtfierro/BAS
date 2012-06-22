@@ -138,8 +138,8 @@ def import_json(j):
 
 def get_interface(s):
   """ Get the interface for a given string, e.g. 'AHU' """
-  import drivers
-  return getattr(drivers, type_dict['points'][s]['interface'])
+  import driver_types
+  return getattr(driver_types, type_dict['points'][s]['interface'])
 
 def list_interfaces():
   """ Returns a list of all supported interfaces identified in type_dict """
