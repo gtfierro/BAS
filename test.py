@@ -1,6 +1,7 @@
 from node import Relational
 from classes import *
 from bacnet_drivers import *
+import networkx as nx
 import gis
 
 # Delete all NodeLink objects: we don't have persistent UUIDs so they need to be
@@ -108,8 +109,7 @@ ah2['RET_FAN'].add_child(ah2['MIX_AIR_TMP_SEN'])
 cwl = CWL(hvac, 'Cold Water Loop', {
             'CON_WAT_COO_TOW': BACnetTOW('Condensed Water Cooling Tower','BACNet point name'),
             'CON_WAT_SUP_TMP_SEN': BACnetSEN('Condensed Water Supply Temp Sensor','BACNet point name'),
-            #'CON_WAT_PMP': BACnetPMP('Condensed Water Pump','BACNet point name'),
-            'CON_WAT_PMP': [BACnetPMP('Condensed Water Pump','BACNet point name'),BACnetPMP('Condensed Water Pump','BACNet point name')],
+            'CON_WAT_PMP': BACnetPMP('Condensed Water Pump','BACNet point name'),
             'CON_CHL_WAT_CHR': BACnetCHR('Condensed to Chilled Water Chiller','BACNet point name'),
             'CON_WAT_RET_TMP_SEN': BACnetSEN('Condensed Water Return Temp Sensor','BACNet point name'),
             'CHL_WAT_SUP_TMP_SEN': BACnetSEN('Chilled Water Supply Temp Sensor','BACNet point name'),
@@ -117,7 +117,6 @@ cwl = CWL(hvac, 'Cold Water Loop', {
             'CHL_WAT_PMP': BACnetPMP('Chilled Water Pump','BACNet point name'),
             'CHL_WAT_PRS_DIF_SEN':  BACnetSEN('Chilled Water Pressure Difference Sensor','BACNet point name'),
   })
-print cwl['CON_WAT_PMP']
 cwl['CON_WAT_COO_TOW'].add_child(cwl['CON_WAT_SUP_TMP_SEN'])
 cwl['CON_WAT_SUP_TMP_SEN'].add_child(cwl['CON_WAT_PMP'])
 cwl['CON_WAT_PMP'].add_child(cwl['CON_CHL_WAT_CHR'])
@@ -142,7 +141,44 @@ hwl['HX'].add_child(hwl['HOT_WAT_PMP'])
 hwl['HOT_WAT_RET_TMP_SEN'].add_child(hwl['HX'])
 hwl['HOT_WAT_PRS_DIF_SEN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
 hwl['HOT_WAT_PMP'].add_child(hwl['HOT_WAT_SUP_TMP_SEN'])
-#hwl['HOT_WAT_SUP_TMP_SEN']
 
-#vav1 = VAV(hvac, 'VAV 1', {})
-#vav2 = VAV(hvac, 'VAV 2', {})
+vav1 = VAV(hvac, 'VAV 1', {'EXH_AIR_FAN':BACnetFAN('Exhaust Air Fan','BACNet point')})
+vav2 = VAV(hvac, 'VAV 2', {'EXH_AIR_FAN':BACnetFAN('Exhaust Air Fan','BACNet point')})
+
+ah1['SUP_AIR_FAN'].add_child(vav1['EXH_AIR_FAN'])
+ah2['SUP_AIR_FAN'].add_child(vav2['EXH_AIR_FAN'])
+vav1['EXH_AIR_FAN'].add_child(ah1['RET_AIR_DMP'])
+vav2['EXH_AIR_FAN'].add_child(ah2['RET_AIR_DMP'])
+hwl['HOT_WAT_SUP_TMP_SEN'].add_child(vav1['EXH_AIR_FAN'])
+hwl['HOT_WAT_SUP_TMP_SEN'].add_child(vav2['EXH_AIR_FAN'])
+vav1['EXH_AIR_FAN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
+vav2['EXH_AIR_FAN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
+
+
+def draw_all(filename='out.png'):
+  """
+  draw every graph connected and everything yeah
+  """
+  def _make_abbreviation(string):
+    s = string.split(" ")
+    return ''.join([word[0] for word in s])
+  import matplotlib.pyplot as plt
+  plt.clf()
+  this = sys.modules[__name__]
+  relationals = [getattr(this, i) for i in this.__dict__ if isinstance(getattr(this,i), Relational)]
+  biggraph = nx.DiGraph()
+  for r in relationals:
+    for n in r._nk.nodes():
+      biggraph.add_edges_from(n._nk.edges())
+  for n in biggraph.nodes():
+    if n.external_parents:
+      for p in n.external_parents:
+        biggraph.add_edges_from(p._nk.edges())
+    if n.external_childs:
+      for c in n.external_childs:
+        biggraph.add_edges_from(c._nk.edges())
+  for n in biggraph.nodes():
+    if "." not in n.name:
+      n.name = n.name+"."+_make_abbreviation(n.container.name)
+  nx.draw_graphviz(biggraph,prog='neato',width=1,node_size=300,font_size=6,overlap='scalexy')
+  plt.savefig(filename)
