@@ -101,31 +101,36 @@ class Container(object):
   """
   Inheritable class for handling basic graph operations beyond what networkx provides
   """
+
+  class CallList(list):
+
+    def add_child(self, child):
+      for item in self:
+        item.add_child(child)
+    
+    def add_parent(self, parent):
+      for item in self:
+        item.add_parent(parent)
+
   def __init__(self, objects):
-
-    def uniquify(l):
-      c = itertools.count(start=1)
-      return [item.set_name(item.name+" "+str(c.next())) for item in l]
-
     self._nk = nx.DiGraph()
     if objects:
-      #objects = list(itertools.chain(*map(lambda x: [x] if not isinstance(x,list) else x,objects)))
       for obj in objects:
-        if isinstance(obj,list):
-          print obj,dir(obj)
-          pass
         obj.container = self
         self._nk.add_node(obj)
 
   def __getitem__(self, key):
     if key in self.points:
-      return self.points[key]
+      if isinstance(self.points[key],list):
+        return CallList(self.points[key])
+      else:
+        return self.points[key]
     else:
       res = []
       for k in self.points:
         if key in k:
           res.append(self.points[k])
-      return res
+      return self.CallList(res)
 
   def draw_graph(self, filename="out.png"):
     """
