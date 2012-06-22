@@ -23,6 +23,10 @@ type_dict = {
         'required_setpoints'  : ['HOT_WAT_RET_TMP_STP','HOT_WAT_PRS_DIF_STP','HOT_WAT_SUP_TMP_STP'], 
         'required_points' : ['HX','HOT_WAT_RET_TMP_SEN','HOT_WAT_PRS_DIF_SEN','HOT_WAT_PMP','HOT_WAT_SUP_TMP_SEN'],
         },
+      'VAV': {
+        'required_setpoints'  : [],
+        'required_points'     : [],
+        },
       'LIG': {
         'required_setpoints'  : [],
         'required_points'     : ['HI_REL','LO_REL'],
@@ -114,7 +118,6 @@ abbreviations = {
     'LO'  : 'Low',
     'LIG' : 'Light',
     }
-
 
 def export_json():
   """

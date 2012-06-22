@@ -16,8 +16,8 @@ class Node(object):
     name: string name of this object
     """
     self.name = name
-    self.external_parent = None
-    self.external_child = None
+    self.external_parents = []
+    self.external_childs = []
     self.uid = uuid.uuid4()
     self.metadata = {}
 
@@ -44,7 +44,8 @@ class Node(object):
     node makes note of that
     """
     if child.container != self.container:
-      self.external_child = child.container
+      self.external_childs.append(child.container)
+      child.external_parents.append(self.container)
     self.container.add_node_child(self, child)
 
   def add_parent(self, parent):
@@ -55,7 +56,8 @@ class Node(object):
     node makes note of that
     """
     if parent.container != self.container:
-      self.external_parent = parent.container
+      self.external_parents.append(parent.container)
+      parent.external_childs.append(self.container)
     self.container.add_node_parent(self, parent)
 
   @property
@@ -100,12 +102,14 @@ class Container(object):
     plt.clf()
     biggraph = self._nk.copy()
     for n in biggraph.nodes():
-      if n.external_parent:
-        biggraph.add_nodes_from(n.external_parent._nk)
-        biggraph.add_edges_from(n.external_parent._nk.edges())
-      if n.external_child:
-        biggraph.add_nodes_from(n.external_child._nk)
-        biggraph.add_edges_from(n.external_child._nk.edges())
+      if n.external_parents:
+        for p in n.external_parents:
+          biggraph.add_nodes_from(p._nk)
+          biggraph.add_edges_from(p._nk.edges())
+      if n.external_childs:
+        for c in n.external_childs:
+          biggraph.add_nodes_from(c._nk)
+          biggraph.add_edges_from(c._nk.edges())
     nx.draw_graphviz(biggraph,prog='neato',width=1,node_size=400,font_size=6)
     plt.savefig(filename)
   

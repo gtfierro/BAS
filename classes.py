@@ -87,6 +87,17 @@ class HWL(node.Obj):
     self.points = validate(self, devices)
     node.Obj.__init__(self,container, name, self.points.values())
 
+class VAV(node.Obj):
+  implements(interfaces.IVAV)
+
+  def __init__(self, container, name, devices):
+    """
+    [devices] should be a dictionary mapping the expected points in node_types.get_required_points()
+    to the device instantiations from bacnet_devices (or whatever)
+    """
+    self.points = validate(self, devices)
+    node.Obj.__init__(self,container, name, self.points.values())
+
 class LIG(node.Obj):
   implements(interfaces.ILIG)
 

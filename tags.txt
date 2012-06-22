@@ -4,41 +4,6 @@ If a point ends with "CMD", then we know we can write to it (it's some sort of s
 input point that we can use to control it), *but* we can also read from that point to get the
 current value of it
 
-For objects, we require they have dictionaries of the following:
-  required setpoints/writeables: for an airhandler, this would be the zone air temperature setpoint.
-                            basically stuff that is a higher level attribute of the holistic
-                            air handler
-  requried points: for an air handler, this would be everything in test.py (assuming that's
-                  the minimum set of points
-
-for points, we require they have dictionaries of the following:
-  required setpoints: writeables
-  required attributes: readables
-
-It's important to maintain
-the following structure:
-object (node in graph)
-|
-point (node in graph)
-|
-attributes (key in dict)
-
-Maybe for each *type* we have a list of required attributes + a list of required physical points
-(if it is an object).
-AH:
-  interface: 'IAH' #air handler interface
-  required_points: outside air damper, supply fan, etc.
-  required_attributes: none
-
-SUP_FAN: #supply fan
-  interface: 'IFAN' #fan interface
-  required_points: none
-  required_attributes: 
-
-maybe this:
-if it is an object, the required are points or setpoints
-if it is a point, the required are attributes
-
 from http://project-haystack.org/doc/AHUs
 AH -- Air Handler
   #CONFIRMED
@@ -73,7 +38,7 @@ AH -- Air Handler
   EXH_AIR_FAN_CMD -- Exhaust Air Fan cmd
 
 CWL -- Chilled Water Loop
-  #PROPOSED
+  #CONFIRMED
   #how do we want to connect this to the cooling coil valve?
   **required** 
   CON_WAT_COO_TOW     -- Condensed Water Cooling Tower
@@ -88,7 +53,7 @@ CWL -- Chilled Water Loop
   CHL_WAT_PRS_DIF_STP_CMD -- Chilled Water Pressure Difference Setpoint
 
 HWL -- Hot Water Loop
-  #PROPOSED
+  #CONFIRMED
   **required**
   HX                  -- Heat Exchanger
   HOT_WAT_RET_TMP_SEN -- Hot Water Returning Temp Sen
@@ -103,3 +68,17 @@ HWL -- Hot Water Loop
   Steam valve
   cp-1/cp-2 (condenser pumps?)
   
+VAV -- Variable Air Volume (box)
+  #PROPOSED
+  **all**
+  ZON_AIR_TMP_SEN         -- Zone Air Temp Sensor
+  ZON_AIR_TMP_STP_CMD     -- Zone Air Temp Setpoint cmd
+  ZON_AIR_TMP_COO_STP_CMD -- Zone Air Temp Cooling setpoint cmd
+  ZON_AIR_TMP_HEA_STP_CMD -- Zone Air Temp Heating setpoint cmd
+  ZON_AIR_CO2_SEN         -- Zone Air CO2 Sensor
+  DIS_AIR_TMP_SEN         -- Discharge Air Temp Sensor
+  DIS_AIR_PRS_SEN         -- Discharge Air Pressure Sensor
+  DIS_AIR_FLW_SEN         -- Discharge Air Flow Sensor
+  DIS_AIR_FAN_CMD         -- Discharge Air Fan cmd
+  DIS_AIR_FAN_SEN         -- Discharge Air Flow Sensor
+  DIS_AIR_DMP_CMD         -- Discharge Air Damper cmd
