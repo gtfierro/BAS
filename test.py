@@ -29,12 +29,13 @@ lightbank5 = LIG(l, 'Light Bank 5', {
                       'HI_REL' : BACnetREL( "High Relay", "/WS86007/RELAY06")
                       })
 
-sdh = gis.Building.objects.get(name='Sutardja Dai Hall')
-lightbank1.areas.add(sdh['Floor4']['Zone1'])
-lightbank2.areas.add(sdh['Floor4']['Zone2'])
-lightbank3.areas.add(sdh['Floor4']['Zone3'])
-lightbank4.areas.add(sdh['Floor4']['Zone4'])
-lightbank5.areas.add(sdh['Floor4']['Zone5'])
+
+sdh_floor4 = gis.buildings['Sutardja Dai Hall']['Floor4']
+lightbank1.areas.add(sdh_floor4['Zone1'])
+lightbank2.areas.add(sdh_floor4['Zone2'])
+lightbank3.areas.add(sdh_floor4['Zone3'])
+lightbank4.areas.add(sdh_floor4['Zone4'])
+lightbank5.areas.add(sdh_floor4['Zone5'])
 
 hvac = Relational('HVAC')
 ah1 = AHU(hvac, 'Air Handler 1', {
