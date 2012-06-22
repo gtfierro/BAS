@@ -91,26 +91,31 @@ class Container(object):
     """
     import matplotlib.pyplot as plt
     plt.clf()
-    nx.draw_graphviz(self._nk)
+    nx.draw_graphviz(self._nk,prog='neato',width=1,node_size=300,font_size=6)
     plt.savefig(filename)
+
+
 
   def draw_all(self, filename="out.png"):
     """
     Connect all the containers so we have one big graph
     """
+    def _make_abbreviation(string):
+      s = string.split(" ")
+      return ''.join([word[0] for word in s])
     import matplotlib.pyplot as plt
     plt.clf()
     biggraph = self._nk.copy()
     for n in biggraph.nodes():
       if n.external_parents:
         for p in n.external_parents:
-          biggraph.add_nodes_from(p._nk)
           biggraph.add_edges_from(p._nk.edges())
       if n.external_childs:
         for c in n.external_childs:
-          biggraph.add_nodes_from(c._nk)
           biggraph.add_edges_from(c._nk.edges())
-    nx.draw_graphviz(biggraph,prog='neato',width=1,node_size=400,font_size=6)
+    for n in biggraph.nodes():
+      n.name = n.name+"."+_make_abbreviation(n.container.name)
+    nx.draw_graphviz(biggraph,prog='neato',width=1,node_size=300,font_size=6,overlap='scalexy')
     plt.savefig(filename)
   
 

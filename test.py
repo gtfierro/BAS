@@ -115,8 +115,6 @@ cwl['CHL_WAT_RET_TMP_SEN'].add_child(cwl['CHL_WAT_PRS_DIF_SEN'])
 cwl['CHL_WAT_PMP'].add_child(cwl['CON_CHL_WAT_CHR'])
 cwl['CHL_WAT_SUP_TMP_SEN'].add_child(ah1['COO_VLV'])
 cwl['CHL_WAT_SUP_TMP_SEN'].add_child(ah2['COO_VLV'])
-print ah1['COO_VLV'].uid
-print ah2['COO_VLV'].uid
 
 #Hot Water Loop
 hwl = HWL(hvac, 'Hot Water Loop', {
