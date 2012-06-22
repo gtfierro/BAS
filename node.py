@@ -122,7 +122,7 @@ class Container(object):
   def __getitem__(self, key):
     if key in self.points:
       if isinstance(self.points[key],list):
-        return CallList(self.points[key])
+        return self.CallList(self.points[key])
       else:
         return self.points[key]
     else:
