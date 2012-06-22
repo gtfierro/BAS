@@ -142,4 +142,4 @@ LOGGING = {
     }
 }
 
-SMAPGEO_DATA_DIR = '/home/nikita/dev/local/projects/data/'
+SMAPGEO_DATA_DIR = os.path.join(os.path.abspath('.').split('appstack')[0], 'data')
