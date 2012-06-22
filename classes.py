@@ -11,6 +11,7 @@ import interfaces
 import inspect
 import itertools
 from zope.interface import implements
+from zope.schema import getValidationErrors
 
 def validate(obj, points):
   """
@@ -33,7 +34,7 @@ def validate(obj, points):
   elif isinstance(obj, node.Point):
     #check obj.attributes
     try:
-      required_points = nodes_types.get_required_points(obj.__class__.__name__)
+      required_points = node_types.get_required_points(obj.__class__.__name__)
     except:
       print "No list of required points for %s in node_types.type_dict['points'][%s]" % (obj.__class__.__name__, obj.__class__.__name__)
       required_points = None
