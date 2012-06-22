@@ -40,7 +40,7 @@ def validate(obj, points):
   #now make sure that all points in required_points are in the points dict
   objects = list(itertools.chain(*map(lambda x: uniquify(x) if isinstance(x,list) else [x],points.values())))
   newkeys = list(itertools.chain(*map(lambda x: uniquify([x]*len(points[x])) if isinstance(points[x],list) else [x],points.keys())))
-  print dict(zip(newkeys,objects))
+  points = dict(zip(newkeys,objects))
   if not required_points:
     raise NotImplementedError
   for reqpt in required_points:

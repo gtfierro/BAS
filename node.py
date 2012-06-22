@@ -41,6 +41,19 @@ class Node(object):
     self.name = name
     return self
 
+  def _apply_to_multiple(fxn):
+    """
+    DECORATOR
+    if we are applying add_child or add_parent to a list of points, then we apply the fxn to each
+    of those points in turn
+    """
+    def apply_multiple(self, *args):
+      if isinstance(args[0],list):
+        for rel in args[0]:
+          return fxn(self, rel)
+    return apply_multiple
+
+  @_apply_to_multiple
   def add_child(self, child):
     """
     Give this node a child w/n the context of it's container graph
@@ -48,11 +61,14 @@ class Node(object):
     if the target child is part of an external container, then this
     node makes note of that
     """
-    if child.container != self.container:
-      self.external_childs.append(child.container)
-      child.external_parents.append(self.container)
-    self.container.add_node_child(self, child)
+    children = [child] if not isinstance(child,list) else child
+    for child in children:
+      if child.container != self.container:
+        self.external_childs.append(child.container)
+        child.external_parents.append(self.container)
+      self.container.add_node_child(self, child)
 
+  @_apply_to_multiple
   def add_parent(self, parent):
     """
     Give this node a parent w/n the context of it's container graph
@@ -60,10 +76,12 @@ class Node(object):
     if the target parent is part of an external container, then this
     node makes note of that
     """
-    if parent.container != self.container:
-      self.external_parents.append(parent.container)
-      parent.external_childs.append(self.container)
-    self.container.add_node_parent(self, parent)
+    parents = list(parent) if not isinstance(parent,list) else parent
+    for parent in parents:
+      if parent.container != self.container:
+        self.external_parents.append(parent.container)
+        parent.external_childs.append(self.container)
+      self.container.add_node_parent(self, parent)
 
   @property
   def type(self):
@@ -85,8 +103,11 @@ class Container(object):
 
     self._nk = nx.DiGraph()
     if objects:
-      objects = list(itertools.chain(*map(lambda x: uniquify(x) if isinstance(x,list) else [x],objects)))
+      #objects = list(itertools.chain(*map(lambda x: [x] if not isinstance(x,list) else x,objects)))
       for obj in objects:
+        if isinstance(obj,list):
+          print obj,dir(obj)
+          pass
         obj.container = self
         self._nk.add_node(obj)
 
@@ -94,7 +115,11 @@ class Container(object):
     if key in self.points:
       return self.points[key]
     else:
-      return self.search(lambda x: x.name == key or x.type == key)
+      res = []
+      for k in self.points:
+        if key in k:
+          res.append(self.points[k])
+      return res
 
   def draw_graph(self, filename="out.png"):
     """

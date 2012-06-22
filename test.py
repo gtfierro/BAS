@@ -105,6 +105,7 @@ cwl = CWL(hvac, 'Cold Water Loop', {
             'CHL_WAT_PMP': BACnetPMP('Chilled Water Pump','BACNet point name'),
             'CHL_WAT_PRS_DIF_SEN':  BACnetSEN('Chilled Water Pressure Difference Sensor','BACNet point name'),
   })
+print cwl['CON_WAT_PMP']
 cwl['CON_WAT_COO_TOW'].add_child(cwl['CON_WAT_SUP_TMP_SEN'])
 cwl['CON_WAT_SUP_TMP_SEN'].add_child(cwl['CON_WAT_PMP'])
 cwl['CON_WAT_PMP'].add_child(cwl['CON_CHL_WAT_CHR'])
