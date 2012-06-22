@@ -1,4 +1,5 @@
 import uuid
+import itertools
 import networkx as nx
 import zope.interface
 import gis
@@ -17,8 +18,8 @@ class Node(object):
     name: string name of this object
     """
     self.name = name
-    self.external_parent = None
-    self.external_child = None
+    self.external_parents = []
+    self.external_childs = []
     self.uid = uuid.uuid4()
     self.metadata = {}
 
@@ -38,7 +39,24 @@ class Node(object):
     if hasattr(self,'uid'):
       return hash(self.uid)
     return object.__hash__(self)
+  
+  def set_name(self, name):
+    self.name = name
+    return self
 
+  def _apply_to_multiple(fxn):
+    """
+    DECORATOR
+    if we are applying add_child or add_parent to a list of points, then we apply the fxn to each
+    of those points in turn
+    """
+    def apply_multiple(self, *args):
+      if isinstance(args[0],list):
+        for rel in args[0]:
+          return fxn(self, rel)
+    return apply_multiple
+
+  @_apply_to_multiple
   def add_child(self, child):
     """
     Give this node a child w/n the context of it's container graph
@@ -46,10 +64,14 @@ class Node(object):
     if the target child is part of an external container, then this
     node makes note of that
     """
-    if child.container != self.container:
-      self.external_child = child.container
-    self.container.add_node_child(self, child)
+    children = [child] if not isinstance(child,list) else child
+    for child in children:
+      if child.container != self.container:
+        self.external_childs.append(child.container)
+        child.external_parents.append(self.container)
+      self.container.add_node_child(self, child)
 
+  @_apply_to_multiple
   def add_parent(self, parent):
     """
     Give this node a parent w/n the context of it's container graph
@@ -57,9 +79,12 @@ class Node(object):
     if the target parent is part of an external container, then this
     node makes note of that
     """
-    if parent.container != self.container:
-      self.external_parent = parent.container
-    self.container.add_node_parent(self, parent)
+    parents = list(parent) if not isinstance(parent,list) else parent
+    for parent in parents:
+      if parent.container != self.container:
+        self.external_parents.append(parent.container)
+        parent.external_childs.append(self.container)
+      self.container.add_node_parent(self, parent)
 
   @property
   def type(self):
@@ -77,9 +102,18 @@ class Container(object):
   Inheritable class for handling basic graph operations beyond what networkx provides
   """
   def __init__(self, objects):
+
+    def uniquify(l):
+      c = itertools.count(start=1)
+      return [item.set_name(item.name+" "+str(c.next())) for item in l]
+
     self._nk = nx.DiGraph()
     if objects:
+      #objects = list(itertools.chain(*map(lambda x: [x] if not isinstance(x,list) else x,objects)))
       for obj in objects:
+        if isinstance(obj,list):
+          print obj,dir(obj)
+          pass
         obj.container = self
         self._nk.add_node(obj)
 
@@ -87,7 +121,11 @@ class Container(object):
     if key in self.points:
       return self.points[key]
     else:
-      return self.search(lambda x: x.name == key or x.type == key)
+      res = []
+      for k in self.points:
+        if key in k:
+          res.append(self.points[k])
+      return res
 
   def draw_graph(self, filename="out.png"):
     """
@@ -95,24 +133,31 @@ class Container(object):
     """
     import matplotlib.pyplot as plt
     plt.clf()
-    nx.draw_graphviz(self._nk)
+    nx.draw_graphviz(self._nk,prog='neato',width=1,node_size=300,font_size=6)
     plt.savefig(filename)
+
+
 
   def draw_all(self, filename="out.png"):
     """
     Connect all the containers so we have one big graph
     """
+    def _make_abbreviation(string):
+      s = string.split(" ")
+      return ''.join([word[0] for word in s])
     import matplotlib.pyplot as plt
     plt.clf()
     biggraph = self._nk.copy()
     for n in biggraph.nodes():
-      if n.external_parent:
-        biggraph.add_nodes_from(n.external_parent._nk)
-        biggraph.add_edges_from(n.external_parent._nk.edges())
-      if n.external_child:
-        biggraph.add_nodes_from(n.external_child._nk)
-        biggraph.add_edges_from(n.external_child._nk.edges())
-    nx.draw_graphviz(biggraph,prog='neato',width=1,node_size=400,font_size=6)
+      if n.external_parents:
+        for p in n.external_parents:
+          biggraph.add_edges_from(p._nk.edges())
+      if n.external_childs:
+        for c in n.external_childs:
+          biggraph.add_edges_from(c._nk.edges())
+    for n in biggraph.nodes():
+      n.name = n.name+"."+_make_abbreviation(n.container.name)
+    nx.draw_graphviz(biggraph,prog='neato',width=1,node_size=300,font_size=6,overlap='scalexy')
     plt.savefig(filename)
   
 

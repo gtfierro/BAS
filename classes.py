@@ -9,6 +9,7 @@ import node
 import node_types
 import interfaces
 import inspect
+import itertools
 from zope.interface import implements
 
 def validate(obj, points):
@@ -18,6 +19,10 @@ def validate(obj, points):
   If the object that calls this is a point, then we look at the attributes and make sure
   that all required points/setpoitns are there
   """
+  def uniquify(l):
+    c = itertools.count(start=1)
+    return [item.set_name(item.name+" "+str(c.next())) if isinstance(item,node.Node) else item+" "+str(c.next()) for item in l]
+
   if isinstance(obj, node.Obj):
     #check obj._nk.nodes to make sure everything from node_types is there
     try:
@@ -33,10 +38,13 @@ def validate(obj, points):
       print "No list of required points for %s in node_types.type_dict['points'][%s]" % (obj.__class__.__name__, obj.__class__.__name__)
       required_points = None
   #now make sure that all points in required_points are in the points dict
+  objects = list(itertools.chain(*map(lambda x: uniquify(x) if isinstance(x,list) else [x],points.values())))
+  newkeys = list(itertools.chain(*map(lambda x: uniquify([x]*len(points[x])) if isinstance(points[x],list) else [x],points.keys())))
+  points = dict(zip(newkeys,objects))
   if not required_points:
     raise NotImplementedError
   for reqpt in required_points:
-    if reqpt not in points.keys():
+    if reqpt not in map(lambda x: x.split(' ')[0], points.keys()):
       raise NotImplementedError(reqpt+" is not provided")
   return points
 
@@ -78,6 +86,17 @@ class CWL(node.Obj):
 
 class HWL(node.Obj):
   implements(interfaces.IHWL)
+
+  def __init__(self, container, name, devices):
+    """
+    [devices] should be a dictionary mapping the expected points in node_types.get_required_points()
+    to the device instantiations from bacnet_devices (or whatever)
+    """
+    self.points = validate(self, devices)
+    node.Obj.__init__(self,container, name, self.points.values())
+
+class VAV(node.Obj):
+  implements(interfaces.IVAV)
 
   def __init__(self, container, name, devices):
     """

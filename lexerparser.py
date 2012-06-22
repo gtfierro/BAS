@@ -141,14 +141,14 @@ class Parser(object):
           already_visited.append(n)
           queue.appendleft(n)
       #if current has an external container, add it to the queue
-      if current.external_parent and direction == "successors":
-        if current.external_parent not in already_visited:
-          already_visited.append(current.external_parent)
-          queue.appendleft(current.external_parent)
-      elif current.external_child and direction == "predecessors":
-        if current.external_child not in already_visited:
-          already_visited.append(current.external_child)
-          queue.appendleft(current.external_child)
+      if current.external_parents and direction == "predecessors":
+        for p in current.external_parents:
+          if p not in already_visited:
+            queue.appendleft(p)
+      elif current.external_childs and direction == "successors":
+        for c in current.external_childs:
+          if c not in already_visited:
+            queue.appendleft(c)
       #finally, add the current's container to the queue
       if not isinstance(current.container, Relational):
         if current.container not in queue and current.container not in already_visited:

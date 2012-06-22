@@ -108,7 +108,8 @@ ah2['RET_FAN'].add_child(ah2['MIX_AIR_TMP_SEN'])
 cwl = CWL(hvac, 'Cold Water Loop', {
             'CON_WAT_COO_TOW': BACnetTOW('Condensed Water Cooling Tower','BACNet point name'),
             'CON_WAT_SUP_TMP_SEN': BACnetSEN('Condensed Water Supply Temp Sensor','BACNet point name'),
-            'CON_WAT_PMP': BACnetPMP('Condensed Water Pump','BACNet point name'),
+            #'CON_WAT_PMP': BACnetPMP('Condensed Water Pump','BACNet point name'),
+            'CON_WAT_PMP': [BACnetPMP('Condensed Water Pump','BACNet point name'),BACnetPMP('Condensed Water Pump','BACNet point name')],
             'CON_CHL_WAT_CHR': BACnetCHR('Condensed to Chilled Water Chiller','BACNet point name'),
             'CON_WAT_RET_TMP_SEN': BACnetSEN('Condensed Water Return Temp Sensor','BACNet point name'),
             'CHL_WAT_SUP_TMP_SEN': BACnetSEN('Chilled Water Supply Temp Sensor','BACNet point name'),
@@ -116,6 +117,7 @@ cwl = CWL(hvac, 'Cold Water Loop', {
             'CHL_WAT_PMP': BACnetPMP('Chilled Water Pump','BACNet point name'),
             'CHL_WAT_PRS_DIF_SEN':  BACnetSEN('Chilled Water Pressure Difference Sensor','BACNet point name'),
   })
+print cwl['CON_WAT_PMP']
 cwl['CON_WAT_COO_TOW'].add_child(cwl['CON_WAT_SUP_TMP_SEN'])
 cwl['CON_WAT_SUP_TMP_SEN'].add_child(cwl['CON_WAT_PMP'])
 cwl['CON_WAT_PMP'].add_child(cwl['CON_CHL_WAT_CHR'])
@@ -128,6 +130,19 @@ cwl['CHL_WAT_PMP'].add_child(cwl['CON_CHL_WAT_CHR'])
 cwl['CHL_WAT_SUP_TMP_SEN'].add_child(ah1['COO_VLV'])
 cwl['CHL_WAT_SUP_TMP_SEN'].add_child(ah2['COO_VLV'])
 
-#cwl.add_child(ah1)
-#cwl.add_child(ah2)
+#Hot Water Loop
+hwl = HWL(hvac, 'Hot Water Loop', {
+            'HX': BACnetHX('Heat Exchanger','BACNet point name'),
+            'HOT_WAT_RET_TMP_SEN': BACnetSEN('Hot Water Return Temp Sensor','BACNet point name'),
+            'HOT_WAT_PRS_DIF_SEN': BACnetSEN('Hot Water Pressure Difference Sensor','BACNet point name'),
+            'HOT_WAT_PMP': BACnetPMP('Hot Water Pump','BACNet point name'),
+            'HOT_WAT_SUP_TMP_SEN': BACnetSEN('Hot Water Supply Temp Sensor','BACNet point name'),
+  })
+hwl['HX'].add_child(hwl['HOT_WAT_PMP'])
+hwl['HOT_WAT_RET_TMP_SEN'].add_child(hwl['HX'])
+hwl['HOT_WAT_PRS_DIF_SEN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
+hwl['HOT_WAT_PMP'].add_child(hwl['HOT_WAT_SUP_TMP_SEN'])
+#hwl['HOT_WAT_SUP_TMP_SEN']
 
+#vav1 = VAV(hvac, 'VAV 1', {})
+#vav2 = VAV(hvac, 'VAV 2', {})

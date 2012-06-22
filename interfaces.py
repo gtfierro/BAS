@@ -24,6 +24,12 @@ class IHWL(Interface):
   """
   pass
 
+class IVAV(Interface):
+  """
+  Interface for the Variable Air Volume boxes
+  """
+  pass
+
 class ILIG(Interface):
   """
   Interface for all the lightbanks
