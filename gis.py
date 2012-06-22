@@ -7,6 +7,12 @@ class BuildingsList(object):
     """
     The purpose of this class is to provide a dictionary-like interface to the list of
     all of the buildings in the database.
+
+    Usage:
+      gis.buildings['Sutardja Dai Hall']
+
+      for b in gis.buildings:
+        foo(b)
     """
     def __getitem__(self, key):
         try:
