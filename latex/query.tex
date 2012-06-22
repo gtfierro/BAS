@@ -17,7 +17,7 @@ The purpose of this query language is to facilitate the navigation of and collec
 \label{sub:graph_nodes}
 
 \begin{center}
-\includegraphics[scale=.6]{out.png}
+\includegraphics[scale=.8]{out.png}
 \end{center}
 Here is a sample functional graph of an Air Handler. A graph consists of a series of {\bf nodes} (representing physical objects in the system) connected by directed edges (representing the flow of the process from one node to another). As we can see in the graph above, the ``Outside Air Damper'' feeds into the ``Outside Air Temp Sensor'', which in turn feeds the ``Mixed Air Temp Sensor'', which is also fed by the ``Return Fan'', and so on. In this way we are able to capture the functional relationships between pieces in the system.
 \\\\
@@ -26,6 +26,8 @@ Each {\bf node} is identified by three different attributes of differing degrees
 	\item {\bf TYPE}: each object is identified by one of the 2-3 character types listed in \verb+node_types.type_dict+ (or listed by calling \verb+node_types.list_types()+). For example: ``AH'' $\rightarrow$ ``Air Handler'', ``DMP'' $\rightarrow$ ``Damper''.
 	
 	\item {\bf NAME}: each object is also initialized with a name, which is a string of arbitrary length, including ``[a-zA-Z]-:\_''. For example: ``Air Handler `'', ``Return Fan''
+	
+	\item {\bf TAG}: each object is usually tagged with some expected value when objects are initialized. For instance, an Air Handler Unit expects an outside air damper, which would be tagged as an ``OUT\_AIR\_DMP''. All tags are listed in \verb+node_types.list_tags()+ and can be translated with \verb+node_types.get_tag_name(tag)+.
 	
 	\item {\bf UID}: each object is additionally provisioned with a unique identification number, which is a UUID created upon initialization of the object. For example: ``c89bdbdd-e780-4f38-9523-9197d8161f6f''.
 \end{itemize}
@@ -57,8 +59,9 @@ In order to specify different objects in your queries, you use a small set of pr
 \hline
 Prefix & What it Specifies & Examples of a {\bf Prefixed Expression}  \\ \hline
 \#	&	Object Type/Class & \textbf{\#AH} (set of all Air Handlers), \textbf{\#DMP} (set of all Dampers) \\ \hline
-\$ 	&	Object Name	& \textbf{\$Air Handler 1} (set of all air handlers named ``Air Handler `'') \\ \hline
+\$ 	&	Object Name	& \textbf{\$Air Handler 1} (set of all air handlers named ``Air Handler '') \\ \hline
 \%	&	Object UID & \textbf{\%ab61b939-a133-4d76-b9c4-a5d6fab7abf5} (the object with this UID) \\ \hline
+\&  &	Object Tag & \textbf{\&OUT\_AIR\_DMP} (all objects tagged as an outside air damper) \\ \hline
 @	&	Variable	& \textbf{@x} (returns the set previously stored in this variable) \\ \hline
 \end{tabular}
 \end{center}
@@ -113,6 +116,43 @@ Additionally, we can save the result of this query in a variable:
 and then run further queries on that variable to search this new domain.
 
 % subsection constructing_a_query (end)
+\subsection{Additional Examples} % (fold)
+\label{sub:additional_examples}
+
+\begin{center}\emph{``I want all outside air dampers''}
+	
+	\verb+&OUT_AIR_DMP+
+	
+	Outside Air Damper 5b88969f-834e-4636-9686-c73afdabeb89
+	
+	Outside Air Damper 7f694301-2e04-44a9-b222-6c6ee0b26323
+\end{center}
+
+\begin{center}\emph{``I want all sensors in air handler 1 that are upstream of the cooling coil valve that feeds into the supply air fan''}
+	
+	\verb+(#SEN < $Air Handler 1) > &COO_VLV > &SUP_AIR_FAN+
+	
+	Mixed Air Temp Sensor 47c65480-bf3c-4343-af87-8c7820b2fd54
+	
+	Return Air Humidity Sensor 787c35e2-8961-46cc-b5db-2b304e390a5f
+	
+	Return Air Pressure Sensor f44d27ec-e698-4e87-9b70-d52e33869304
+	
+	Outside Air Temp Sensor 01ed9eba-1cd2-446b-97a5-b7dae7870714
+	
+	Return Air Flow Sensor 7c6bfdf7-5083-4667-83cb-1e5f1909e850
+
+	Return Air Temp Sensor 540a778f-30bf-49c2-b06d-5c679621e3bc
+\end{center}
+
+\begin{center}\emph{``I want all cooling towers that feed the cooling valve that cools the air measured by the mixed air tmp sensor''}
+	
+	\verb+#TOW > ($Cooling Valve < $Mixed Air Temp Sensor)+
+	
+	Condensed Water Cooling Tower 96afc50a-ea13-4835-8e6d-b5cd289af2ad
+\end{center}
+
+% subsection additional_examples (end)
 \subsection{Help} % (fold)
 \label{sub:help}
 Typing ``help'' into the interpreter gives you some additional commands you can use to help you learn what exactly you can query.

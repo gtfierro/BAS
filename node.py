@@ -17,6 +17,8 @@ class Node(object):
     name: string name of this object
     """
     self.name = name
+    self.external_parent = None
+    self.external_child = None
     self.uid = uuid.uuid4()
     self.metadata = {}
 
@@ -32,26 +34,37 @@ class Node(object):
     return self.uid.__cmp__(other.uid)
 
   def __hash__(self):
-    return hash(self.uid)
+    #hack to get graph copy working
+    if hasattr(self,'uid'):
+      return hash(self.uid)
+    return object.__hash__(self)
 
   def add_child(self, child):
     """
     Give this node a child w/n the context of it's container graph
     child: Point or Obj (which ever this object's type is)
+    if the target child is part of an external container, then this
+    node makes note of that
     """
+    if child.container != self.container:
+      self.external_child = child.container
     self.container.add_node_child(self, child)
 
   def add_parent(self, parent):
     """
     Give this node a parent w/n the context of it's container graph
     parent: Point or Obj (which ever this object's type is)
+    if the target parent is part of an external container, then this
+    node makes note of that
     """
+    if parent.container != self.container:
+      self.external_parent = parent.container
     self.container.add_node_parent(self, parent)
 
   @property
   def type(self):
     for interface in zope.interface.providedBy(self):
-      if interface.__name__.startswith('D'):
+      if interface.__name__.startswith('D') or interface.__name__.startswith('I'):
         return interface.__name__[1:]
     return self.__class__.__name__
 
@@ -84,6 +97,24 @@ class Container(object):
     plt.clf()
     nx.draw_graphviz(self._nk)
     plt.savefig(filename)
+
+  def draw_all(self, filename="out.png"):
+    """
+    Connect all the containers so we have one big graph
+    """
+    import matplotlib.pyplot as plt
+    plt.clf()
+    biggraph = self._nk.copy()
+    for n in biggraph.nodes():
+      if n.external_parent:
+        biggraph.add_nodes_from(n.external_parent._nk)
+        biggraph.add_edges_from(n.external_parent._nk.edges())
+      if n.external_child:
+        biggraph.add_nodes_from(n.external_child._nk)
+        biggraph.add_edges_from(n.external_child._nk.edges())
+    nx.draw_graphviz(biggraph,prog='neato',width=1,node_size=400,font_size=6)
+    plt.savefig(filename)
+  
 
   def add_node_child(self, node, child):
     """
@@ -191,6 +222,7 @@ class Relational(Container):
 
   def __init__(self, name, objects=[]):
     self.name = name
+    self.uid = uuid.uuid4()
     Container.__init__(self, objects)
 
 

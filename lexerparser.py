@@ -1,6 +1,7 @@
 import sys
 import test
 import inspect
+import itertools
 import networkx as nx
 from ply.lex import lex
 from ply.yacc import yacc
@@ -12,7 +13,7 @@ import gis
 class Lexer(object):
 
   tokens = [
-      'NAME','TYPE','UUID','VAR',
+      'NAME','TYPE','UUID','VAR','TAG',
       'UPSTREAM','DOWNSTREAM','EQUALS',
       'LPAREN','RPAREN',
       ]
@@ -47,14 +48,21 @@ class Lexer(object):
     t.value = t.value.strip()
     return t
 
+  def t_TAG(self,t):
+    r'\&[A-Z_]+[ ]?'
+    t.value = t.value.strip()
+    return t
+
   def t_keyword(self, t):
-    r'\b(help|types|prefixes|examples)\b'
+    r'\b(help|types|prefixes|examples|tags)\b'
     if t.value == 'help':
-      print " help: returns this help list \n types: returns list of types you can query \n prefixes: returns list of prefixes for queries \n examples: lists some example queries"
+      print " help: returns this help list \n types: returns list of types you can query \n tags: returns a list of tags you can query \n prefixes: returns list of prefixes for queries \n examples: lists some example queries"
     elif t.value == 'types':
       print list_types()
+    elif t.value == 'tags':
+      print list_tags()
     elif t.value == 'prefixes':
-      print " #TYPE: designates set of all objects with type [TYPE] \n $Name Of Object: designates set of all objects named [Name of Object] (case sensitive \n %ab61b939-a133-4d76-b9c4-a5d6fab7abf5: designates object tagged with uuid \n @var_name: you can assign queries to variables and use them in later queries"
+      print " #TYPE: designates set of all objects with type [TYPE] \n $Name Of Object: designates set of all objects named [Name of Object] (case sensitive \n %ab61b939-a133-4d76-b9c4-a5d6fab7abf5: designates object tagged with uuid \n @var_name: you can assign queries to variables and use them in later queries \n &TAG designates set of all objects tagged as TAG"
     elif t.value == 'examples':
       print " #DMP < $Return Air Handler: give me all dampers downstream of the Return Air Handler"
     t.lexer.skip(1)
@@ -100,36 +108,52 @@ class Parser(object):
     put these all onto a deque, followed by the container. We iterate through this generator, checking for membership in [target]. As we pop 
     nodes off the deque, we add their immediate children to the deque.
     """
+    #initialize whether we're looking for successors or predecessors
     relative_fxn = lambda x: getattr(x.container._nk, direction)(x)
-
-    if self.debug: print "Starting Search: node:",node,"target:",[i.name for i in target]
-    if self.debug: print "-"*20
+    #initialize already-visited lists
+    already_visited = [node]
+    #initialize queue
     queue = deque()
+    #add first node to queue
     queue.appendleft(node)
+    #add its Container if it isn't already a container
     if not isinstance(node, Container):
-      queue.appendleft(node.container) 
-    already_visited_containers = [node.container]
-    while queue:
-      if self.debug: print "QUEUE:",[i.name for i in queue]
+      queue.appendleft(node.container)
+      already_visited.append(node.container)
+
+    while queue: #loop until we reach the end of the queue
+      #get next node off the top (FIFO)
       current = queue.pop()
-      if current in target: 
-        if self.debug: print "returning",node
-        if self.debug: print "+"*20
+      if current in target: #successful!
         return node
+      #if this node is in a container we haven't visited yet, add
+      #all of that container's nodes to our queue
       if isinstance(current, Container):
-        if current not in already_visited_containers:
-          if self.debug: print "adding nodes in",current.name
+        if current not in already_visited:
           for n in current._nk.nodes():
-            queue.appendleft(n)
+            if n not in already_visited:
+              already_visited.append(n)
+              queue.appendleft(n)
+      #search the relatives of the current node according to relative_fxn
+      #for each relative, if we haven't traversed it, add it to the queue
       for n in relative_fxn(current):
-        if self.debug: print "adding node",n.name
-        queue.appendleft(n)
+        if n not in already_visited:
+          already_visited.append(n)
+          queue.appendleft(n)
+      #if current has an external container, add it to the queue
+      if current.external_parent and direction == "successors":
+        if current.external_parent not in already_visited:
+          already_visited.append(current.external_parent)
+          queue.appendleft(current.external_parent)
+      elif current.external_child and direction == "predecessors":
+        if current.external_child not in already_visited:
+          already_visited.append(current.external_child)
+          queue.appendleft(current.external_child)
+      #finally, add the current's container to the queue
       if not isinstance(current.container, Relational):
-        if current.container not in queue and current.container not in already_visited_containers:
-          if self.debug: print "adding",current.name,"'s container",current.container.name
-          already_visited_containers.append(current.container)
+        if current.container not in queue and current.container not in already_visited:
+          already_visited.append(current.container)
           queue.appendleft(current.container)
-    if self.debug: print "*"*20
     return None
 
   def p_statement_assign(self,p):
@@ -145,14 +169,10 @@ class Parser(object):
              | query DOWNSTREAM set'''
     res = []
     if p[2] == ">": #upstream
-      #we want all of the items in p[1] whose successors are in p[3]
-      #res.extend(filter(lambda node: set([item for sublist in nx.dfs_successors(node.container._nk.node).values()]).intersection(set(p[3])),p[1]))
       next_domain = [self.search_relatives(node, p[3],"successors") for node in p[1]]
     else:
       next_domain = [self.search_relatives(node, p[3],"predecessors") for node in p[1]]
     next_domain = filter(lambda x: x, next_domain)
-    if self.debug: print ">>",[i.name for i in next_domain]
-    #p[0] now contains p[3] found from the domain of p[1]
     p[0] = self.filter_dup_uids(next_domain)
 
   def p_query_set(self,p):
@@ -168,7 +188,7 @@ class Parser(object):
     name_lookup = p[1][1:].strip()
     domain = p[0] if p[0] else self.relationals
     res = []
-    for r in self.relationals:
+    for r in domain:
       res.extend(r.search(lambda x: x.name == name_lookup))
     p[0] = self.filter_dup_uids(res)
 
@@ -177,7 +197,7 @@ class Parser(object):
     type_lookup = p[1][1:].strip()
     domain = p[0] if p[0] else self.relationals
     res = []
-    for r in self.relationals:
+    for r in domain:
       res.extend(r.search(lambda x: x.type == type_lookup))
     p[0] = self.filter_dup_uids(res)
 
@@ -186,13 +206,25 @@ class Parser(object):
     uuid_lookup = p[1][1:].strip()
     domain = p[0] if p[0] else self.relationals
     res = []
-    for r in self.relationals:
+    for r in domain:
       res.extend(r.search(lambda x: str(x.uid) == uuid_lookup))
     p[0] = res
 
   def p_set_var(self,p):
     'set : VAR'
     p[0] = self.vars.get(p[1],[])
+
+  def p_set_tag(self,p):
+    'set : TAG'
+    tag_lookup = p[1][1:].strip()
+    domain = p[0] if p[0] else self.relationals
+    domain = [r._nk.nodes() if isinstance(r,Relational) else r for r in domain]
+    domain = list(itertools.chain(*domain))
+    res = []
+    for d in domain:
+      if d[tag_lookup]:
+        res.append(d[tag_lookup]) 
+    p[0] = res
 
   def p_error(self,p):
     if p:

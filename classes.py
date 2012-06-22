@@ -7,13 +7,9 @@ be found in node_types.get_required_setpoints('AHU'), node_types.get_required_po
 import sys
 import node
 import node_types
+import interfaces
+import inspect
 from zope.interface import implements
-
-#try:
-#  import bacnet_drivers
-#except:
-#  #bacnet_drivers do not correctly implement interfaces
-#  sys.exit(0)
 
 def validate(obj, points):
   """
@@ -49,6 +45,7 @@ class AHU(node.Obj):
   """
   Logic for Air Handlers
   """
+  implements(interfaces.IAHU)
 
   def __init__(self, container, name, devices):
     """
@@ -68,13 +65,30 @@ class AHU(node.Obj):
     pass
 
 class CWL(node.Obj):
-  pass
+  implements(interfaces.ICWL)
+
+  def __init__(self, container, name, devices):
+    """
+    [devices] should be a dictionary mapping the expected points in node_types.get_required_points()
+    to the device instantiations from bacnet_devices (or whatever)
+    """
+    self.points = validate(self, devices)
+    node.Obj.__init__(self,container, name, self.points.values())
+
 
 class HWL(node.Obj):
-  pass
+  implements(interfaces.IHWL)
 
+  def __init__(self, container, name, devices):
+    """
+    [devices] should be a dictionary mapping the expected points in node_types.get_required_points()
+    to the device instantiations from bacnet_devices (or whatever)
+    """
+    self.points = validate(self, devices)
+    node.Obj.__init__(self,container, name, self.points.values())
 
 class LIG(node.Obj):
+  implements(interfaces.ILIG)
 
   def __init__(self,container, name, devices):
     """
@@ -104,3 +118,20 @@ class LIG(node.Obj):
     low, high = self.get_relays()
     low.set_brightness(level % 2)
     high.set_brightness(level // 2)
+
+""" 
+Double checks to make sure all of the user-provided implementations correctly
+implement the classes
+"""
+classes = [i[1] for i in inspect.getmembers(sys.modules[__name__], inspect.isclass)]
+ifaces = node_types.list_interfaces()
+error = False
+for i in ifaces:
+  for cl in classes:
+    if i.implementedBy(cl):
+      if getValidationErrors(i,cl):
+        error = True
+        print cl.__name__,"does not correctly implement",i.__name__,getValidationErrors(i,cl)
+if error:
+  print "Something is wrong! Double-check your interface implementations"
+  sys.exit(0)

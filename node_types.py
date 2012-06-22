@@ -145,6 +145,28 @@ def list_interfaces():
     ifaces.append(get_interface(obj))
   return ifaces
 
+def list_tags(targ=''):
+  """ Returns a list of all tags"""
+  tags = []
+  for o in type_dict['objects']:
+    if not targ:
+      tags.extend(type_dict['objects'][o]['required_points'])
+    elif o == targ:
+      tags.extend(type_dict['objects'][o]['required_points'])
+  for p in type_dict['points']:
+    if not targ:
+      tags.extend(type_dict['points'][p]['required_points'])
+    elif p == targ:
+      tags.extend(type_dict['points'][p]['required_points'])
+  return tags
+
+def list_types():
+  """ Returns a list of all types"""
+  types = []
+  types.extend(type_dict['objects'].keys())
+  types.extend(type_dict['points'].keys())
+  return types
+
 def get_tag_name(tag):
   """ convert something like DIS_AIR_TMP_SEN to Discharge Air Temp Sensor """
   #convert tag to a list 
