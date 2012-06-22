@@ -1,4 +1,5 @@
 import uuid
+import itertools
 import networkx as nx
 import zope.interface
 
@@ -35,6 +36,10 @@ class Node(object):
     if hasattr(self,'uid'):
       return hash(self.uid)
     return object.__hash__(self)
+  
+  def set_name(self, name):
+    self.name = name
+    return self
 
   def add_child(self, child):
     """
@@ -73,8 +78,14 @@ class Container(object):
   Inheritable class for handling basic graph operations beyond what networkx provides
   """
   def __init__(self, objects):
+
+    def uniquify(l):
+      c = itertools.count(start=1)
+      return [item.set_name(item.name+" "+str(c.next())) for item in l]
+
     self._nk = nx.DiGraph()
     if objects:
+      objects = list(itertools.chain(*map(lambda x: uniquify(x) if isinstance(x,list) else [x],objects)))
       for obj in objects:
         obj.container = self
         self._nk.add_node(obj)

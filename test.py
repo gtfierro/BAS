@@ -96,7 +96,8 @@ ah2['RET_FAN'].add_child(ah2['MIX_AIR_TMP_SEN'])
 cwl = CWL(hvac, 'Cold Water Loop', {
             'CON_WAT_COO_TOW': BACnetTOW('Condensed Water Cooling Tower','BACNet point name'),
             'CON_WAT_SUP_TMP_SEN': BACnetSEN('Condensed Water Supply Temp Sensor','BACNet point name'),
-            'CON_WAT_PMP': BACnetPMP('Condensed Water Pump','BACNet point name'),
+            #'CON_WAT_PMP': BACnetPMP('Condensed Water Pump','BACNet point name'),
+            'CON_WAT_PMP': [BACnetPMP('Condensed Water Pump','BACNet point name'),BACnetPMP('Condensed Water Pump','BACNet point name')],
             'CON_CHL_WAT_CHR': BACnetCHR('Condensed to Chilled Water Chiller','BACNet point name'),
             'CON_WAT_RET_TMP_SEN': BACnetSEN('Condensed Water Return Temp Sensor','BACNet point name'),
             'CHL_WAT_SUP_TMP_SEN': BACnetSEN('Chilled Water Supply Temp Sensor','BACNet point name'),
