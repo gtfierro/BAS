@@ -1,6 +1,7 @@
 import uuid
 import networkx as nx
 import zope.interface
+import gis
 
 class Node(object):
   """
@@ -18,6 +19,8 @@ class Node(object):
     self.name = name
     self.uid = uuid.uuid4()
     self.metadata = {}
+
+    self._link, _ = gis.NodeLink.objects.get_or_create(uuid=self.uid)
 
     #self.container.add_nodes(self)
 
@@ -52,6 +55,9 @@ class Node(object):
         return interface.__name__[1:]
     return self.__class__.__name__
 
+  @property
+  def areas(self):
+    return self._link.areas
 
 class Container(object):
   """

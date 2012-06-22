@@ -1,6 +1,11 @@
 from node import Relational
 from classes import *
 from bacnet_drivers import *
+import gis
+
+# Delete all NodeLink objects: we don't have persistent UUIDs so they need to be
+# regenerated each time
+gis.NodeLink.objects.all().delete()
 
 l = Relational('Lights')
 lightbank1 = LIG(l, 'Light Bank 1', {
@@ -23,6 +28,13 @@ lightbank5 = LIG(l, 'Light Bank 5', {
                       'LO_REL' : BACnetREL( "Low Relay", "/WS86007/RELAY05"),
                       'HI_REL' : BACnetREL( "High Relay", "/WS86007/RELAY06")
                       })
+
+sdh = gis.Building.objects.get(name='Sutardja Dai Hall')
+lightbank1.areas.add(sdh['Floor4']['Zone1'])
+lightbank2.areas.add(sdh['Floor4']['Zone2'])
+lightbank3.areas.add(sdh['Floor4']['Zone3'])
+lightbank4.areas.add(sdh['Floor4']['Zone4'])
+lightbank5.areas.add(sdh['Floor4']['Zone5'])
 
 hvac = Relational('HVAC')
 ah1 = AHU(hvac, 'Air Handler 1', {

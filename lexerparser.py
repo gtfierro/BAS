@@ -7,6 +7,7 @@ from ply.yacc import yacc
 from node import *
 from node_types import *
 from collections import deque
+import gis
 
 class Lexer(object):
 
@@ -70,6 +71,12 @@ class Parser(object):
     self.relationals = [getattr(test, i) for i in test.__dict__ if isinstance(getattr(test,i), Relational)]
     self.domain = []
     self.vars = {}
+
+  def links_to_nodes(self, links):
+    for r in self.relationals:
+      for node in r.nodes:
+        if str(node.uid) in [link.uuid for link in links]:
+            yield node
 
   def filter_dup_uids(self, target):
     """
