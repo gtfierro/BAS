@@ -1,5 +1,5 @@
 import node
-import node_types
+import device_types
 import requests
 import json
 from zope.interface import implements
@@ -21,7 +21,7 @@ def write_multiple_points(data, root=ROOT):
 
 
 class BACnetFAN(node.Device):
-  implements(node_types.get_device_interface('FAN'))
+  implements(device_types.DFAN)
 
   # required_setpoints = ['SPD']
   # required_points = ['POW']
@@ -30,56 +30,56 @@ class BACnetFAN(node.Device):
       self.point = point
 
 class BACnetCCV(node.Device):
-  implements(node_types.get_device_interface('CCV'))
+  implements(device_types.DCCV)
   def __init__(self, name, point):
       node.Device.__init__(self, name)
       self.point = point
 
 class BACnetDMP(node.Device):
-  implements(node_types.get_device_interface('DMP'))
+  implements(device_types.DDMP)
   def __init__(self, name, point):
       node.Device.__init__(self, name)
       self.point = point
 
 class BACnetSEN(node.Device):
-  implements(node_types.get_device_interface('SEN'))
+  implements(device_types.DSEN)
   def __init__(self, name, point):
       node.Device.__init__(self, name)
       self.point = point
 
 class BACnetCHR(node.Device):
-  implements(node_types.get_device_interface('CHR'))
+  implements(device_types.DCHR)
   def __init__(self, name, point):
       node.Device.__init__(self, name)
       self.point = point
 
 class BACnetPMP(node.Device):
-  implements(node_types.get_device_interface('PMP'))
+  implements(device_types.DPMP)
   def __init__(self, name, point):
       node.Device.__init__(self, name)
       self.point = point
 
 class BACnetTOW(node.Device):
-  implements(node_types.get_device_interface('TOW'))
+  implements(device_types.DTOW)
   def __init__(self, name, point):
       node.Device.__init__(self, name)
       self.point = point
 
 class BACnetVLV(node.Device):
-  implements(node_types.get_device_interface('VLV'))
+  implements(device_types.DVLV)
   def __init__(self, name, point):
       node.Device.__init__(self, name)
       self.point = point
 
 class BACnetHX(node.Device):
-  implements(node_types.get_device_interface('HX'))
+  implements(device_types.DHX)
   def __init__(self, name, point):
       node.Device.__init__(self, name)
       self.point = point
 
 
 class BACnetREL(node.Device):
-  implements(node_types.get_device_interface('REL'))
+  implements(device_types.DREL)
 
   def __init__(self, name, point):
       node.Device.__init__(self, name)

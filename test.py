@@ -3,6 +3,7 @@ from generic_objects import *
 from bacnet_devices import *
 import networkx as nx
 import gis
+import node_types
 
 # Delete all NodeLink objects: we don't have persistent UUIDs so they need to be
 # regenerated each time

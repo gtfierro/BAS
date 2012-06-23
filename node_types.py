@@ -1,6 +1,8 @@
 import node
 import object_types
 import device_types
+import generic_objects
+import bacnet_devices
 import zope.interface
 
 abbreviations = {
@@ -35,28 +37,10 @@ abbreviations = {
     'LIG' : 'Light',
     }
 
-def get_device_interface(s):
-  """Get the device interface for a given string, e.g. 'REL' """
-  return getattr(device_types, 'D' + s)
-
-def list_device_interfaces():
-  """ Returns a list of all supported devic interfaces"""
-  return [ getattr(device_types, k) for k in vars(device_types).keys() if k.isupper() and k.startswith('D') ]
-
-def get_object_interface(s):
-  """Get the object interface for a given string, e.g. 'AHU' """
-  return getattr(object_types, 'I' + s)
-
-def list_object_interfaces():
-  """ Returns a list of all supported object interfaces"""
-  return [ getattr(object_types, k) for k in vars(object_types).keys() if k.isupper() and k.startswith('I') ]
-
 def list_objects():
-  import generic_objects
   return [v for v in vars(generic_objects).values() if type(v) == type and issubclass(v, node.Obj)]
 
 def list_devices():
-  import bacnet_devices
   return [v for v in vars(bacnet_devices).values() if type(v) == type and issubclass(v, node.Device)]
 
 def list_tags(targ=''):
@@ -88,7 +72,6 @@ def get_tag_name(tag):
 
 def get_required_setpoints(s):
   """ Return list of required setpoints for a given string e.g. 'AH' """
-  import generic_objects, bacnet_devices
   if s in vars(generic_objects):
     return getattr(generic_objects, s).required_setpoints
   else:
@@ -96,7 +79,6 @@ def get_required_setpoints(s):
 
 def get_required_points(s):
   """ Return list of required points for a given string e.g. 'AH' """
-  import generic_objects, bacnet_devices
   if s in vars(generic_objects):
       return getattr(generic_objects, s).required_devices
   else:
