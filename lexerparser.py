@@ -28,18 +28,18 @@ class Lexer(object):
   t_ignore      = ' \t'
 
   def t_NAME(self,t):
-    r'\$[\w\-\:\_\s]+'
+    r'\$!?[\w\-\:\_\s]+'
     # find everything with name t.value and replace t.value with that value
     t.value = t.value.strip()
     return t
 
   def t_TYPE(self,t):
-    r'\#[A-Z0-9]+[ ]?'
+    r'\#!?[A-Z0-9]+[ ]?'
     t.value = t.value.strip()
     return t
  
   def t_UUID(self,t):
-    r'\%[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}[ ]?'
+    r'\%!?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}[ ]?'
     t.value = t.value.strip()
     return t
 
@@ -49,7 +49,7 @@ class Lexer(object):
     return t
 
   def t_TAG(self,t):
-    r'\&[A-Z_]+[ ]?'
+    r'\&!?[A-Z_]+[ ]?'
     t.value = t.value.strip()
     return t
 
@@ -188,8 +188,12 @@ class Parser(object):
     name_lookup = p[1][1:].strip()
     domain = p[0] if p[0] else self.relationals
     res = []
-    for r in domain:
-      res.extend(r.search(lambda x: x.name == name_lookup))
+    if '!' in name_lookup:
+      #TODO: spatial name lookup
+      pass
+    else:
+      for r in domain:
+        res.extend(r.search(lambda x: x.name == name_lookup))
     p[0] = self.filter_dup_uids(res)
 
   def p_set_type(self,p):
