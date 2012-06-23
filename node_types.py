@@ -42,12 +42,12 @@ def list_interfaces():
   import device_types
   return [ getattr(device_types, k) for k in vars(device_types).keys() if k.isupper() and k.startswith('D') ]
 
-def list_classes():
+def list_object_types():
   import generic_objects
   import node
   return [v for v in vars(generic_objects).values() if type(v) == type and issubclass(v, node.Obj)]
 
-def list_drivers():
+def list_device_types():
   import bacnet_devices
   import node
   return [v for v in vars(bacnet_devices).values() if type(v) == type and issubclass(v, node.Device)]
@@ -55,11 +55,11 @@ def list_drivers():
 def list_tags(targ=''):
   """ Returns a list of all tags"""
   tags = set()
-  for cls in list_classes():
+  for cls in list_object_types():
     if targ and not cls.type() == targ:
         continue
     tags |= set(cls.required_devices)
-  for driver in list_drivers():
+  for driver in list_device_types():
     if targ and not driver.type() == targ:
         continue
     tags |= set(driver.required_points)
@@ -68,8 +68,8 @@ def list_tags(targ=''):
 def list_types():
   """ Returns a list of all types"""
   types = []
-  types.extend(x.type() for x in list_classes())
-  types.extend(x.type() for x in list_drivers())
+  types.extend(x.type() for x in list_object_types())
+  types.extend(x.type() for x in list_device_types())
   return types
 
 def get_tag_name(tag):
@@ -101,8 +101,8 @@ def verify_list(l):
       zope.interface.verify.verifyClass(i, el)
 
 def verify_devices():
-  return verify_list(list_drivers())
+  return verify_list(list_device_types())
 
 def verify_objects():
-  return verify_list(list_classes())
+  return verify_list(list_object_types())
 
