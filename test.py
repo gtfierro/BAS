@@ -1,6 +1,6 @@
 from node import Relational
-from classes import *
-from bacnet_drivers import *
+from generic_objects import *
+from bacnet_devices import *
 import networkx as nx
 import gis
 

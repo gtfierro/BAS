@@ -32,23 +32,23 @@ abbreviations = {
 
 def get_interface(s):
   """ Get the interface for a given string, e.g. 'AHU' """
-  import driver_types
-  return getattr(driver_types, 'D' + s)
+  import device_types
+  return getattr(device_types, 'D' + s)
 
 def list_interfaces():
   """ Returns a list of all supported interfaces identified in type_dict """
-  import driver_types
-  return [ getattr(driver_types, k) for k in driver_types.__dict__.keys() if k.isupper() and k.startswith('D') ]
+  import device_types
+  return [ getattr(device_types, k) for k in device_types.__dict__.keys() if k.isupper() and k.startswith('D') ]
 
 def list_classes():
-  import classes
+  import generic_objects
   import node
-  return [v for v in classes.__dict__.values() if type(v) == type and issubclass(v, node.Obj)]
+  return [v for v in generic_objects.__dict__.values() if type(v) == type and issubclass(v, node.Obj)]
 
 def list_drivers():
-  import bacnet_drivers
+  import bacnet_devices
   import node
-  return [v for v in bacnet_drivers.__dict__.values() if type(v) == type and issubclass(v, node.Device)]
+  return [v for v in bacnet_devices.__dict__.values() if type(v) == type and issubclass(v, node.Device)]
 
 def list_tags(targ=''):
   """ Returns a list of all tags"""
@@ -79,17 +79,17 @@ def get_tag_name(tag):
 
 def get_required_setpoints(s):
   """ Return list of required setpoints for a given string e.g. 'AH' """
-  import classes, bacnet_drivers
-  if s in classes.__dict__:
-    return getattr(classes, s).required_setpoints
+  import generic_objects, bacnet_devices
+  if s in generic_objects.__dict__:
+    return getattr(generic_objects, s).required_setpoints
   else:
-    return getattr(bacnet_drivers, s).required_setpoints
+    return getattr(bacnet_devices, s).required_setpoints
 
 def get_required_points(s):
   """ Return list of required points for a given string e.g. 'AH' """
-  import classes, bacnet_drivers
-  if s in classes.__dict__:
-      return getattr(classes, s).required_drivers
+  import generic_objects, bacnet_devices
+  if s in generic_objects.__dict__:
+      return getattr(generic_objects, s).required_drivers
   else:
-    return getattr(bacnet_drivers, s).required_points
+    return getattr(bacnet_devices, s).required_points
 

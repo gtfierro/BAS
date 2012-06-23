@@ -7,7 +7,7 @@ be found in node_types.get_required_setpoints('AHU'), node_types.get_required_de
 import sys
 import node
 import node_types
-import interfaces
+import object_types
 import inspect
 from zope.interface import implements
 from zope.schema import getValidationErrors
@@ -16,7 +16,7 @@ class AHU(node.Obj):
   """
   Logic for Air Handlers
   """
-  implements(interfaces.IAHU)
+  implements(object_types.IAHU)
 
   required_setpoints = ['ZON_AIR_STP_CMD']
   required_devices = ['OUT_AIR_DMP', 'OUT_AIR_TMP_SEN', 'MIX_AIR_TMP_SEN', 'RET_FAN', 'RET_AIR_FLW_SEN',
@@ -33,7 +33,7 @@ class AHU(node.Obj):
     pass
 
 class CWL(node.Obj):
-  implements(interfaces.ICWL)
+  implements(object_types.ICWL)
 
   required_setpoints =  ['CHL_WAT_PRS_DIF_STP']
   required_devices = ['CON_WAT_COO_TOW','CON_WAT_SUP_TMP_SEN','CON_WAT_PMP','CON_CHL_WAT_CHR',
@@ -41,18 +41,18 @@ class CWL(node.Obj):
                       'CHL_WAT_PMP','CHL_WAT_PRS_DIF_SEN']
 
 class HWL(node.Obj):
-  implements(interfaces.IHWL)
+  implements(object_types.IHWL)
 
   required_setpoints = ['HOT_WAT_RET_TMP_STP','HOT_WAT_PRS_DIF_STP','HOT_WAT_SUP_TMP_STP']
   required_devices = ['HX','HOT_WAT_RET_TMP_SEN','HOT_WAT_PRS_DIF_SEN','HOT_WAT_PMP','HOT_WAT_SUP_TMP_SEN']
 
 class VAV(node.Obj):
-  implements(interfaces.IVAV)
+  implements(object_types.IVAV)
 
   required_devices = ['EXH_AIR_FAN']
 
 class LIG(node.Obj):
-  implements(interfaces.ILIG)
+  implements(object_types.ILIG)
 
   required_setpoints = []
   required_devices = ['HI_REL','LO_REL']

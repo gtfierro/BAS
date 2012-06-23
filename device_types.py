@@ -2,7 +2,6 @@ from zope.interface import Interface
 from zope.interface import Attribute
 from zope.schema import Dict, Choice
 from zope.schema import getValidationErrors
-from node_types import *
 
 class DREL(Interface):
   """
