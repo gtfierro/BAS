@@ -2,7 +2,7 @@
 Contains the pre-implemented logic for the higher level objects like the AHU, HWL, CWL.
 Each of these classes should be initialized with the specific instantiations of drivers that
 they expect in order to provide the full functionality of the class. The drivers they expect can 
-be found in node_types.get_required_setpoints('AHU'), node_types.get_required_points('AHU'), etc
+be found in node_types.get_required_setpoints('AHU'), node_types.get_required_devices('AHU'), etc
 """
 import sys
 import node
@@ -11,43 +11,6 @@ import interfaces
 import inspect
 from zope.interface import implements
 from zope.schema import getValidationErrors
-
-# def validate(obj, points):
-#   """
-#   If the object that calls this this an object, then we look at the list of self._nk.nodes
-#   to make sure that we have all required points and set points there
-#   If the object that calls this is a point, then we look at the attributes and make sure
-#   that all required points/setpoitns are there
-#   """
-#   def uniquify(l):
-#     c = itertools.count(start=1)
-#     return [item.set_name(item.name+" "+str(c.next())) if isinstance(item,node.Node) else item+" "+str(c.next()) for item in l]
-
-#   if isinstance(obj, node.Obj):
-#     #check obj._nk.nodes to make sure everything from node_types is there
-#     try:
-#       required_points = node_types.get_required_points(obj.__class__.__name__)
-#     except:
-#       print "No list of required points for %s in node_types.type_dict['objects'][%s]" % (obj.__class__.__name__, obj.__class__.__name__)
-#       required_points = None
-#   elif isinstance(obj, node.Point):
-#     #check obj.attributes
-#     try:
-#       required_points = node_types.get_required_points(obj.__class__.__name__)
-#     except:
-#       print "No list of required points for %s in node_types.type_dict['points'][%s]" % (obj.__class__.__name__, obj.__class__.__name__)
-#       required_points = None
-#   #now make sure that all points in required_points are in the points dict
-#   objects = list(itertools.chain(*map(lambda x: uniquify(x) if isinstance(x,list) else [x],points.values())))
-#   newkeys = list(itertools.chain(*map(lambda x: uniquify([x]*len(points[x])) if isinstance(points[x],list) else [x],points.keys())))
-#   points = dict(zip(newkeys,objects))
-#   if not required_points:
-#     raise NotImplementedError
-#   for reqpt in required_points:
-#     if reqpt not in map(lambda x: x.split(' ')[0], points.keys()):
-#       raise NotImplementedError(reqpt+" is not provided")
-#   return points
-
 
 class AHU(node.Obj):
   """

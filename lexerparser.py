@@ -198,7 +198,7 @@ class Parser(object):
     domain = p[0] if p[0] else self.relationals
     res = []
     for r in domain:
-      res.extend(r.search(lambda x: x.type == type_lookup))
+      res.extend(r.search(lambda x: x.type() == type_lookup))
     p[0] = self.filter_dup_uids(res)
 
   def p_set_uuid(self,p):

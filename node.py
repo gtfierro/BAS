@@ -73,7 +73,7 @@ class Node(object):
   def add_child(self, child):
     """
     Give this node a child w/n the context of it's container graph
-    child: Point or Obj (which ever this object's type is)
+    child: Device or Obj (which ever this object's type is)
     if the target child is part of an external container, then this
     node makes note of that
     """
@@ -88,7 +88,7 @@ class Node(object):
   def add_parent(self, parent):
     """
     Give this node a parent w/n the context of it's container graph
-    parent: Point or Obj (which ever this object's type is)
+    parent: Device or Obj (which ever this object's type is)
     if the target parent is part of an external container, then this
     node makes note of that
     """
@@ -99,12 +99,12 @@ class Node(object):
         parent.external_childs.append(self.container)
       self.container.add_node_parent(self, parent)
 
-  @property
-  def type(self):
-    for interface in zope.interface.providedBy(self):
-      if interface.__name__.startswith('D') or interface.__name__.startswith('I'):
-        return interface.__name__[1:]
-    return self.__class__.__name__
+  @classmethod
+  def type(cls):
+    for interface in zope.interface.implementedBy(cls):
+      if interface.getName().startswith('D') or interface.getName().startswith('I'):
+        return interface.getName()[1:]
+    return cls.__name__
 
   @property
   def areas(self):
@@ -219,15 +219,23 @@ class Container(object):
         for node in nd.nodes:
             yield node
 
-class Point(Node):
+class Device(Node):
   """
   Internal components of a larger object
   """
+  required_setpoints = []
+  required_points = []
 
   def __init__(self, name):
     self.attributes = {}
     Node.__init__(self,name)
-    print "Point",self.name, self.uid
+
+    if not self.validate():
+      raise NotImplementedError("Required point not provided")
+    print "Device",self.name, self.uid
+
+  def validate(self):
+    return all(key.split(' ')[0] in self.required_points for key in self.attributes.keys())
 
   def set_attribute(self, att, value):
     self.attributes[att] = value
@@ -248,6 +256,7 @@ class Point(Node):
     self.del_attribute(att)
 
 class Obj(Node, Container):
+  required_setpoints = []
   required_devices = []
 
   def __init__(self, container, name, devices=None):
