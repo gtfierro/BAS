@@ -54,6 +54,7 @@ class Node(object):
       if isinstance(args[0],list):
         for rel in args[0]:
           return fxn(self, rel)
+      else: return fxn(self, *args)
     return apply_multiple
 
   @_apply_to_multiple
@@ -121,16 +122,9 @@ class Container(object):
 
   def __getitem__(self, key):
     if key in self.points:
-      if isinstance(self.points[key],list):
-        return self.CallList(self.points[key])
-      else:
-        return self.points[key]
+      return self.CallList(self.points[key]) if isinstance(self.points[key],list) else self.points[key]
     else:
-      res = []
-      for k in self.points:
-        if key in k:
-          res.append(self.points[k])
-      return self.CallList(res)
+      return self.CallList(filter(lambda x: x, [self.points[k] if key in k else None for k in self.points]))
 
   def draw_graph(self, filename="out.png"):
     """
@@ -140,8 +134,6 @@ class Container(object):
     plt.clf()
     nx.draw_graphviz(self._nk,prog='neato',width=1,node_size=300,font_size=6)
     plt.savefig(filename)
-
-
 
   def draw_all(self, filename="out.png"):
     """
@@ -274,5 +266,4 @@ class Relational(Container):
     self.name = name
     self.uid = uuid.uuid4()
     Container.__init__(self, objects)
-
 

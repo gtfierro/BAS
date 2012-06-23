@@ -25,7 +25,7 @@ type_dict = {
         },
       'VAV': {
         'required_setpoints'  : [],
-        'required_points'     : [],
+        'required_points'     : ['EXH_AIR_FAN'],
         },
       'LIG': {
         'required_setpoints'  : [],
