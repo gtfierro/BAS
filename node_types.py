@@ -1,3 +1,6 @@
+import node
+import object_types
+import device_types
 import zope.interface
 
 abbreviations = {
@@ -32,34 +35,38 @@ abbreviations = {
     'LIG' : 'Light',
     }
 
-def get_interface(s):
-  """ Get the interface for a given string, e.g. 'AHU' """
-  import device_types
+def get_device_interface(s):
+  """Get the device interface for a given string, e.g. 'REL' """
   return getattr(device_types, 'D' + s)
 
-def list_interfaces():
-  """ Returns a list of all supported interfaces identified in type_dict """
-  import device_types
+def list_device_interfaces():
+  """ Returns a list of all supported devic interfaces"""
   return [ getattr(device_types, k) for k in vars(device_types).keys() if k.isupper() and k.startswith('D') ]
 
-def list_object_types():
+def get_object_interface(s):
+  """Get the object interface for a given string, e.g. 'AHU' """
+  return getattr(object_types, 'I' + s)
+
+def list_object_interfaces():
+  """ Returns a list of all supported object interfaces"""
+  return [ getattr(object_types, k) for k in vars(object_types).keys() if k.isupper() and k.startswith('I') ]
+
+def list_objects():
   import generic_objects
-  import node
   return [v for v in vars(generic_objects).values() if type(v) == type and issubclass(v, node.Obj)]
 
-def list_device_types():
+def list_devices():
   import bacnet_devices
-  import node
   return [v for v in vars(bacnet_devices).values() if type(v) == type and issubclass(v, node.Device)]
 
 def list_tags(targ=''):
   """ Returns a list of all tags"""
   tags = set()
-  for cls in list_object_types():
+  for cls in list_objects():
     if targ and not cls.type() == targ:
         continue
     tags |= set(cls.required_devices)
-  for driver in list_device_types():
+  for driver in list_devices():
     if targ and not driver.type() == targ:
         continue
     tags |= set(driver.required_points)
@@ -68,8 +75,8 @@ def list_tags(targ=''):
 def list_types():
   """ Returns a list of all types"""
   types = []
-  types.extend(x.type() for x in list_object_types())
-  types.extend(x.type() for x in list_device_types())
+  types.extend(x.type() for x in list_objects())
+  types.extend(x.type() for x in list_devices())
   return types
 
 def get_tag_name(tag):
@@ -101,8 +108,8 @@ def verify_list(l):
       zope.interface.verify.verifyClass(i, el)
 
 def verify_devices():
-  return verify_list(list_device_types())
+  return verify_list(list_devices())
 
 def verify_objects():
-  return verify_list(list_object_types())
+  return verify_list(list_objects())
 
