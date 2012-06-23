@@ -4,8 +4,21 @@ import requests
 import json
 from zope.interface import implements
 
-from smap_wrapper import read_point, write_multiple_points
 ROOT='http://127.0.0.1:8080/data/WattStopper'
+
+def read_point(point, root=ROOT):
+  time, reading = requests.get(root + point).json['Readings'][-1]
+  return reading
+
+def write_point(point, value, type=None, root=ROOT):
+    if type:
+        write_multiple_points({point: {'type': type, 'value': value}})
+    else:
+        write_multiple_points({point: {'value': value}})
+
+def write_multiple_points(data, root=ROOT):
+    requests.post(root+'/write', json.dumps(data))
+
 
 class BACnetFAN(node.Device):
   implements(node_types.get_interface('FAN'))
@@ -72,12 +85,8 @@ class BACnetREL(node.Device):
       node.Device.__init__(self, name)
       self.point = point
 
-  def get_json(self, value):
-      return json.dumps({self.point: {'type': 'enumerated', 'value': value}})
- 
   def set_brightness(self, value):
-    requests.post(ROOT+'/write',self.get_json(value))
+    write_point(self.point, value, type='enumerated')
 
   def get_brightness(self):
-    time, reading = requests.get(ROOT + self.point).json['Readings'][-1]
-    return reading
+    return read_point(self.point)
