@@ -1,3 +1,5 @@
+import zope.interface
+
 abbreviations = {
     'DIS' : 'Discharge',
     'AIR' : 'Air',
@@ -92,4 +94,15 @@ def get_required_points(s):
       return getattr(generic_objects, s).required_drivers
   else:
     return getattr(bacnet_devices, s).required_points
+
+def verify_list(l):
+  for el in l:
+    for i in zope.interface.implementedBy(el):
+      zope.interface.verify.verifyClass(i, el)
+
+def verify_devices():
+  return verify_list(list_drivers())
+
+def verify_objects():
+  return verify_list(list_classes())
 

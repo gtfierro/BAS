@@ -154,6 +154,9 @@ hwl['HOT_WAT_SUP_TMP_SEN'].add_child(vav2['EXH_AIR_FAN'])
 vav1['EXH_AIR_FAN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
 vav2['EXH_AIR_FAN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
 
+node_types.verify_devices()
+node_types.verify_objects()
+
 
 def draw_all(filename='out.png'):
   """

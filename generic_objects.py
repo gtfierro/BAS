@@ -23,13 +23,13 @@ class AHU(node.Obj):
                      'EXH_AIR_DMP', 'RET_AIR_HUM_SEN', 'RET_AIR_TMP_SEN', 'RET_AIR_DMP', 'RET_AIR_PRS_SEN',
                      'COO_VLV', 'SUP_AIR_FAN', 'SUP_AIR_FLW_SEN','SUP_AIR_TMP_SEN','SUP_AIR_PRS_SEN']
 
-  def get_airflow():
+  def get_airflow(self):
     pass
 
-  def set_airflow():
+  def set_airflow(self, airflow):
     pass
 
-  def set_zone_temp():
+  def set_zone_temp(self):
     pass
 
 class CWL(node.Obj):
@@ -77,19 +77,3 @@ class LIG(node.Obj):
     low.set_brightness(level % 2)
     high.set_brightness(level // 2)
 
-""" 
-Double checks to make sure all of the user-provided implementations correctly
-implement the classes
-"""
-classes = [i[1] for i in inspect.getmembers(sys.modules[__name__], inspect.isclass)]
-ifaces = node_types.list_interfaces()
-error = False
-for i in ifaces:
-  for cl in classes:
-    if i.implementedBy(cl):
-      if getValidationErrors(i,cl):
-        error = True
-        print cl.__name__,"does not correctly implement",i.__name__,getValidationErrors(i,cl)
-if error:
-  print "Something is wrong! Double-check your interface implementations"
-  sys.exit(0)
