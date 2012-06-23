@@ -6,33 +6,6 @@ type_dict defines the allowed types of objects, and the allowed types of nodes
 for each of those objects. There's some redundancy
 """
 type_dict = {
-    'objects': {
-      'AHU': {
-        'required_setpoints'  : ['ZON_AIR_STP_CMD'], 
-        'required_points'     : ['OUT_AIR_DMP', 'OUT_AIR_TMP_SEN', 'MIX_AIR_TMP_SEN', 'RET_FAN', 'RET_AIR_FLW_SEN',
-                                 'EXH_AIR_DMP', 'RET_AIR_HUM_SEN', 'RET_AIR_TMP_SEN', 'RET_AIR_DMP', 'RET_AIR_PRS_SEN',
-                                 'COO_VLV', 'SUP_AIR_FAN', 'SUP_AIR_FLW_SEN','SUP_AIR_TMP_SEN','SUP_AIR_PRS_SEN'],
-        },
-      'CWL': {
-        'required_setpoints'  : ['CHL_WAT_PRS_DIF_STP'],
-        'required_points'     : ['CON_WAT_COO_TOW','CON_WAT_SUP_TMP_SEN','CON_WAT_PMP','CON_CHL_WAT_CHR',
-                                 'CON_WAT_RET_TMP_SEN','CHL_WAT_SUP_TMP_SEN','CHL_WAT_RET_TMP_SEN',
-                                 'CHL_WAT_PMP','CHL_WAT_PRS_DIF_SEN'],
-        },
-      'HWL': {
-        'required_setpoints'  : ['HOT_WAT_RET_TMP_STP','HOT_WAT_PRS_DIF_STP','HOT_WAT_SUP_TMP_STP'], 
-        'required_points' : ['HX','HOT_WAT_RET_TMP_SEN','HOT_WAT_PRS_DIF_SEN','HOT_WAT_PMP','HOT_WAT_SUP_TMP_SEN'],
-        },
-      'VAV': {
-        'required_setpoints'  : [],
-        'required_points'     : ['EXH_AIR_FAN'],
-        },
-      'LIG': {
-        'required_setpoints'  : [],
-        'required_points'     : ['HI_REL','LO_REL'],
-        },
-      },
-
     'points': {
       'REL': {
         'interface' : 'DREL',
@@ -119,54 +92,37 @@ abbreviations = {
     'LIG' : 'Light',
     }
 
-def export_json():
-  """
-  Fix up the type_dict for exporting to JSON. This means changing the interface references
-  to their string representations
-  """
-  tmp_dict = deepcopy(type_dict)
-  return json.dumps(tmp_dict)
-
-def import_json(j):
-  """
-  We just take in the JSON-formatted dict, but for all 'interface's, we have to use getattr
-  to replace the value in the dict with the actual interface reference
-  """
-  import interfaces
-  tmp_dict= json.loads(j)
-  return tmp_dict
-
 def get_interface(s):
   """ Get the interface for a given string, e.g. 'AHU' """
   import driver_types
-  return getattr(driver_types, type_dict['points'][s]['interface'])
+  return getattr(driver_types, 'D' + s)
 
 def list_interfaces():
   """ Returns a list of all supported interfaces identified in type_dict """
-  ifaces = []
-  for obj in type_dict['points'].iterkeys():
-    ifaces.append(get_interface(obj))
-  return ifaces
+  import driver_types
+  return [ getattr(driver_types, k) for k in driver_types.__dict__.keys() if k.isupper() and k.startswith('D') ]
+
+def list_classes():
+  import classes
+  import node
+  return [v for v in classes.__dict__.values() if type(v) == type and issubclass(v, node.Obj)]
 
 def list_tags(targ=''):
   """ Returns a list of all tags"""
-  tags = []
-  for o in type_dict['objects']:
-    if not targ:
-      tags.extend(type_dict['objects'][o]['required_points'])
-    elif o == targ:
-      tags.extend(type_dict['objects'][o]['required_points'])
+  tags = set()
+  for cls in list_classes():
+    tags |= set(cls.required_devices)
   for p in type_dict['points']:
     if not targ:
-      tags.extend(type_dict['points'][p]['required_points'])
+      tags |= set(type_dict['points'][p]['required_points'])
     elif p == targ:
-      tags.extend(type_dict['points'][p]['required_points'])
-  return tags
+      tags |= set(type_dict['points'][p]['required_points'])
+  return list(tags)
 
 def list_types():
   """ Returns a list of all types"""
   types = []
-  types.extend(type_dict['objects'].keys())
+  types.extend(x.__name__ for x in list_classes())
   types.extend(type_dict['points'].keys())
   return types
 
@@ -179,15 +135,17 @@ def get_tag_name(tag):
 
 def get_required_setpoints(s):
   """ Return list of required setpoints for a given string e.g. 'AH' """
-  if s in type_dict['objects'].keys():
-    return type_dict['objects'][s]['required_setpoints']
+  import classes
+  if s in classes.__dict__:
+      return getattr(classes, s).required_setpoints
   else:
     return type_dict['points'][s]['required_setpoints']
 
 def get_required_points(s):
   """ Return list of required points for a given string e.g. 'AH' """
-  if s in type_dict['objects'].keys():
-    return type_dict['objects'][s]['required_points']
+  import classes
+  if s in classes.__dict__:
+      return getattr(classes, s).required_drivers
   else:
     return type_dict['points'][s]['required_points']
 

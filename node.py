@@ -11,6 +11,15 @@ class Node(object):
   Supports methods add_child, add_parent
   """
 
+  class NodeList(list):
+    def add_child(self, child):
+      for item in self:
+        item.add_child(child)
+
+    def add_parent(self, parent):
+      for item in self:
+        item.add_parent(parent)
+
   def __init__(self, name):
     """
     obj_type: string that conforms to the list of recognized object types
@@ -39,10 +48,13 @@ class Node(object):
     if hasattr(self,'uid'):
       return hash(self.uid)
     return object.__hash__(self)
-  
+
   def set_name(self, name):
     self.name = name
     return self
+
+  def validate(self):
+    return True
 
   def _apply_to_multiple(fxn):
     """
@@ -103,28 +115,12 @@ class Container(object):
   Inheritable class for handling basic graph operations beyond what networkx provides
   """
 
-  class CallList(list):
-
-    def add_child(self, child):
-      for item in self:
-        item.add_child(child)
-    
-    def add_parent(self, parent):
-      for item in self:
-        item.add_parent(parent)
-
-  def __init__(self, objects):
+  def __init__(self, contents):
     self._nk = nx.DiGraph()
-    if objects:
-      for obj in objects:
+    if contents:
+      for obj in contents:
         obj.container = self
         self._nk.add_node(obj)
-
-  def __getitem__(self, key):
-    if key in self.points:
-      return self.CallList(self.points[key]) if isinstance(self.points[key],list) else self.points[key]
-    else:
-      return self.CallList(filter(lambda x: x, [self.points[k] if key in k else None for k in self.points]))
 
   def draw_graph(self, filename="out.png"):
     """
@@ -252,13 +248,34 @@ class Point(Node):
     self.del_attribute(att)
 
 class Obj(Node, Container):
+  required_devices = []
 
-  def __init__(self, container, name, objects=[]):
+  def __init__(self, container, name, devices=None):
     self.container = container
+    if devices is None:
+      self.devices = {}
+    else:
+      def uniquify(l):
+        c = itertools.count(start=1)
+        return [item.set_name(item.name+" "+str(c.next())) if isinstance(item, Node) else item+" "+str(c.next()) for item in l]
+      self.devices = dict(itertools.chain(*[zip(uniquify([k] * len(v)), uniquify(v)) if isinstance(v, list) else ((k, v),) for k, v in devices.items()]))
+
     Node.__init__(self, name)
-    Container.__init__(self, objects)
+    Container.__init__(self, self.devices.values())
     self.container._nk.add_node(self)
+
+    if not self.validate():
+      raise NotImplementedError("Required device not provided")
     print ">>>Object",self.name, self.uid
+
+  def validate(self):
+    return all(key.split(' ')[0] in self.required_devices for key in self.devices.keys())
+
+  def __getitem__(self, key):
+    if key in self.devices:
+      return Node.NodeList(self.devices[key]) if isinstance(self.devices[key],list) else self.devices[key]
+    else:
+      return Node.NodeList(filter(lambda x: x, [self.devices[k] if key in k else None for k in self.devices]))
 
 class Relational(Container):
 

@@ -9,45 +9,44 @@ import node
 import node_types
 import interfaces
 import inspect
-import itertools
 from zope.interface import implements
 from zope.schema import getValidationErrors
 
-def validate(obj, points):
-  """
-  If the object that calls this this an object, then we look at the list of self._nk.nodes
-  to make sure that we have all required points and set points there
-  If the object that calls this is a point, then we look at the attributes and make sure
-  that all required points/setpoitns are there
-  """
-  def uniquify(l):
-    c = itertools.count(start=1)
-    return [item.set_name(item.name+" "+str(c.next())) if isinstance(item,node.Node) else item+" "+str(c.next()) for item in l]
+# def validate(obj, points):
+#   """
+#   If the object that calls this this an object, then we look at the list of self._nk.nodes
+#   to make sure that we have all required points and set points there
+#   If the object that calls this is a point, then we look at the attributes and make sure
+#   that all required points/setpoitns are there
+#   """
+#   def uniquify(l):
+#     c = itertools.count(start=1)
+#     return [item.set_name(item.name+" "+str(c.next())) if isinstance(item,node.Node) else item+" "+str(c.next()) for item in l]
 
-  if isinstance(obj, node.Obj):
-    #check obj._nk.nodes to make sure everything from node_types is there
-    try:
-      required_points = node_types.get_required_points(obj.__class__.__name__)
-    except:
-      print "No list of required points for %s in node_types.type_dict['objects'][%s]" % (obj.__class__.__name__, obj.__class__.__name__)
-      required_points = None
-  elif isinstance(obj, node.Point):
-    #check obj.attributes
-    try:
-      required_points = node_types.get_required_points(obj.__class__.__name__)
-    except:
-      print "No list of required points for %s in node_types.type_dict['points'][%s]" % (obj.__class__.__name__, obj.__class__.__name__)
-      required_points = None
-  #now make sure that all points in required_points are in the points dict
-  objects = list(itertools.chain(*map(lambda x: uniquify(x) if isinstance(x,list) else [x],points.values())))
-  newkeys = list(itertools.chain(*map(lambda x: uniquify([x]*len(points[x])) if isinstance(points[x],list) else [x],points.keys())))
-  points = dict(zip(newkeys,objects))
-  if not required_points:
-    raise NotImplementedError
-  for reqpt in required_points:
-    if reqpt not in map(lambda x: x.split(' ')[0], points.keys()):
-      raise NotImplementedError(reqpt+" is not provided")
-  return points
+#   if isinstance(obj, node.Obj):
+#     #check obj._nk.nodes to make sure everything from node_types is there
+#     try:
+#       required_points = node_types.get_required_points(obj.__class__.__name__)
+#     except:
+#       print "No list of required points for %s in node_types.type_dict['objects'][%s]" % (obj.__class__.__name__, obj.__class__.__name__)
+#       required_points = None
+#   elif isinstance(obj, node.Point):
+#     #check obj.attributes
+#     try:
+#       required_points = node_types.get_required_points(obj.__class__.__name__)
+#     except:
+#       print "No list of required points for %s in node_types.type_dict['points'][%s]" % (obj.__class__.__name__, obj.__class__.__name__)
+#       required_points = None
+#   #now make sure that all points in required_points are in the points dict
+#   objects = list(itertools.chain(*map(lambda x: uniquify(x) if isinstance(x,list) else [x],points.values())))
+#   newkeys = list(itertools.chain(*map(lambda x: uniquify([x]*len(points[x])) if isinstance(points[x],list) else [x],points.keys())))
+#   points = dict(zip(newkeys,objects))
+#   if not required_points:
+#     raise NotImplementedError
+#   for reqpt in required_points:
+#     if reqpt not in map(lambda x: x.split(' ')[0], points.keys()):
+#       raise NotImplementedError(reqpt+" is not provided")
+#   return points
 
 
 class AHU(node.Obj):
@@ -56,13 +55,10 @@ class AHU(node.Obj):
   """
   implements(interfaces.IAHU)
 
-  def __init__(self, container, name, devices):
-    """
-    [devices] should be a dictionary mapping the expected points in node_types.get_required_points()
-    to the device instantiations from bacnet_devices (or whatever)
-    """
-    self.points = validate(self, devices)
-    node.Obj.__init__(self,container, name, self.points.values())
+  required_setpoints = ['ZON_AIR_STP_CMD']
+  required_devices = ['OUT_AIR_DMP', 'OUT_AIR_TMP_SEN', 'MIX_AIR_TMP_SEN', 'RET_FAN', 'RET_AIR_FLW_SEN',
+                     'EXH_AIR_DMP', 'RET_AIR_HUM_SEN', 'RET_AIR_TMP_SEN', 'RET_AIR_DMP', 'RET_AIR_PRS_SEN',
+                     'COO_VLV', 'SUP_AIR_FAN', 'SUP_AIR_FLW_SEN','SUP_AIR_TMP_SEN','SUP_AIR_PRS_SEN']
 
   def get_airflow():
     pass
@@ -76,51 +72,30 @@ class AHU(node.Obj):
 class CWL(node.Obj):
   implements(interfaces.ICWL)
 
-  def __init__(self, container, name, devices):
-    """
-    [devices] should be a dictionary mapping the expected points in node_types.get_required_points()
-    to the device instantiations from bacnet_devices (or whatever)
-    """
-    self.points = validate(self, devices)
-    node.Obj.__init__(self,container, name, self.points.values())
-
+  required_setpoints =  ['CHL_WAT_PRS_DIF_STP']
+  required_devices = ['CON_WAT_COO_TOW','CON_WAT_SUP_TMP_SEN','CON_WAT_PMP','CON_CHL_WAT_CHR',
+                      'CON_WAT_RET_TMP_SEN','CHL_WAT_SUP_TMP_SEN','CHL_WAT_RET_TMP_SEN',
+                      'CHL_WAT_PMP','CHL_WAT_PRS_DIF_SEN']
 
 class HWL(node.Obj):
   implements(interfaces.IHWL)
 
-  def __init__(self, container, name, devices):
-    """
-    [devices] should be a dictionary mapping the expected points in node_types.get_required_points()
-    to the device instantiations from bacnet_devices (or whatever)
-    """
-    self.points = validate(self, devices)
-    node.Obj.__init__(self,container, name, self.points.values())
+  required_setpoints = ['HOT_WAT_RET_TMP_STP','HOT_WAT_PRS_DIF_STP','HOT_WAT_SUP_TMP_STP']
+  required_devices = ['HX','HOT_WAT_RET_TMP_SEN','HOT_WAT_PRS_DIF_SEN','HOT_WAT_PMP','HOT_WAT_SUP_TMP_SEN']
 
 class VAV(node.Obj):
   implements(interfaces.IVAV)
 
-  def __init__(self, container, name, devices):
-    """
-    [devices] should be a dictionary mapping the expected points in node_types.get_required_points()
-    to the device instantiations from bacnet_devices (or whatever)
-    """
-    self.points = validate(self, devices)
-    node.Obj.__init__(self,container, name, self.points.values())
+  required_devices = ['EXH_AIR_FAN']
 
 class LIG(node.Obj):
   implements(interfaces.ILIG)
 
-  def __init__(self,container, name, devices):
-    """
-    Devices is a dictionary of mappings from required points to instantiations of them
-    e.g. {'relay_low':BACnetREL('low relay','/WS86007/RELAY05'),
-          'relay_hi' :BACnetREL('hi relay','/WS86007/RELAY06')}
-    """
-    self.points = validate(self, devices)
-    node.Obj.__init__(self,container, name, self.points.values())
+  required_setpoints = []
+  required_devices = ['HI_REL','LO_REL']
 
   def get_relays(self):
-    return filter(lambda x: x.type == "REL", self._nk.nodes())
+    return self['HI_REL'], self['LO_REL']
 
   def get_level(self):
     """
