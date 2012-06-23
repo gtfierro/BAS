@@ -91,7 +91,7 @@ def get_required_points(s):
   """ Return list of required points for a given string e.g. 'AH' """
   import generic_objects, bacnet_devices
   if s in vars(generic_objects):
-      return getattr(generic_objects, s).required_drivers
+      return getattr(generic_objects, s).required_devices
   else:
     return getattr(bacnet_devices, s).required_points
 
