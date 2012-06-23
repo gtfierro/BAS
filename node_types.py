@@ -74,7 +74,7 @@ def list_types():
 
 def get_tag_name(tag):
   """ convert something like DIS_AIR_TMP_SEN to Discharge Air Temp Sensor """
-  #convert tag to a list 
+  #convert tag to a list
   tag = tag.split("_") if "_" in tag else [tag]
   classification = [abbreviations[prefix] for prefix in tag if prefix in abbreviations ]
   return " ".join(classification)
