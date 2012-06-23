@@ -54,7 +54,7 @@ class Node(object):
     return self
 
   def validate(self):
-    return True
+    pass
 
   def _apply_to_multiple(fxn):
     """
@@ -230,12 +230,18 @@ class Device(Node):
     self.attributes = {}
     Node.__init__(self,name)
 
-    if not self.validate():
-      raise NotImplementedError("Required point not provided")
+    self.validate()
     print "Device",self.name, self.uid
 
   def validate(self):
-    return all(key.split(' ')[0] in self.required_points for key in self.attributes.keys())
+    req = set(self.required_points)
+    for k in self.attributes.keys():
+        k = k.split(' ')[0]
+        req.discard(k)
+
+    if req:
+        raise NotImplementedError("Required points %s are not provided for %s" %
+                                  (str(list(req)), self.name))
 
   def set_attribute(self, att, value):
     self.attributes[att] = value
@@ -273,12 +279,18 @@ class Obj(Node, Container):
     Container.__init__(self, self.devices.values())
     self.container._nk.add_node(self)
 
-    if not self.validate():
-      raise NotImplementedError("Required device not provided")
+    self.validate()
     print ">>>Object",self.name, self.uid
 
   def validate(self):
-    return all(key.split(' ')[0] in self.required_devices for key in self.devices.keys())
+    req = set(self.required_devices)
+    for k in self.devices.keys():
+        k = k.split(' ')[0]
+        req.discard(k)
+
+    if req:
+        raise NotImplementedError("Required devices %s are not provided for %s" %
+                                  (str(list(req)), self.name))
 
   def __getitem__(self, key):
     if key in self.devices:

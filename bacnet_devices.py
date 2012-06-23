@@ -23,8 +23,8 @@ def write_multiple_points(data, root=ROOT):
 class BACnetFAN(node.Device):
   implements(node_types.get_interface('FAN'))
 
-  required_setpoints = ['SPD']
-  required_points = ['POW']
+  # required_setpoints = ['SPD']
+  # required_points = ['POW']
   def __init__(self, name, point):
       node.Device.__init__(self, name)
       self.point = point
