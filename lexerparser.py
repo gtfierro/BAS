@@ -13,7 +13,7 @@ import gis
 class Lexer(object):
 
   tokens = [
-      'NAME','TYPE','UUID','VAR','TAG',
+      'NAME','TYPE','UUID','VAR','TAG','SPATIAL',
       'UPSTREAM','DOWNSTREAM','EQUALS',
       'LPAREN','RPAREN',
       ]
@@ -29,7 +29,11 @@ class Lexer(object):
 
   def t_NAME(self,t):
     r'\$[\w\-\:\_\s]+'
-    # find everything with name t.value and replace t.value with that value
+    t.value = t.value.strip()
+    return t
+
+  def t_SPATIAL(self,t):
+    r'!!?[\w\-\:\_\s]+'
     t.value = t.value.strip()
     return t
 
@@ -98,7 +102,10 @@ class Parser(object):
     """
     ret = []
     for item in target:
-      if item.uid not in map(lambda x: x.uid, ret):
+      if hasattr(item,'uid'):
+        if item.uid not in map(lambda x: x.uid, ret):
+          ret.append(item)
+      else:
         ret.append(item)
     return ret
 
@@ -162,6 +169,9 @@ class Parser(object):
           queue.appendleft(current.container)
     return None
 
+  def spatial_lookup(self,lookup):
+    pass
+
   def p_statement_assign(self,p):
     '''statement : VAR EQUALS query'''
     self.vars[p[1]] = p[3]
@@ -188,6 +198,15 @@ class Parser(object):
   def p_set_group(self, p):
     '''set : LPAREN query RPAREN'''
     p[0] = p[2]
+
+  def p_spatial_lookup(self, p):
+    '''set : SPATIAL'''
+    name_lookup = p[1][1:].strip()
+    strict = False
+    if name_lookup.startswith('!'):
+      name_lookup = name_lookup[1:]
+      strict = True
+    p[0] = gis.search(name_lookup, strict)
 
   def p_set_name(self,p):
     'set : NAME'
@@ -250,7 +269,13 @@ if __name__ == '__main__':
     result = parser.parse(query)
     if result:
       for res in result:
-        print res.name,res.uid
+        if isinstance(res, (Relational,Obj,Device)):
+          print res.name,res.uid
+        else: #it's a building!
+          area = res.name.split(':')[-1] if isinstance(res, gis.Area) else ''
+          floor = res if isinstance(res,gis.Floor) else res.floor if hasattr(res,'floor') else area.building if area else ''
+          building = res if isinstance(res, gis.Building) else res.building if hasattr(res,'building') else floor.building if floor else ''
+          print building,':',floor,':',area
 
 def query(string):
   """returns list of objects as returned by the query language"""
