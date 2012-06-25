@@ -1,21 +1,18 @@
-from django.contrib.gis.measure import Distance
-from django.contrib.gis.geos import *
-
 ### Distance queries
 
-# distance = Distance(m=1)
+# distance = gis.Distance(m=1)
 # For the distance object, see
 # https://docs.djangoproject.com/en/dev/ref/contrib/gis/measure/#supported-units
 # NOTE: not supported by Spatialite. We need PostGIS to use real distance units
 
-pt = fromstr('POINT(0 0)') # can use any geometry, not just points
+pt = gis.fromstr('POINT(0 0)') # can use any geometry, not just points
 distance = 1 # 1 degree lat/long - not an actual distance unit! (see above)
 gis.Area.objects.filter(regions__distance_gt=(pt, distance))
 gis.Area.objects.filter(regions__distance_lt=(pt, distance))
 
 ### Contains/intersects/disjoint queries
 
-polygon = fromstr('POLYGON ((-122.25854 37.874881, -122.258488 37.874746, -122.2583 37.874789, -122.258353 37.874924, -122.25854 37.874881))')
+polygon = gis.fromstr('POLYGON ((-122.25854 37.874881, -122.258488 37.874746, -122.2583 37.874789, -122.258353 37.874924, -122.25854 37.874881))')
 polygon2 = gis.Area.objects.all()[0].regions
 
 gis.Area.objects.filter(regions__contains=polygon)
@@ -36,7 +33,7 @@ p.areas_to_nodes(areas)
 
 nodes = Node.NodeList(node1, node2, ...)
 # OR
-nodes = p.areas_to_nodes(areas)
+nodes = p.areas_to_nodes(areas) # Automatically creates a NodeList
 areas = nodes.areas
 
 ### Chaining geo-queries
@@ -45,21 +42,6 @@ areas = gis.Areas.objects.filter(regions__intersects=zone.regions, name__contain
 
 ### Lexer/parser code for WKT
 def WKT_comma(x, limit=0):
-    """Comma-separate multiple copies of the regex"""
-    if limit == 0:
-        return r'\s*' + x + r'(\s*,' + x + r')*\s*'
-    else:
-        return r'\s*' + x + r'(\s*,' + x + r'){0,%i}\s*' % (limit -1)
-
-def WKT_paren(x):
-    """Parenthesize"""
-    return r'\s*\(' + x + '\)\s*'
-
-def WKT_prefix(name, x):
-    """Parenthesize x and prefix it with name"""
-    return r'(' + name + r'\s*' + WKT_paren(x) + ')'
-
-WKT_num = r'-?\d+(\.\d+)?'def WKT_comma(x, limit=0):
     """Comma-separate multiple copies of the regex"""
     if limit == 0:
         return r'\s*' + x + r'(\s*,' + x + r')*\s*'
@@ -87,5 +69,5 @@ WKT_multipolygon = WKT_prefix('MULTIPOLYGON', WKT_comma(WKT_paren(WKT_comma(WKT_
 
 @lex.TOKEN(WKT_point + '|' + WKT_linestring + '|' + WKT_polygon  + '|' + WKT_multipoint+ '|' + WKT_multilinestring + '|' + WKT_multipolygon)
 def t_WKT(t):
-    t.value = fromstr(t.value)
+    t.value = gis.fromstr(t.value)
     return t
