@@ -4,6 +4,8 @@ sys.path.append(os.path.abspath('./geo'))
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 from smapgeo.models import *
 from smapgeo import serialization
+from django.contrib.gis.measure import Distance
+from django.contrib.gis.geos import fromstr
 
 class BuildingsList(object):
     """

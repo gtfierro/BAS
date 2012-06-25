@@ -9,35 +9,97 @@ import node_types
 # regenerated each time
 gis.NodeLink.objects.all().delete()
 
-#Lights
+# Lights
 l = Relational('Lights')
-lightbank1 = LIG(l, 'Light Bank 1', {
-                      'LO_REL' : BACnetREL( "Low Relay", "/WS86007/RELAY11"),
-                      'HI_REL' : BACnetREL( "High Relay", "/WS86007/RELAY12")
-                      })
-lightbank2 = LIG(l, 'Light Bank 2', {
-                      'LO_REL' : BACnetREL( "Low Relay", "/WS86007/RELAY09"),
-                      'HI_REL' : BACnetREL( "High Relay", "/WS86007/RELAY10")
-                      })
-lightbank3 = LIG(l, 'Light Bank 3', {
-                      'LO_REL' : BACnetREL( "Low Relay", "/WS86007/RELAY07"),
-                      'HI_REL' : BACnetREL( "High Relay", "/WS86007/RELAY08")
-                      })
-lightbank4 = LIG(l, 'Light Bank 4', {
-                      'LO_REL' : BACnetREL( "Low Relay", "/WS86007/RELAY03"),
-                      'HI_REL' : BACnetREL( "High Relay", "/WS86007/RELAY04")
-                      })
-lightbank5 = LIG(l, 'Light Bank 5', {
-                      'LO_REL' : BACnetREL( "Low Relay", "/WS86007/RELAY05"),
-                      'HI_REL' : BACnetREL( "High Relay", "/WS86007/RELAY06")
+# Floor 4
+lightbank4_1 = LIG(l, 'Light Bank 1', {
+                        'LO_REL' : BACnetREL( "Low Relay", "/WS86007/RELAY12"),
+                        'HI_REL' : BACnetREL( "High Relay", "/WS86007/RELAY11")
+                        })
+lightbank4_2 = LIG(l, 'Light Bank 2', {
+                        'LO_REL' : BACnetREL( "Low Relay", "/WS86007/RELAY10"),
+                        'HI_REL' : BACnetREL( "High Relay", "/WS86007/RELAY09")
+                        })
+lightbank4_3 = LIG(l, 'Light Bank 3', {
+                        'LO_REL' : BACnetREL( "Low Relay", "/WS86007/RELAY08"),
+                        'HI_REL' : BACnetREL( "High Relay", "/WS86007/RELAY07")
+                        })
+lightbank4_4 = LIG(l, 'Light Bank 4', {
+                        'LO_REL' : BACnetREL( "Low Relay", "/WS86007/RELAY04"),
+                        'HI_REL' : BACnetREL( "High Relay", "/WS86007/RELAY03")
                       })
 
+lightbank4_5 = LIG(l, 'Light Bank 5', {
+                        'LO_REL' : BACnetREL( "Low Relay", "/WS86007/RELAY06"),
+                        'HI_REL' : BACnetREL( "High Relay", "/WS86007/RELAY05")
+                        })
+# Floor 5
+lightbank5_1 = LIG(l, 'Light Bank 1', {
+                        'LO_REL' : BACnetREL( "Low Relay", "/WS86008/RELAY10"),
+                        'HI_REL' : BACnetREL( "High Relay", "/WS86008/RELAY11")
+                        })
+lightbank5_2 = LIG(l, 'Light Bank 2', {
+                        'LO_REL' : BACnetREL( "Low Relay", "/WS86008/RELAY12"),
+                        'HI_REL' : BACnetREL( "High Relay", "/WS86008/RELAY13")
+                        })
+lightbank5_3 = LIG(l, 'Light Bank 3', {
+                        'LO_REL' : BACnetREL( "Low Relay", "/WS86008/RELAY07"),
+                        'HI_REL' : BACnetREL( "High Relay", "/WS86008/RELAY06")
+                        })
+lightbank5_4 = LIG(l, 'Light Bank 4', {
+                        'LO_REL' : BACnetREL( "Low Relay", "/WS86008/RELAY09"),
+                        'HI_REL' : BACnetREL( "High Relay", "/WS86008/RELAY08")
+                        })
+lightbank5_5 = LIG(l, 'Light Bank 5', {
+                        'LO_REL' : BACnetREL( "Low Relay", "/WS86008/RELAY05"),
+                        'HI_REL' : BACnetREL( "High Relay", "/WS86008/RELAY04")
+                        })
+lightbank5_6 = LIG(l, 'Light Bank 6', {
+                        'LO_REL' : BACnetREL( "Low Relay", "/WS86008/RELAY03"),
+                        'HI_REL' : BACnetREL( "High Relay", "/WS86008/RELAY02")
+                        })
+
+# Floor 6
+lightbank6_1 = LIG(l, 'Light Bank 1', {
+                        'LO_REL' : BACnetREL( "Low Relay", "/WS86010/RELAY03"),
+                        'HI_REL' : BACnetREL( "High Relay", "/WS86010/RELAY02")
+                      })
+
+# Floor 7
+lightbank7_1 = LIG(l, 'Light Bank 1', {
+                        'LO_REL' : BACnetREL( "Low Relay", "/WS86011/RELAY09"),
+                        'HI_REL' : BACnetREL( "High Relay", "/WS86011/RELAY08")
+                      })
+lightbank7_2 = LIG(l, 'Light Bank 2', {
+                        'LO_REL' : BACnetREL( "Low Relay", "/WS86011/RELAY11"),
+                        'HI_REL' : BACnetREL( "High Relay", "/WS86011/RELAY10")
+                        })
+lightbank7_3 = LIG(l, 'Light Bank 3', {
+                        'LO_REL' : BACnetREL( "Low Relay", "/WS86011/RELAY05"),
+                        'HI_REL' : BACnetREL( "High Relay", "/WS86011/RELAY04")
+                        })
+lightbank7_4 = LIG(l, 'Light Bank 4', {
+                        'LO_REL' : BACnetREL( "Low Relay", "/WS86011/RELAY07"),
+                        'HI_REL' : BACnetREL( "High Relay", "/WS86011/RELAY06")
+                      })
+
+
+
 sdh_floor4 = gis.buildings['Sutardja Dai Hall']['Floor4']
-lightbank1.areas.add(sdh_floor4['Zone1'])
-lightbank2.areas.add(sdh_floor4['Zone2'])
-lightbank3.areas.add(sdh_floor4['Zone3'])
-lightbank4.areas.add(sdh_floor4['Zone4'])
-lightbank5.areas.add(sdh_floor4['Zone5'])
+lightbank4_1.areas.add(sdh_floor4['Zone1'])
+lightbank4_2.areas.add(sdh_floor4['Zone2'])
+lightbank4_3.areas.add(sdh_floor4['Zone3'])
+lightbank4_4.areas.add(sdh_floor4['Zone4'])
+lightbank4_5.areas.add(sdh_floor4['Zone5'])
+
+sdh_floor6 = gis.buildings['Sutardja Dai Hall']['Floor6']
+lightbank6_1.areas.add(sdh_floor6['Zone1'])
+
+sdh_floor7 = gis.buildings['Sutardja Dai Hall']['Floor7']
+lightbank7_1.areas.add(sdh_floor7['Zone1'])
+lightbank7_2.areas.add(sdh_floor7['Zone2'])
+lightbank7_3.areas.add(sdh_floor7['Zone3'])
+lightbank7_4.areas.add(sdh_floor7['Zone4'])
 
 #Air Handler 1
 hvac = Relational('HVAC')

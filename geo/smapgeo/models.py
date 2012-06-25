@@ -20,6 +20,9 @@ class NodeLink(models.Model):
     id = models.AutoField(primary_key=True)
     uuid = models.CharField(unique=True, max_length=36)
 
+    def __unicode__(self):
+        return self.uuid
+
 class Building(models.Model, Serializable):
     name = models.CharField(max_length=50, unique=True)
 
