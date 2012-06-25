@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{ building.name }}</title>
+<style type="text/css">
+#svgbasics { width: 1000px; height: 1000px; border: 1px solid #484; }
+</style>
+<script type="text/javascript" src="/static/jquery-1.6.4.min.js"></script>
+<script type="text/javascript" src="/static/jquery.svg.min.js"></script>
+<script type="text/javascript">
+$(function() {
+	$('#svgbasics').svg({loadURL: '{{ building.id }}.svg', onLoad:function(){
+$('#svgbasics').css('height', '300');
+$('.floor').each(function(index, element){
+  $('<input type="radio" name="radio" value="' + element.id + '" />'+ element.id + '<label for="' + element.id + '">').change(function(){
+        radioValue = $(this).val();
+	    $('.floor').hide();
+        $('#' + radioValue).show();
+}).attr('checked', 'checked').appendTo('#buttons');
+});
+
+
+}});
+});
+</script>
+</head>
+<body>
+<h1>{{ building.name }}</h1>
+<div id="svgbasics"></div>
+<div id="buttons"></div>
+</body>
+</html>
+

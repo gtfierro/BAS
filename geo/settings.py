@@ -1,5 +1,6 @@
 # Django settings for geo project.
 import os
+PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -49,6 +50,7 @@ MEDIA_ROOT = ''
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
 MEDIA_URL = ''
 
+
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
@@ -66,6 +68,7 @@ ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
+    os.path.join(PROJECT_PATH, 'media'),
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -142,4 +145,4 @@ LOGGING = {
     }
 }
 
-SMAPGEO_DATA_DIR = os.path.join(os.path.abspath('.').split('appstack')[0], 'data')
+SMAPGEO_DATA_DIR = os.path.abspath(os.path.join(PROJECT_PATH, '../../data'))

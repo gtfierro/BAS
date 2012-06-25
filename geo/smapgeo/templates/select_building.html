@@ -1,11 +1,7 @@
 <!DOCTYPE html> 
 <html>
   <head>
-{% comment %}
-    <script language="javascript" type="text/javascript" src="/media/jquery-1.5.2/jquery-1.5.2.min.js"></script>
-    <script language="javascript" type="text/javascript" src="/media/graph/js/buttons.js"></script>
-    <link type="text/css" href="/media/jquery-ui/css/redmond/jquery-ui-1.8.11.custom.css" rel="Stylesheet" />
-{% endcomment %}
+    <script language="javascript" type="text/javascript" src="/static/jquery-1.6.4.min.js"></script>
 
 <style type="text/css">
   #body {
@@ -97,6 +93,11 @@
     class="big_button fg-button ui-state-default ui-corner-top ui-corner-bottom
     ">Go to upload page</a>
 {% for building in buildings %}
+  <a href="{{ url_prefix }}{{ building.id }}.html"
+    class="big_button fg-button ui-state-default
+      {% if forloop.first %} ui-corner-top {% endif %}
+      {% if forloop.last %} ui-corner-bottom {% endif %}
+    ">{{ building.name }} (HTML)</a>
   <a href="{{ url_prefix }}{{ building.id }}.svg"
     class="big_button fg-button ui-state-default
       {% if forloop.first %} ui-corner-top {% endif %}
