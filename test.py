@@ -154,6 +154,8 @@ hwl['HOT_WAT_SUP_TMP_SEN'].add_child(vav1['EXH_AIR_FAN'])
 hwl['HOT_WAT_SUP_TMP_SEN'].add_child(vav2['EXH_AIR_FAN'])
 vav1['EXH_AIR_FAN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
 vav2['EXH_AIR_FAN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
+vav1['EXH_AIR_FAN'].add_child(cwl['CHL_WAT_PRS_DIF_SEN'])
+vav2['EXH_AIR_FAN'].add_child(cwl['CHL_WAT_PRS_DIF_SEN'])
 
 node_types.verify_devices()
 node_types.verify_objects()
@@ -184,5 +186,5 @@ def draw_all(filename='out.png'):
   for n in biggraph.nodes():
     if "." not in n.name:
       n.name = n.name+"."+_make_abbreviation(n.container.name)
-  nx.draw_graphviz(biggraph,prog='neato',width=1,node_size=300,font_size=6,overlap='scalexy')
+  nx.draw_graphviz(biggraph,prog='neato',width=1,node_size=300,font_size=4,overlap='scalexy')
   plt.savefig(filename)
