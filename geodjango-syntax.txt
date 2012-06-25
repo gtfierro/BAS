@@ -38,3 +38,36 @@ nodes = Node.NodeList(node1, node2, ...)
 # OR
 nodes = p.areas_to_nodes(areas)
 areas = nodes.areas
+
+
+### Lexer/parser code for WKT
+def WKT_comma(x, limit=0):
+    """Comma-separate multiple copies of the regex"""
+    if limit == 0:
+        return r'\s*' + x + r'(\s*,' + x + r')*\s*'
+    else:
+        return r'\s*' + x + r'(\s*,' + x + r'){0,%i}\s*' % (limit -1)
+
+def WKT_paren(x):
+    """Parenthesize"""
+    return r'\s*\(' + x + '\)\s*'
+
+def WKT_prefix(name, x):
+    """Parenthesize x and prefix it with name"""
+    return r'(' + name + r'\s*' + WKT_paren(x) + ')'
+
+WKT_num = r'-?\d+(\.\d+)?'
+WKT_coord = '\s*' + WKT_num + '\s+' + WKT_num + '\s*'
+WKT_point = WKT_prefix('POINT', WKT_coord)
+WKT_linestring = WKT_prefix('LINESTRING', WKT_comma(WKT_coord))
+WKT_polygon = WKT_prefix('POLYGON', WKT_comma(WKT_paren(WKT_comma(WKT_coord)), limit=2))
+WKT_multipoint_1 = WKT_prefix('MULTIPOINT', WKT_comma(WKT_paren(WKT_coord)))
+WKT_multipoint_2 = WKT_prefix('MULTIPOINT', WKT_comma(WKT_coord))
+WKT_multipoint = r'(' + WKT_multipoint_1 + r'|' + WKT_multipoint_2 + r')'
+WKT_multilinestring = WKT_prefix('MULTILINESTRING', WKT_comma(WKT_paren(WKT_comma(WKT_coord))))
+WKT_multipolygon = WKT_prefix('MULTIPOLYGON', WKT_comma(WKT_paren(WKT_comma(WKT_paren(WKT_comma(WKT_coord)), limit=2))))
+
+@lex.TOKEN(WKT_point + '|' + WKT_linestring + '|' + WKT_polygon  + '|' + WKT_multipoint+ '|' + WKT_multilinestring + '|' + WKT_multipolygon)
+def t_WKT(t):
+    t.value = fromstr(t.value)
+    return t
