@@ -84,11 +84,17 @@ class Parser(object):
     self.domain = []
     self.vars = {}
 
-  def links_to_nodes(self, links):
+  def _links_to_nodes(self, links):
     for r in self.relationals:
       for node in r.nodes:
         if str(node.uid) in [link.uuid for link in links]:
             yield node
+
+  def links_to_nodes(self, links):
+      return Node.NodeList(self._links_to_nodes(links))
+
+  def areas_to_nodes(self, areas):
+    return self.links_to_nodes(list(itertools.chain.from_iterable(x.nodes.all() for x in areas)))
 
   def filter_dup_uids(self, target):
     """
