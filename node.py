@@ -20,6 +20,10 @@ class Node(object):
       for item in self:
         item.add_parent(parent)
 
+    @property
+    def areas(self):
+        return gis.Area.objects.filter(nodes__in=[x.link for x in self])
+
   def __init__(self, name):
     """
     obj_type: string that conforms to the list of recognized object types
@@ -32,7 +36,7 @@ class Node(object):
     self.uid = uuid.uuid4()
     self.metadata = {}
 
-    self._link, _ = gis.NodeLink.objects.get_or_create(uuid=self.uid)
+    self.link, _ = gis.NodeLink.objects.get_or_create(uuid=self.uid)
 
     #self.container.add_nodes(self)
 
@@ -108,7 +112,7 @@ class Node(object):
 
   @property
   def areas(self):
-    return self._link.areas
+    return self.link.areas
 
 class Container(object):
   """
