@@ -1,4 +1,5 @@
 import sys, os
+from collections import deque
 sys.path.append(os.path.abspath('./geo'))
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 from smapgeo.models import *
@@ -28,4 +29,33 @@ class BuildingsList(object):
         for b in Building.objects.all():
             yield b
 
+
 buildings=BuildingsList()
+
+def search(string,strict=False):
+  """
+  search the buildings, then the floors, then the areas for occurence of [string],
+  and return that object (or objects)
+  """
+  domain = deque()
+  results = []
+  #initialize queue with buildings
+  for b in list(buildings):
+    domain.appendleft(b)
+  while domain:
+    current = domain.pop()
+    if strict:
+      if string == current.name:
+        results.append(current)
+    else:
+      if string in current.name:
+        results.append(current)
+    if hasattr(current,'floors'):
+      for f in list(current.floors.all()):
+        domain.appendleft(f)
+    #maybe buildings will have areas too, so this is `if` instead of `elif`
+    if hasattr(current,'areas'):
+      for a in list(current.areas.all()):
+        domain.appendleft(a)
+  return results
+
