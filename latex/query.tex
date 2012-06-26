@@ -153,6 +153,42 @@ to get the floor that ``Lightbank 1'' affects.
 % subsection more_complicated_spatial_queries (end)
 % section spatial_queries (end)
 
+\section{Actuation}
+Now you can actuate these items through the prompt exposed by running \verb+python lexerparser.py+. If you assign the result of your query to a variable, you can access the results of those queries later.
+\\\\
+You can assign a query result to variable by including it in the query:
+\begin{center}
+\verb+@lights = #LIG < !Floor 4+
+\end{center}
+or you can just run a query
+\begin{center}
+\verb+#LIG < !Floor 4+
+\end{center}
+and then assign a variable to the last query by using the special character \verb+_ +:
+\begin{center}
+\verb+@lights = _+
+\end{center}
+Then, simply type in the actuation command into the lexerparser prompt: \verb+actuate+. Now, all of your variables are available in a localized Python prompt! For example, using the example above, we can type \verb+lights+ into the python prompt:
+
+\begin{verbatim}
+>>> lights
+[<generic_objects.LIG object at 0x10426b250>, <generic_objects.LIG object at
+ 0x104261a50>, <generic_objects.LIG object at 0x104261f90>, <generic_objects.LIG
+ object at 0x104261e10>, <generic_objects.LIG object
+ at 0x10426b410>]
+\end{verbatim}
+and then we can run the actuation commands on them (assuming you have your actuation sMAP server running):
+\begin{verbatim}
+>>> for light in lights:
+      print light.get_level()
+
+0
+3
+3
+0
+0
+\end{verbatim}
+
 \section{Additional Examples} % (fold)
 \label{sub:additional_examples}
 
