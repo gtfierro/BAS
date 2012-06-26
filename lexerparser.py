@@ -1,6 +1,7 @@
 import sys
-import test
+import code
 import inspect
+import test
 import itertools
 import networkx as nx
 from ply.lex import lex
@@ -14,7 +15,7 @@ class Lexer(object):
 
   tokens = [
       'NAME','TYPE','UUID','VAR','TAG','SPATIAL',
-      'UPSTREAM','DOWNSTREAM','EQUALS',
+      'UPSTREAM','DOWNSTREAM','EQUALS','KEYWORD',
       'LPAREN','RPAREN',
       ]
 
@@ -57,8 +58,8 @@ class Lexer(object):
     t.value = t.value.strip()
     return t
 
-  def t_keyword(self, t):
-    r'\b(help|types|prefixes|examples|tags)\b'
+  def t_KEYWORD(self, t):
+    r'\b(help|types|prefixes|examples|tags|actuate)\b'
     if t.value == 'help':
       print " help: returns this help list \n types: returns list of types you can query \n tags: returns a list of tags you can query \n prefixes: returns list of prefixes for queries \n examples: lists some example queries"
     elif t.value == 'types':
@@ -69,6 +70,8 @@ class Lexer(object):
       print " #TYPE: designates set of all objects with type [TYPE] \n $Name Of Object: designates set of all objects named [Name of Object] (case sensitive \n %ab61b939-a133-4d76-b9c4-a5d6fab7abf5: designates object tagged with uuid \n @var_name: you can assign queries to variables and use them in later queries \n &TAG designates set of all objects tagged as TAG"
     elif t.value == 'examples':
       print " #DMP < $Return Air Handler: give me all dampers downstream of the Return Air Handler"
+    elif t.value == 'actuate':
+      return t
     t.lexer.skip(1)
 
   def t_error(self,t):
@@ -83,6 +86,17 @@ class Parser(object):
     self.relationals = [getattr(test, i) for i in test.__dict__ if isinstance(getattr(test,i), Relational)]
     self.domain = []
     self.vars = {}
+
+  def call_actuation_console(self):
+    """
+    Start an interactive python console with the local variables and names preloaded 
+    into the environment
+    """
+    local_vars = {}
+    for k in self.vars.iterkeys():
+      local_vars[k[1:]] = self.vars[k]
+    console = code.InteractiveConsole(local_vars)
+    console.interact()
 
   def _links_to_nodes(self, links):
     for r in self.relationals:
@@ -236,6 +250,11 @@ class Parser(object):
     else: #neither node nor target is spatial, so we do nothing
       return node,target
 
+  def p_actuation(self,p):
+    '''statement : KEYWORD'''
+    if p[1] == 'actuate':
+      self.call_actuation_console()
+
   def p_statement_assign(self,p):
     '''statement : VAR EQUALS query'''
     self.vars[p[1]] = p[3]
@@ -324,6 +343,7 @@ class Parser(object):
       print "Syntax error!",p
 
   tokens = Lexer.tokens
+
 
 if __name__ == '__main__':
   debug= int(sys.argv[1]) if len(sys.argv) > 1 else 0
