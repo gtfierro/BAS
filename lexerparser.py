@@ -244,7 +244,6 @@ class Parser(object):
     '''statement : query'''
     p[0] = p[1]
 
-  #TODO: update to incorporate spatial queries
   def p_query(self,p):
     '''query : query UPSTREAM set
              | query DOWNSTREAM set'''

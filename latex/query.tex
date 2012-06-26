@@ -42,6 +42,8 @@ For example, the graph above \emph{functions} as an Air Handler, so it would be 
 
 % section introduction (end)
 
+
+
 \section{Query Language} % (fold)
 \label{sec:query_language}
 \subsection{What Can I Query?} % (fold)
@@ -114,9 +116,44 @@ which returns the correct list of sensors:
 Additionally, we can save the result of this query in a variable:
 \begin{center}\verb+@sensors = #SEN < %ab61b939-a133-4d76-b9c4-a5d6fab7abf5+\end{center}
 and then run further queries on that variable to search this new domain.
+\section{Spatial Queries} % (fold)
+\label{sec:spatial_queries}
+\subsection{I Can Do Spatial Queries?} % (fold)
+\label{sub:i_can_do_spatial_queries_}
+Well, mostly. 
+\\\\
+We haven't geotagged {\bf everything}, but what's there, you can run queries on. 
+\begin{center}
+\begin{tabular}{|l|c|r|}
+ \hline
+\verb+!name+ & matches partial names & ``!Zone'' matches ``Zone1, Zone2, etc'' \\ \hline
+\verb+!!name+ & matches strict names & ``!!Zone'' matches nothing. ``Zone1'' matches ``Zone1'' \\ \hline
+\end{tabular}
+\end{center}
+The spatial hierarchy is thus: each building is represented by a Building model, which contains several Floor models. Each floor can be separated into an arbitrary number of arbitrarily sized ``areas'' (the ``zones'' I refer to above are such areas). There is no differentiation at the query level as to which of these layers you are specifying. For querying specific spatial locations, use the double-bang (\verb+!!name+), and for querying all areas on a floor, use something like \verb+!Zone < !!Floor 4+, which brings us to our next topic.
+% subsection i_can_do_spatial_queries_ (end)
+\subsection{More Complicated Spatial Queries} % (fold)
+\label{sec:more_complicated_spatial_queries}
+Of course, we can find all floors on a building by running a query such as
+\begin{center}
+\verb+!Floor < !!Sutardja Dai Hall+
+\end{center}but what if we want to combine spatial queries with object-based queries? Well, now you can! (mostly...)
+\\\\
+The ``$<$'' delimiter specifies a ``belonging to'' or ``contained within'' relationship, so queries such as
+\begin{center}
+\verb+#LIG < (!!Zone 1 < !Floor < !!Sutardja Dai Hall)+
+\end{center}
+will return all lights for all ``Zone 1''s on each floor of SDH.
 
-% subsection constructing_a_query (end)
-\subsection{Additional Examples} % (fold)
+Alternatively, we can run a query such as 
+\begin{center}
+\verb+!Floor > $Lightbank 1+
+\end{center}
+to get the floor that ``Lightbank 1'' affects.
+% subsection more_complicated_spatial_queries (end)
+% section spatial_queries (end)
+
+\section{Additional Examples} % (fold)
 \label{sub:additional_examples}
 
 \begin{center}\emph{``I want all outside air dampers''}
