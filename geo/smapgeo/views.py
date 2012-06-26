@@ -23,6 +23,15 @@ def index(request):
         })
     return HttpResponse(t.render(c))
 
+def building_html(request, building_id):
+    t = loader.get_template('building.html')
+    c = Context({
+        'heading' : 'Buildings',
+        'url_prefix' : '/smapgeo/',
+        'building' : Building.objects.get(id=building_id)
+        })
+    return HttpResponse(t.render(c))
+
 def building_svg(request, building_id):
     try:
         b = Building.objects.get(id=building_id)

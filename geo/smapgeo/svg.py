@@ -71,6 +71,7 @@ def building_to_svg(building):
 
         f.set('id', floor_id)
         f.set(addNS('groupmode', 'inkscape'), 'layer')
+        f.set('class', 'floor')
         f.set(addNS('label', 'inkscape'), floor.name)
 
         views = floor.views.filter(shortname='floorplan')
