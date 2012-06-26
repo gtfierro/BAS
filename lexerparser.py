@@ -107,8 +107,6 @@ class Parser(object):
         flattened.extend(list(place.areas.all()))
       else:
         flattened.append(place)
-    print "from",gisobj,"we get",flattened
-    print
     return flattened
 
   def areas_to_nodes(self, areas):
@@ -218,8 +216,6 @@ class Parser(object):
                             to find 3's areas
     1:object, 3:object => use search_relatives (just return node and target unchanged)
     """
-    print node
-    print target
     nodespatial = self.isspatial(node)
     targetspatial = self.isspatial(target)
     if targetspatial and not nodespatial: #resolve target into objects!
@@ -229,24 +225,14 @@ class Parser(object):
       target = self.nodes_to_areas(target)
       targetspatial = True
     if nodespatial and targetspatial: #resolve the derivative relationship spatially
-      if direction=="<": #want to get all nodes that intersect anything in target
-        target_regions = []
-        node_regions = []
-        target = self.get_areas(target)
-        node_areas = self.get_areas(node)
-
-        for area in target:
-          target_regions.extend(gis.Area.objects.filter(regions__contains=area.regions))
-        for area in node_areas:
-          node_regions.extend(gis.Area.objects.filter(regions__contains=area.regions))
-        print 'node_regions:',node_regions
-        print
-        print 'target_regions:',target_regions
-        print
-
-      #find all spatial relatives from nodespatial to target spatial
-      #if node < target, find everything in
-      return None,None
+      target_regions = []
+      node_regions = []
+      #TODO: fix the filter stuff, decide what >,< mean
+      for area in self.get_areas(target):
+        target_regions.extend(gis.Area.objects.filter(regions__exact=area.regions))
+      for area in self.get_areas(node):
+        node_regions.extend(gis.Area.objects.filter(regions__exact=area.regions))
+      return filter(lambda x: x in target_regions, node_regions), None
     else: #neither node nor target is spatial, so we do nothing
       return node,target
 
@@ -264,12 +250,15 @@ class Parser(object):
              | query DOWNSTREAM set'''
     res = []
     domain,target = self.resolve_spatial(p[1],p[3],p[2])
-    if p[2] == ">": #upstream
-      next_domain = [self.search_relatives(node, p[3],"successors") for node in p[1]]
+    if not self.isspatial(domain) and not self.isspatial(target):
+      if p[2] == ">": #upstream
+        next_domain = [self.search_relatives(node, target,"successors") for node in domain]
+      else:
+        next_domain = [self.search_relatives(node, target,"predecessors") for node in domain]
+      next_domain = filter(lambda x: x, next_domain)
+      p[0] = self.filter_dup_uids(next_domain)
     else:
-      next_domain = [self.search_relatives(node, p[3],"predecessors") for node in p[1]]
-    next_domain = filter(lambda x: x, next_domain)
-    p[0] = self.filter_dup_uids(next_domain)
+      p[0] = domain
 
   def p_query_set(self,p):
     '''query : set'''
