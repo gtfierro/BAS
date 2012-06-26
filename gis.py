@@ -31,7 +31,6 @@ class BuildingsList(object):
         for b in Building.objects.all():
             yield b
 
-
 buildings=BuildingsList()
 
 def search(string,strict=False):

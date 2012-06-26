@@ -93,8 +93,40 @@ class Parser(object):
   def links_to_nodes(self, links):
       return Node.NodeList(self._links_to_nodes(links))
 
+  def get_areas(self, gisobj):
+    """
+    returns a list of the areas for the given gisobj
+    """
+    areas = [gisobj] if not isinstance(gisobj,list) else gisobj
+    flattened = []
+    for place in areas:
+      if isinstance(place, gis.Building):
+        for floor in place.floors.all():
+          flattened.extend(list(floor.areas.all()))
+      if isinstance(place, gis.Floor):
+        flattened.extend(list(place.areas.all()))
+      else:
+        flattened.append(place)
+    print "from",gisobj,"we get",flattened
+    print
+    return flattened
+
   def areas_to_nodes(self, areas):
+    """
+    For every item in [areas], we resolve it down to all areas inside it and
+    then return the flat list of all nodes in those areas
+    """
+    areas = self.get_areas(areas)
     return self.links_to_nodes(list(itertools.chain.from_iterable(x.nodes.all() for x in areas)))
+  
+  def nodes_to_areas(self,nodes):
+    nodes = [nodes] if not isinstance(nodes,list) else nodes
+    flattened = []
+    for node in nodes:
+      extension = node.areas.all()
+      if extension:
+        flattened.extend(extension) 
+    return flattened
 
   def filter_dup_uids(self, target):
     """
@@ -105,7 +137,7 @@ class Parser(object):
       if hasattr(item,'uid'):
         if item.uid not in map(lambda x: x.uid, ret):
           ret.append(item)
-      else:
+      else: #if it doesn't have a uid, then it's a spatial
         ret.append(item)
     return ret
 
@@ -169,8 +201,54 @@ class Parser(object):
           queue.appendleft(current.container)
     return None
 
-  def spatial_lookup(self,lookup):
-    pass
+  def isspatial(self, nodes):
+    """
+    returns True if [nodes] contains spatial objects
+    """
+    nodes = [nodes] if not isinstance(nodes,list) else nodes
+    return all(map(lambda x: not isinstance(x, (Relational, Node)),nodes))
+
+  def resolve_spatial(self,node,target,direction):
+    """
+    resolve queries before we send them along to be resolved so that we're dealing with a constant datatype: spatials or objects
+
+    1:spatial, 3:spatial => 'normal' spatial lookup, looking for some overlap between 1 and 3
+    1:object, 3:spatial => resolve 3 to nodes, use the search_relatives fxn to filter 1
+    1:spatial, 3:object => use nodes.areas and then go to the first case. go up the hierarchy
+                            to find 3's areas
+    1:object, 3:object => use search_relatives (just return node and target unchanged)
+    """
+    print node
+    print target
+    nodespatial = self.isspatial(node)
+    targetspatial = self.isspatial(target)
+    if targetspatial and not nodespatial: #resolve target into objects!
+      target = self.areas_to_nodes(target)
+      return node,target
+    elif nodespatial and not targetspatial: #resolve target into areas!
+      target = self.nodes_to_areas(target)
+      targetspatial = True
+    if nodespatial and targetspatial: #resolve the derivative relationship spatially
+      if direction=="<": #want to get all nodes that intersect anything in target
+        target_regions = []
+        node_regions = []
+        target = self.get_areas(target)
+        node_areas = self.get_areas(node)
+
+        for area in target:
+          target_regions.extend(gis.Area.objects.filter(regions__contains=area.regions))
+        for area in node_areas:
+          node_regions.extend(gis.Area.objects.filter(regions__contains=area.regions))
+        print 'node_regions:',node_regions
+        print
+        print 'target_regions:',target_regions
+        print
+
+      #find all spatial relatives from nodespatial to target spatial
+      #if node < target, find everything in
+      return None,None
+    else: #neither node nor target is spatial, so we do nothing
+      return node,target
 
   def p_statement_assign(self,p):
     '''statement : VAR EQUALS query'''
@@ -180,10 +258,12 @@ class Parser(object):
     '''statement : query'''
     p[0] = p[1]
 
+  #TODO: update to incorporate spatial queries
   def p_query(self,p):
     '''query : query UPSTREAM set
              | query DOWNSTREAM set'''
     res = []
+    domain,target = self.resolve_spatial(p[1],p[3],p[2])
     if p[2] == ">": #upstream
       next_domain = [self.search_relatives(node, p[3],"successors") for node in p[1]]
     else:
@@ -199,7 +279,7 @@ class Parser(object):
     '''set : LPAREN query RPAREN'''
     p[0] = p[2]
 
-  def p_spatial_lookup(self, p):
+  def p_set_spatial(self, p):
     '''set : SPATIAL'''
     name_lookup = p[1][1:].strip()
     strict = False
@@ -213,12 +293,8 @@ class Parser(object):
     name_lookup = p[1][1:].strip()
     domain = p[0] if p[0] else self.relationals
     res = []
-    if '!' in name_lookup:
-      #TODO: spatial name lookup
-      pass
-    else:
-      for r in domain:
-        res.extend(r.search(lambda x: x.name == name_lookup))
+    for r in domain:
+      res.extend(r.search(lambda x: x.name == name_lookup))
     p[0] = self.filter_dup_uids(res)
 
   def p_set_type(self,p):

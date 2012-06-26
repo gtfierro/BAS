@@ -20,7 +20,7 @@ gis.Area.objects.filter(regions__intersects=polygon)
 gis.Area.objects.filter(regions__disjoint=polygon2)
 
 ### Filtering within a given building/floor
-gis.buildings['Sutardja Dai Hall']['Floor4'].areas.filter(regions__contains=polygon)
+gis.buildings['Sutardja Dai Hall']['Floor4'].areas.filter(regions__contains=polygon) #can use ,name__contains='Cubicle') as well
 # OR
 gis.Area.objects.filter(regions__contains=polygon, floor__building__name='Sutardja Dai Hall', floor__name='Floor 4')
 

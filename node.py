@@ -22,7 +22,8 @@ class Node(object):
 
     @property
     def areas(self):
-        return gis.Area.objects.filter(nodes__in=[x.link for x in self])
+      print 'here!'
+      return gis.Area.objects.filter(nodes__in=[x.link for x in self])
 
   def __init__(self, name):
     """
@@ -112,7 +113,7 @@ class Node(object):
 
   @property
   def areas(self):
-    return self.link.areas
+    return self.container.areas if hasattr(self.container,'areas') and not self.link.areas.all() else self.link.areas
 
 class Container(object):
   """
