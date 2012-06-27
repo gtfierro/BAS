@@ -15,7 +15,7 @@ class Lexer(object):
 
   tokens = [
       'NAME','TYPE','UUID','VAR','TAG','SPATIAL',
-      'UPSTREAM','DOWNSTREAM','EQUALS','KEYWORD',
+      'UPSTREAM','DOWNSTREAM','EQUALS','KEYWORD','LASTVALUE',
       'LPAREN','RPAREN',
       ]
 
@@ -58,6 +58,11 @@ class Lexer(object):
     t.value = t.value.strip()
     return t
 
+  def t_LASTVALUE(self,t):
+    r'\b\_\b'
+    t.value = t.value.strip()
+    return t
+
   def t_KEYWORD(self, t):
     r'\b(help|types|prefixes|examples|tags|actuate)\b'
     if t.value == 'help':
@@ -86,6 +91,7 @@ class Parser(object):
     self.relationals = [getattr(test, i) for i in test.__dict__ if isinstance(getattr(test,i), Relational)]
     self.domain = []
     self.vars = {}
+    self.lastvalue = []
 
   def call_actuation_console(self):
     """
@@ -261,6 +267,7 @@ class Parser(object):
 
   def p_statement_query(self,p):
     '''statement : query'''
+    self.lastvalue=p[1]
     p[0] = p[1]
 
   def p_query(self,p):
@@ -274,17 +281,22 @@ class Parser(object):
       else:
         next_domain = [self.search_relatives(node, target,"predecessors") for node in domain]
       next_domain = filter(lambda x: x, next_domain)
-      p[0] = self.filter_dup_uids(next_domain)
+      p[0] = self.lastvalue=self.filter_dup_uids(next_domain)
     else:
-      p[0] = domain
+      p[0] = self.lastvalue=domain
 
   def p_query_set(self,p):
     '''query : set'''
-    p[0] = self.filter_dup_uids(p[1])
+    p[0] = self.lastvalue = self.filter_dup_uids(p[1])
+
 
   def p_set_group(self, p):
     '''set : LPAREN query RPAREN'''
-    p[0] = p[2]
+    p[0] = self.lastvalue = p[2]
+
+  def p_set_lastvalue(self,p):
+    '''set : LASTVALUE'''
+    p[0] = self.lastvalue
 
   def p_set_spatial(self, p):
     '''set : SPATIAL'''
@@ -293,7 +305,7 @@ class Parser(object):
     if name_lookup.startswith('!'):
       name_lookup = name_lookup[1:]
       strict = True
-    p[0] = gis.search(name_lookup, strict)
+    p[0] = self.lastvalue = gis.search(name_lookup, strict)
 
   def p_set_name(self,p):
     'set : NAME'
@@ -302,7 +314,7 @@ class Parser(object):
     res = []
     for r in domain:
       res.extend(r.search(lambda x: x.name == name_lookup))
-    p[0] = self.filter_dup_uids(res)
+    p[0] = self.lastvalue = self.filter_dup_uids(res)
 
   def p_set_type(self,p):
     'set : TYPE'
@@ -311,7 +323,7 @@ class Parser(object):
     res = []
     for r in domain:
       res.extend(r.search(lambda x: x.type() == type_lookup))
-    p[0] = self.filter_dup_uids(res)
+    p[0] = self.lastvalue = self.filter_dup_uids(res)
 
   def p_set_uuid(self,p):
     'set : UUID'
@@ -320,7 +332,7 @@ class Parser(object):
     res = []
     for r in domain:
       res.extend(r.search(lambda x: str(x.uid) == uuid_lookup))
-    p[0] = res
+    p[0] = self.lastvalue = res
 
   def p_set_var(self,p):
     'set : VAR'
@@ -336,7 +348,7 @@ class Parser(object):
     for d in domain:
       if d[tag_lookup]:
         res.append(d[tag_lookup]) 
-    p[0] = res
+    p[0] = self.lastvalue = res
 
   def p_error(self,p):
     if p:
