@@ -95,8 +95,16 @@ class Parser(object):
     local_vars = {}
     for k in self.vars.iterkeys():
       local_vars[k[1:]] = self.vars[k]
-    console = code.InteractiveConsole(local_vars)
-    console.interact()
+    try:
+      from IPython.frontend.terminal.embed import TerminalInteractiveShell
+      from IPython.frontend.terminal.ipapp import load_default_config
+      config = load_default_config()
+      shell = TerminalInteractiveShell(config=config, user_ns=local_vars)
+      shell.mainloop()
+    except ImportError:
+      console = code.InteractiveConsole(local_vars)
+      console.interact()
+
 
   def _links_to_nodes(self, links):
     for r in self.relationals:
