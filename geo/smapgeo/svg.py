@@ -40,7 +40,7 @@ def building_to_svg(building):
   xmlns:svg="http://www.w3.org/2000/svg"
   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-  xmlns:dm="{}">
+  xmlns:geo="{}">
   sodipodi:docname="{}">
 </svg>
 """.format(str(NSS[u'geo']), building.name)
