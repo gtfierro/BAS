@@ -83,7 +83,9 @@ $('.floor').each(function(index, element){
         $('#' + radioValue).show();
 }).attr('checked', 'checked').appendTo('#buttons');
 });
-
+$('.area').click(function() {
+  alert($(this).children('title').text());
+})
 
 }});
 });
