@@ -370,7 +370,11 @@ if __name__ == '__main__':
   parser = yacc(module=Parser(debug_flag=debug), write_tables=0)
   print "type 'help' for assistance"
   while True:
-    query = raw_input("query> ")
+    try:
+      query = raw_input("query> ")
+    except EOFError:
+      print ''
+      break
     if not query:
       continue
     result = parser.parse(query)
