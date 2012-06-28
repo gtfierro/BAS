@@ -124,7 +124,7 @@ class Parser(object):
       if isinstance(place, gis.Building):
         for floor in place.floors.all():
           flattened.extend(list(floor.areas.all()))
-      if isinstance(place, gis.Floor):
+      elif isinstance(place, gis.Floor):
         flattened.extend(list(place.areas.all()))
       else:
         flattened.append(place)
