@@ -1,7 +1,6 @@
 import sys
 import code
 import inspect
-import test
 import itertools
 import networkx as nx
 from ply.lex import lex
@@ -10,6 +9,7 @@ from node import *
 from node_types import *
 from collections import deque
 import gis
+import test
 from IPython.frontend.terminal.interactiveshell import TerminalInteractiveShell 
 
 class Lexer(object):
