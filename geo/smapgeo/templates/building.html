@@ -3,13 +3,25 @@
 <head>
 <title>{{ building.name }}</title>
 <style type="text/css">
-#svgbasics { width: 1000px; height: 1000px; border: 1px solid #484; }
+  #svgbasics { width: 1000px; height: 1000px; border: 1px solid #484; }
 
   #body {
     position: absolute;
     top: 0px;
     left: 0px;
     width:500px;
+  }
+
+  #buttons {
+    position: absolute;
+    top: 100px;
+    left: 720px;
+    width:100px;
+    height:240px;
+  }
+
+  #query {
+    width: 500px;
   }
 
   #body_padding {
@@ -75,16 +87,23 @@
 <script type="text/javascript">
 $(function() {
 	$('#svgbasics').svg({loadURL: '{{ building.id }}.svg', onLoad:function(){
-$('#svgbasics').css('height', '300');
+$('#svgbasics').css('height', '240').css('width', '700');
 $('.floor').each(function(index, element){
-  $('<input type="radio" name="radio" value="' + element.id + '" />'+ element.id + '<label for="' + element.id + '">').change(function(){
+  $('<input type="radio" name="radio" value="' + element.id + '" />'+ $(element).attr('inkscape:label') + '<label for="' + element.id + '">').change(function(){
         radioValue = $(this).val();
 	    $('.floor').hide();
         $('#' + radioValue).show();
 }).attr('checked', 'checked').appendTo('#buttons');
+  $('<br/>').appendTo('#buttons');
 });
 $('.area').click(function() {
-  alert($(this).children('title').text());
+  building = '{{ building.name }}'
+  floor = $(this).parent().attr('inkscape:label');
+  area = $(this).children('title').text();
+  $('p#building').html('Building: ' + building);
+  $('p#floor').html('Floor: ' + floor);
+  $('p#area').html('Area: ' + area);
+  $('input#query').val('!!' + area + ' < !!' + floor);
 })
 
 }});
@@ -95,6 +114,12 @@ $('.area').click(function() {
 <h1>{{ building.name }}</h1>
 <div id="svgbasics"></div>
 <div id="buttons"></div>
+<div id="info">
+<p id="building">Building: {{ building.name }}</p>
+<p id="floor">Floor: Floor 4</p>
+<p id="area">Area: Zone 4</p>
+<p>Query: <input id="query" type='text' spellcheck='false' value='!!Zone 4 < !!Floor 4 < !!{{ building.name }}'/></p>
+</div>
 <div id="menu">
   <a href="{{ url_prefix }}"
     class="big_button fg-button ui-state-default ui-corner-top
