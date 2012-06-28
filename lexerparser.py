@@ -105,12 +105,11 @@ class Parser(object):
       from IPython.frontend.terminal.embed import TerminalInteractiveShell
       from IPython.frontend.terminal.ipapp import load_default_config
       config = load_default_config()
-      shell = TerminalInteractiveShell(config=config, user_ns=local_vars)
-      shell.mainloop()
+      console = TerminalInteractiveShell(config=config, user_ns=local_vars)
+      console.mainloop()
     except ImportError:
       console = code.InteractiveConsole(local_vars)
       console.interact()
-
 
   def _links_to_nodes(self, links):
     for r in self.relationals:
