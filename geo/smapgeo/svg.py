@@ -135,6 +135,7 @@ def svg_to_building(s):
             for metadata_node in group.iterchildren():
                 if metadata_node.tag == addNS('title', 'dc'):
                     name = group.text
+    name = name.strip('\n\t')
 
     b = find_or_create(Building, save=True, name=name)
     for group in svg:
