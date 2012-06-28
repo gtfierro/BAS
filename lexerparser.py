@@ -10,6 +10,7 @@ from node import *
 from node_types import *
 from collections import deque
 import gis
+from IPython.frontend.terminal.interactiveshell import TerminalInteractiveShell 
 
 class Lexer(object):
 
@@ -101,8 +102,8 @@ class Parser(object):
     local_vars = {}
     for k in self.vars.iterkeys():
       local_vars[k[1:]] = self.vars[k]
-    console = code.InteractiveConsole(local_vars)
-    console.interact()
+    console = TerminalInteractiveShell(user_ns=local_vars)
+    console.mainloop()
 
   def _links_to_nodes(self, links):
     for r in self.relationals:
