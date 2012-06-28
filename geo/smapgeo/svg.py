@@ -40,7 +40,7 @@ def building_to_svg(building):
   xmlns:svg="http://www.w3.org/2000/svg"
   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-  xmlns:dm="{}">
+  xmlns:geo="{}">
   sodipodi:docname="{}">
 </svg>
 """.format(str(NSS[u'geo']), building.name)
@@ -56,7 +56,7 @@ def building_to_svg(building):
       .area {
         fill: #0000ff;
         fill-opacity: 0.3;
-        stroke-width: 0.000002;
+        stroke-width: 2.0;
         stroke: #000000;
       }
     """
@@ -93,15 +93,10 @@ def building_to_svg(building):
         except:
             pass
 
-        g = d.makeelement(addNS('g', 'svg'))
-        f.append(g)
-        g.set(addNS('groupmode', 'inkscape'), 'layer')
-        g.set(addNS('label', 'inkscape'), floor.name + ' areas')
-        g.set('transform', formatTransform(geoutil.inverse(view.mtx)))
         for area in floor.areas.all():
             area_id = area.shortname
-            a = g.makeelement(addNS('path', 'svg'))
-            g.append(a)
+            a = f.makeelement(addNS('path', 'svg'))
+            f.append(a)
 
             a.set('id', floor_id + '__' + area_id)
             title = a.makeelement(addNS('title', 'svg'))
@@ -114,7 +109,9 @@ def building_to_svg(building):
                                   ['{}={}'.format(m.tagname, m.tagval) for m in area.metadata.all()])
             a.set('class', 'area')
 
-            a.set('d', simplepath.formatPath(regions_to_path(area.get_regions())))
+            path = cubicsuperpath.CubicSuperPath(regions_to_path(area.get_regions()))
+            simpletransform.applyTransformToPath(geoutil.inverse(view.mtx), path)
+            a.set('d', cubicsuperpath.formatPath(path))
 
     d.set('width', str(max_width))
     d.set('height', str(max_height))
@@ -138,6 +135,7 @@ def svg_to_building(s):
             for metadata_node in group.iterchildren():
                 if metadata_node.tag == addNS('title', 'dc'):
                     name = group.text
+    name = name.strip('\n\t')
 
     b = find_or_create(Building, save=True, name=name)
     for group in svg:
@@ -167,15 +165,10 @@ def parse_floor(b, group):
     else:
         return
 
-    for node in group:
-        if node.tag == addNS('g', 'svg') and node.get(addNS('groupmode', 'inkscape')) == 'layer':
-            group = node
-            break
-    else:
-        assert False
-
-    v = find_or_create(View, save=False, floor=f, shortname='floorplan')
-    v.mtx = geoutil.inverse(simpletransform.parseTransform(group.get('transform')))
+    try:
+        v = View.objects.filter(floor=f, shortname='floorplan')[0]
+    except IndexError:
+        return
     v.image = 'floor_plans/' + image.split('/')[-1]
     v.save()
 
@@ -209,6 +202,9 @@ def parse_path(f, node):
     t = node.get('transform')
     if t is not None:
         simpletransform.applyTransformToPath(simpletransform.parseTransform(t), p)
+
+    view = f.views.filter(shortname='floorplan')[0]
+    simpletransform.applyTransformToPath(view.mtx, p)
     cspsubdiv.cspsubdiv(p, flatness)
     for sp in p:
         region = []

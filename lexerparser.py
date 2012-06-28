@@ -10,7 +10,6 @@ from node import *
 from node_types import *
 from collections import deque
 import gis
-from IPython.frontend.terminal.interactiveshell import TerminalInteractiveShell 
 
 class Lexer(object):
 
@@ -102,8 +101,15 @@ class Parser(object):
     local_vars = {}
     for k in self.vars.iterkeys():
       local_vars[k[1:]] = self.vars[k]
-    console = TerminalInteractiveShell(user_ns=local_vars)
-    console.mainloop()
+    try:
+      from IPython.frontend.terminal.embed import TerminalInteractiveShell
+      from IPython.frontend.terminal.ipapp import load_default_config
+      config = load_default_config()
+      console = TerminalInteractiveShell(config=config, user_ns=local_vars)
+      console.mainloop()
+    except ImportError:
+      console = code.InteractiveConsole(local_vars)
+      console.interact()
 
   def _links_to_nodes(self, links):
     for r in self.relationals:
@@ -364,7 +370,11 @@ if __name__ == '__main__':
   parser = yacc(module=Parser(debug_flag=debug), write_tables=0)
   print "type 'help' for assistance"
   while True:
-    query = raw_input("query> ")
+    try:
+      query = raw_input("query> ")
+    except EOFError:
+      print ''
+      break
     if not query:
       continue
     result = parser.parse(query)
