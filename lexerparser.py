@@ -30,7 +30,7 @@ class Lexer(object):
   t_ignore      = ' \t'
 
   def t_NAME(self,t):
-    r'\$[\w\-\:\_\s]+'
+    r'\$[^!][\w\-\:\_\s]+'
     t.value = t.value.strip()
     return t
 
@@ -302,11 +302,7 @@ class Parser(object):
   def p_set_spatial(self, p):
     '''set : SPATIAL'''
     name_lookup = p[1][1:].strip()
-    strict = False
-    if name_lookup.startswith('!'):
-      name_lookup = name_lookup[1:]
-      strict = True
-    p[0] = self.lastvalue = gis.search(name_lookup, strict)
+    p[0] = self.lastvalue = gis.search(name_lookup)
 
   def p_set_name(self,p):
     'set : NAME'
@@ -382,4 +378,9 @@ def query(string):
   """returns list of objects as returned by the query language"""
   lexer = lex(module=Lexer())
   parser = yacc(module=Parser())
+  lexer.input(string)
+  while 1:
+    tok = lexer.token()
+    if not tok: break
+    print tok
   return parser.parse(string)
