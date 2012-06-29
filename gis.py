@@ -33,7 +33,7 @@ class BuildingsList(object):
 
 buildings=BuildingsList()
 
-def search(string,strict=False):
+def search(string):
   """
   search the buildings, then the floors, then the areas for occurence of [string],
   and return that object (or objects)
@@ -45,12 +45,8 @@ def search(string,strict=False):
     domain.appendleft(b)
   while domain:
     current = domain.pop()
-    if strict:
-      if string == current.name:
-        results.append(current)
-    else:
-      if string in current.name:
-        results.append(current)
+    if string in current.name:
+      results.append(current)
     if hasattr(current,'floors'):
       for f in list(current.floors.all()):
         domain.appendleft(f)

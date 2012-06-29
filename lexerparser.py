@@ -1,7 +1,5 @@
 import sys
-import code
 import inspect
-import test
 import itertools
 import networkx as nx
 from ply.lex import lex
@@ -10,6 +8,7 @@ from node import *
 from node_types import *
 from collections import deque
 import gis
+import test
 
 class Lexer(object):
 
@@ -29,7 +28,7 @@ class Lexer(object):
   t_ignore      = ' \t'
 
   def t_NAME(self,t):
-    r'\$[\w\-\:\_\s]+'
+    r'\$[^!][\w\-\:\_\s]+'
     t.value = t.value.strip()
     return t
 
@@ -130,7 +129,7 @@ class Parser(object):
       if isinstance(place, gis.Building):
         for floor in place.floors.all():
           flattened.extend(list(floor.areas.all()))
-      if isinstance(place, gis.Floor):
+      elif isinstance(place, gis.Floor):
         flattened.extend(list(place.areas.all()))
       else:
         flattened.append(place)
@@ -308,11 +307,7 @@ class Parser(object):
   def p_set_spatial(self, p):
     '''set : SPATIAL'''
     name_lookup = p[1][1:].strip()
-    strict = False
-    if name_lookup.startswith('!'):
-      name_lookup = name_lookup[1:]
-      strict = True
-    p[0] = self.lastvalue = gis.search(name_lookup, strict)
+    p[0] = self.lastvalue = gis.search(name_lookup)
 
   def p_set_name(self,p):
     'set : NAME'
@@ -392,4 +387,9 @@ def query(string):
   """returns list of objects as returned by the query language"""
   lexer = lex(module=Lexer())
   parser = yacc(module=Parser())
+  lexer.input(string)
+  while 1:
+    tok = lexer.token()
+    if not tok: break
+    print tok
   return parser.parse(string)
