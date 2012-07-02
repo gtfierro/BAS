@@ -110,5 +110,8 @@ def get_methods(target):
   or an object for the purposes of the API
   """
   base_attributes = filter(lambda x: not x[0].startswith("_"), get_class(target).__dict__.keys())
-  return filter(lambda x: inspect.ismethod(getattr(target, x)), base_attributes)
-
+  methods = filter(lambda x: inspect.ismethod(getattr(target, x)), base_attributes)
+  ret = {}
+  for m in methods:
+    ret[m] = inspect.getdoc(getattr(target,m))
+  return ret
