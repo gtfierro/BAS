@@ -1,4 +1,5 @@
 import node
+import inspect
 import object_types
 import device_types
 import generic_objects
@@ -94,4 +95,20 @@ def verify_devices():
 
 def verify_objects():
   return verify_list(list_objects())
+
+def get_class(target):
+  """
+  returns the class in generic_objects that [target] inherits from
+  """
+  classes = map(lambda x: x[1], inspect.getmembers(generic_objects,predicate=inspect.isclass))
+  target_class = filter(lambda x: isinstance(target, x), classes)
+  return target_class[0] if target_class else None
+
+def get_methods(target):
+  """
+  Returns a list of non-inherited methods for [target], which can be either a device
+  or an object for the purposes of the API
+  """
+  base_attributes = filter(lambda x: not x[0].startswith("_"), get_class(target).__dict__.keys())
+  return filter(lambda x: inspect.ismethod(getattr(target, x)), base_attributes)
 
