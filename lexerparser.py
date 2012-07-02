@@ -43,7 +43,7 @@ class Lexer(object):
     return t
  
   def t_UUID(self,t):
-    r'\%[^!][a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}[ ]?'
+    r'\%[^!]?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}[ ]?'
     t.value = t.value.strip()
     return t
 
