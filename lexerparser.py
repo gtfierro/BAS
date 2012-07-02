@@ -152,7 +152,7 @@ class Parser(object):
       extension = node.areas.all()
       if extension:
         flattened.extend(extension) 
-    return flattened
+    return list(set(flattened))
 
   def filter_dup_uids(self, target):
     """
@@ -262,7 +262,7 @@ class Parser(object):
         target_regions.extend(gis.Area.objects.filter(regions__exact=area.regions))
       for area in self.get_areas(node):
         node_regions.extend(gis.Area.objects.filter(regions__exact=area.regions))
-      return filter(lambda x: x in target_regions, node_regions), None
+      return list(set(filter(lambda x: x in target_regions, node_regions))), None
     else: #neither node nor target is spatial, so we do nothing
       return node,target
 
