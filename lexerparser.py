@@ -48,7 +48,7 @@ class Lexer(object):
     return t
 
   def t_VAR(self,t):
-    r'\@[^!][a-zA-Z_][a-zA-Z0-9_]*[ ]?'
+    r'\@[^!]?[a-zA-Z_][a-zA-Z0-9_]*[ ]?'
     t.value = t.value.strip()
     return t
 
@@ -100,6 +100,7 @@ class Parser(object):
     local_vars = {}
     for k in self.vars.iterkeys():
       local_vars[k[1:]] = self.vars[k]
+    local_vars['api'] = lambda x: get_methods(x)
     try:
       from IPython.frontend.terminal.embed import TerminalInteractiveShell
       from IPython.frontend.terminal.ipapp import load_default_config

@@ -106,9 +106,17 @@ def get_class(target):
 
 def get_methods(target):
   """
-  Returns a list of non-inherited methods for [target], which can be either a device
+  Returns a dict of non-inherited methods for [target], which can be either a device
   or an object for the purposes of the API
+  Dict is of format {'method_as_string': 'doc_string_of_method'}
   """
   base_attributes = filter(lambda x: not x[0].startswith("_"), get_class(target).__dict__.keys())
-  return filter(lambda x: inspect.ismethod(getattr(target, x)), base_attributes)
-
+  methods = filter(lambda x: inspect.ismethod(getattr(target, x)), base_attributes)
+  interface = filter(lambda x: x.implementedBy(get_class(target)) if hasattr(x,'implementedBy') else False, vars(object_types).values())[0]
+  ret = {}
+  for m in methods:
+    ret[m] = inspect.getdoc(getattr(target,m))
+    if not ret[m]:
+      interface_method = interface.get(m)
+      ret[m] = interface_method.getDoc() if interface_method else None
+  return ret
