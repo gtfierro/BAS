@@ -7,5 +7,12 @@
 <p>Name: {{ obj.name }}</p>
 <p>Type: {{ obj.type }}</p>
 <p>UUID: <a href='{{url_prefix}}uuid/{{ obj.uuid }}.html'>{{ obj.uuid }}</a></p>
+<p><a href='{{url_prefix}}uuid/{{ obj.uuid }}'>JSON format</a></p>
+<p>
+Methods:
+{% for method in obj.methods %}
+{{ method }},
+{% endfor %}
+</p>
 </body>
 </html>
