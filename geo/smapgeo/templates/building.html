@@ -103,7 +103,7 @@ $('.area').click(function() {
   $('p#building').html('Building: ' + building);
   $('p#floor').html('Floor: ' + floor);
   $('p#area').html('Area: ' + area);
-  $('input#query').val('!!' + area + ' < !!' + floor);
+  $('a#query').attr('href', '/webapi/query.html?q=' + '.<!' + area + '<!' + floor);
 })
 
 }});
@@ -118,7 +118,7 @@ $('.area').click(function() {
 <p id="building">Building: {{ building.name }}</p>
 <p id="floor">Floor: Floor 4</p>
 <p id="area">Area: Zone 4</p>
-<p>Query: <input id="query" type='text' spellcheck='false' value='!!Zone 4 < !!Floor 4'/></p>
+<p><a id="query" href="#">List Devices</a></p>
 </div>
 <div id="menu">
   <a href="{{ url_prefix }}"
