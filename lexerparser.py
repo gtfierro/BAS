@@ -38,7 +38,7 @@ class Lexer(object):
     return t
 
   def t_SPATIAL(self,t):
-    r'![\w\-\:\_\s]+'
+    r'!([\w\-\:\_\s]+)?'
     t.value = t.value.strip()
     return t
 
