@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Objects</title>
+</head>
+<body>
+{% for obj in objs %}
+<p>Name: {{ obj.name }}</p>
+<p>Type: {{ obj.type }}</p>
+<p>UUID: <a href='{{url_prefix}}uuid/{{ obj.uuid }}.html'>{{ obj.uuid }}</a></p>
+{% endfor %}
+</body>
+</html>
