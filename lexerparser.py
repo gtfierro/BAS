@@ -8,7 +8,7 @@ from node import *
 from node_types import *
 from collections import deque
 import gis
-import test
+import sdh
 
 class Lexer(object):
 
@@ -87,7 +87,7 @@ class Parser(object):
   def __init__(self,debug_flag=False):
     self.debug = debug_flag
     self.lexer = lex(module=Lexer())
-    self.relationals = [getattr(test, i) for i in test.__dict__ if isinstance(getattr(test,i), Relational)]
+    self.relationals = [getattr(sdh, i) for i in sdh.__dict__ if isinstance(getattr(sdh,i), Relational)]
     self.domain = []
     self.vars = {}
     self.lastvalue = []
