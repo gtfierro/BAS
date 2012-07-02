@@ -33,7 +33,7 @@ class Lexer(object):
     return t
 
   def t_TAG(self,t):
-    r'\.[^!]?[A-Z_]+[ ]?'
+    r'\.([^!]?[A-Z_]+)?[ ]?'
     t.value = t.value.strip()
     return t
 
@@ -215,10 +215,12 @@ class Parser(object):
       if current.external_parents and direction == "predecessors":
         for p in current.external_parents:
           if p not in already_visited:
+            already_visited.append(p)
             queue.appendleft(p)
       elif current.external_childs and direction == "successors":
         for c in current.external_childs:
           if c not in already_visited:
+            already_visited.append(c)
             queue.appendleft(c)
       #finally, add the current's container to the queue
       if not isinstance(current.container, Relational):
@@ -297,7 +299,6 @@ class Parser(object):
     '''query : set'''
     p[0] = self.lastvalue = self.filter_dup_uids(p[1])
 
-
   def p_set_group(self, p):
     '''set : LPAREN query RPAREN'''
     p[0] = self.lastvalue = p[2]
@@ -326,15 +327,19 @@ class Parser(object):
     tag_lookup = p[1][1:].strip()
     domain = p[0] if p[0] else self.relationals
     for r in domain:
-      res.extend(r.search(lambda x: x.type() == tag_lookup))
-    domain = [r._nk.nodes() if isinstance(r,Relational) else r for r in domain]
-    domain = list(itertools.chain(*domain))
-    for d in domain:
-      if d[tag_lookup]:
-        if isinstance(d[tag_lookup], Node.NodeList):
-          res.extend(list(d[tag_lookup]))
-        else:
-          res.append(d[tag_lookup]) 
+      if tag_lookup:
+        res.extend(r.search(lambda x: x.type() == tag_lookup))
+      else:
+        res.extend(r.search(lambda x: True))
+    if tag_lookup:
+      domain = [r._nk.nodes() if isinstance(r,Relational) else r for r in domain]
+      domain = list(itertools.chain(*domain))
+      for d in domain:
+        if d[tag_lookup]:
+          if isinstance(d[tag_lookup], Node.NodeList):
+            res.extend(list(d[tag_lookup]))
+          else:
+            res.append(d[tag_lookup]) 
     p[0] = self.lastvalue = self.filter_dup_uids(res)
 
 
@@ -365,7 +370,6 @@ class Parser(object):
       print "Syntax error!",p
 
   tokens = Lexer.tokens
-
 
 if __name__ == '__main__':
   debug= int(sys.argv[1]) if len(sys.argv) > 1 else 0
