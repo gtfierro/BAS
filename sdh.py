@@ -2,12 +2,12 @@ from node import Relational
 from generic_objects import *
 from bacnet_devices import *
 import networkx as nx
-# import gis
+import gis
 import node_types
 
 # Delete all NodeLink objects: we don't have persistent UUIDs so they need to be
 # regenerated each time
-# gis.NodeLink.objects.all().delete()
+gis.NodeLink.objects.all().delete()
 
 # Lights
 l = Relational('Lights')
@@ -85,21 +85,21 @@ lightbank7_4 = LIG(l, 'Light Bank 4', {
 
 
 
-# sdh_floor4 = gis.buildings['Sutardja Dai Hall']['Floor4']
-# lightbank4_1.areas.add(sdh_floor4['Zone1'])
-# lightbank4_2.areas.add(sdh_floor4['Zone2'])
-# lightbank4_3.areas.add(sdh_floor4['Zone3'])
-# lightbank4_4.areas.add(sdh_floor4['Zone4'])
-# lightbank4_5.areas.add(sdh_floor4['Zone5'])
+sdh_floor4 = gis.buildings['Sutardja Dai Hall']['Floor4']
+lightbank4_1.areas.add(sdh_floor4['Zone1'])
+lightbank4_2.areas.add(sdh_floor4['Zone2'])
+lightbank4_3.areas.add(sdh_floor4['Zone3'])
+lightbank4_4.areas.add(sdh_floor4['Zone4'])
+lightbank4_5.areas.add(sdh_floor4['Zone5'])
 
-# sdh_floor6 = gis.buildings['Sutardja Dai Hall']['Floor6']
-# lightbank6_1.areas.add(sdh_floor6['Zone1'])
+sdh_floor6 = gis.buildings['Sutardja Dai Hall']['Floor6']
+lightbank6_1.areas.add(sdh_floor6['Zone1'])
 
-# sdh_floor7 = gis.buildings['Sutardja Dai Hall']['Floor7']
-# lightbank7_1.areas.add(sdh_floor7['Zone1'])
-# lightbank7_2.areas.add(sdh_floor7['Zone2'])
-# lightbank7_3.areas.add(sdh_floor7['Zone3'])
-# lightbank7_4.areas.add(sdh_floor7['Zone4'])
+sdh_floor7 = gis.buildings['Sutardja Dai Hall']['Floor7']
+lightbank7_1.areas.add(sdh_floor7['Zone1'])
+lightbank7_2.areas.add(sdh_floor7['Zone2'])
+lightbank7_3.areas.add(sdh_floor7['Zone3'])
+lightbank7_4.areas.add(sdh_floor7['Zone4'])
 
 #Air Handler 1
 hvac = Relational('HVAC')
