@@ -364,6 +364,7 @@ if __name__ == '__main__':
   lexer = lex(module=Lexer())
   parser = yacc(module=Parser(debug_flag=debug), write_tables=0)
   print "type 'help' for assistance"
+  import readline
   while True:
     try:
       query = raw_input("query> ")
