@@ -13,7 +13,7 @@ import sdh
 class Lexer(object):
 
   tokens = [
-      'NAME','TYPE','UUID','VAR','TAG','SPATIAL',
+      'NAME','UUID','VAR','TAG','SPATIAL',
       'UPSTREAM','DOWNSTREAM','EQUALS','KEYWORD','LASTVALUE',
       'LPAREN','RPAREN',
       ]
@@ -32,15 +32,20 @@ class Lexer(object):
     t.value = t.value.strip()
     return t
 
-  def t_SPATIAL(self,t):
-    r'!!?[\w\-\:\_\s]+'
+  def t_TAG(self,t):
+    r'\.[^!]?[A-Z_]+[ ]?'
     t.value = t.value.strip()
     return t
 
-  def t_TYPE(self,t):
-    r'\#[^!][A-Z0-9]+[ ]?'
+  def t_SPATIAL(self,t):
+    r'![\w\-\:\_\s]+'
     t.value = t.value.strip()
     return t
+
+#  def t_TYPE(self,t):
+#    r'\#[^!][A-Z0-9]+[ ]?'
+#    t.value = t.value.strip()
+#    return t
  
   def t_UUID(self,t):
     r'\%[^!]?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}[ ]?'
@@ -52,10 +57,6 @@ class Lexer(object):
     t.value = t.value.strip()
     return t
 
-  def t_TAG(self,t):
-    r'\&[^!][A-Z_]+[ ]?'
-    t.value = t.value.strip()
-    return t
 
   def t_LASTVALUE(self,t):
     r'\b\_\b'
@@ -316,17 +317,35 @@ class Parser(object):
     domain = p[0] if p[0] else self.relationals
     res = []
     for r in domain:
-      res.extend(r.search(lambda x: x.name == name_lookup))
+      res.extend(r.search(lambda x: name_lookup in x.name))
     p[0] = self.lastvalue = self.filter_dup_uids(res)
 
-  def p_set_type(self,p):
-    'set : TYPE'
-    type_lookup = p[1][1:].strip()
-    domain = p[0] if p[0] else self.relationals
+  def p_set_tag(self,p):
+    'set : TAG'
     res = []
+    tag_lookup = p[1][1:].strip()
+    domain = p[0] if p[0] else self.relationals
     for r in domain:
-      res.extend(r.search(lambda x: x.type() == type_lookup))
+      res.extend(r.search(lambda x: x.type() == tag_lookup))
+    domain = [r._nk.nodes() if isinstance(r,Relational) else r for r in domain]
+    domain = list(itertools.chain(*domain))
+    for d in domain:
+      if d[tag_lookup]:
+        if isinstance(d[tag_lookup], Node.NodeList):
+          res.extend(list(d[tag_lookup]))
+        else:
+          res.append(d[tag_lookup]) 
     p[0] = self.lastvalue = self.filter_dup_uids(res)
+
+
+#  def p_set_type(self,p):
+#    'set : TYPE'
+#    type_lookup = p[1][1:].strip()
+#    domain = p[0] if p[0] else self.relationals
+#    res = []
+#    for r in domain:
+#      res.extend(r.search(lambda x: x.type() == type_lookup))
+#    p[0] = self.lastvalue = self.filter_dup_uids(res)
 
   def p_set_uuid(self,p):
     'set : UUID'
@@ -340,18 +359,6 @@ class Parser(object):
   def p_set_var(self,p):
     'set : VAR'
     p[0] = self.vars.get(p[1],[])
-
-  def p_set_tag(self,p):
-    'set : TAG'
-    tag_lookup = p[1][1:].strip()
-    domain = p[0] if p[0] else self.relationals
-    domain = [r._nk.nodes() if isinstance(r,Relational) else r for r in domain]
-    domain = list(itertools.chain(*domain))
-    res = []
-    for d in domain:
-      if d[tag_lookup]:
-        res.append(d[tag_lookup]) 
-    p[0] = self.lastvalue = res
 
   def p_error(self,p):
     if p:
