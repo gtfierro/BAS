@@ -38,22 +38,22 @@ class Lexer(object):
     return t
 
   def t_TYPE(self,t):
-    r'\#!?[A-Z0-9]+[ ]?'
+    r'\#[^!][A-Z0-9]+[ ]?'
     t.value = t.value.strip()
     return t
  
   def t_UUID(self,t):
-    r'\%!?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}[ ]?'
+    r'\%[^!][a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}[ ]?'
     t.value = t.value.strip()
     return t
 
   def t_VAR(self,t):
-    r'\@[a-zA-Z_][a-zA-Z0-9_]*[ ]?'
+    r'\@[^!][a-zA-Z_][a-zA-Z0-9_]*[ ]?'
     t.value = t.value.strip()
     return t
 
   def t_TAG(self,t):
-    r'\&!?[A-Z_]+[ ]?'
+    r'\&[^!][A-Z_]+[ ]?'
     t.value = t.value.strip()
     return t
 
