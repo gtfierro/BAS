@@ -7,7 +7,15 @@
 {% for obj in objs %}
 <p>Name: {{ obj.name }}</p>
 <p>Type: {{ obj.type }}</p>
+{% if obj.uuid %}
 <p>UUID: <a href='{{url_prefix}}uuid/{{ obj.uuid }}.html'>{{ obj.uuid }}</a></p>
+{% endif %}
+{% if obj.floor %}
+<p>Floor: {{ obj.floor }}</p>
+{% endif %}
+{% if obj.building %}
+<p>Building: {{ obj.building }}</p>
+{% endif %}
 {% endfor %}
 </body>
 </html>

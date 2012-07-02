@@ -17,12 +17,20 @@ class JSONResponse(HttpResponse):
 
     @staticmethod
     def encode_obj(obj):
-        return {
+        if isinstance(obj, lexerparser.gis.Area):
+            return {
             'name': obj.name,
-            'type': obj.type(),
-            'uuid': str(obj.uid),
-            'methods': node_types.get_methods(obj)
+            'type': 'Area',
+            'floor': obj.floor.name,
+            'building': obj.floor.building.name
             }
+        else:
+            return {
+                'name': obj.name,
+                'type': obj.type(),
+                'uuid': str(obj.uid),
+                'methods': node_types.get_methods(obj)
+                }
 
     @staticmethod
     def encode_objs(objs):
@@ -30,7 +38,7 @@ class JSONResponse(HttpResponse):
 
     @staticmethod
     def error(s):
-        return HttpResponseBadRequest(json.dumps('Invalid object'), mimetype="application/json")
+        return HttpResponseBadRequest(json.dumps(s), mimetype="application/json")
 
 class HTMLResponse(HttpResponse):
     def __init__(self, s):
@@ -50,7 +58,7 @@ class HTMLResponse(HttpResponse):
                 }))
     @staticmethod
     def error(s):
-        return HttpResponseBadRequest('Invalid object')
+        return HttpResponseBadRequest(s)
 
 
 class Response(object):
@@ -90,11 +98,16 @@ class Response(object):
 
 
 def index(request, output='json'):
-    return Response.text(output, 'URLs: "/t", "/q", "/uuid"')
+    return Response.text(output, 'URLs: "/t", "/all", "/query", "/uuid"')
 
 def t(request, tag, output='json'):
-    q = lexerparser.query('#' + tag)
+    q = lexerparser.query('.' + tag)
     return Response.objs(output, q)
+
+def all_objs(request, output='json'):
+    q = lexerparser.query('.')
+    return Response.objs(output, q)
+
 
 def uuid(request, uuid, output='json'):
     q = lexerparser.query('%' + uuid)
@@ -123,7 +136,12 @@ def call_method(request, obj, method, output='json'):
     res = getattr(obj, method)(*args, **kwargs)
     return Response.text(output, res)
 
-def query(request, string, output='json'):
+def query(request, output='json'):
+    if 'q' not in request.GET:
+        return Response.error(output, "No query string given")
+    string = request.GET['q']
     q = lexerparser.query(string.replace('+', ' '))
-    return Response.obj(output, q)
+    if q is None:
+        return Response.error(output, "Error processing query")
+    return Response.objs(output, q)
 
