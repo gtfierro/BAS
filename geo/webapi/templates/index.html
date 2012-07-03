@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Appstack Web API</title>
+</head>
+<body>
+<h1>Appstack HTML Pages</h1>
+<p><a href='geo.html'>All buildings</a></p>
+<p><a href='all.html'>All objects and devices</a></p>
+
+<p>
+<form action="query.html" method="get">
+Query: <input type="text" name="q" />
+<input type="submit" value="Submit" />
+</form> 
+</p>
+
+<h1>Appstack JSON API</h1>
+<p><a href='all'>All objects and devices</a></p>
+<p><a href='t/LIG'>Sample tag/type lookup</a></p>
+
+<p>
+<form action="query" method="get">
+Query: <input type="text" name="q" />
+<input type="submit" value="Submit" />
+</form> 
+</p>
+
+<p>
+To call a method on a device, send a GET request to the right URL:
+<ul>
+<li>webapi/uuid/1ea52aab-0a17-4d77-9b5c-72835d802e06/get_level</li>
+<li>webapi/uuid/1ea52aab-0a17-4d77-9b5c-72835d802e06/set_level?3</li>
+<li>webapi/uuid/1ea52aab-0a17-4d77-9b5c-72835d802e06/set_level?level=3</li>
+</ul>
+</p>
+
+</body>
+</html>

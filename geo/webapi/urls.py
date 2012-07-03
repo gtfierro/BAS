@@ -16,5 +16,5 @@ urlpatterns = patterns('',
 
     url(r'^query.html$', 'webapi.views.query', kwargs={'output': 'html'}),
     url(r'^query$', 'webapi.views.query', kwargs={'output':'json'}),
-    url(r'^$', 'webapi.views.index', kwargs={'output':'json'}),
+    url(r'^$', 'webapi.views.index'),
 )

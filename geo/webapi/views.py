@@ -108,8 +108,13 @@ class Response(object):
         return cls(s)
 
 
-def index(request, output='json'):
-    return Response.text(output, 'URLs: "/t", "/all", "/query", "/uuid"')
+def index(request):
+    t = loader.get_template('index.html')
+    c = Context({
+        'url_prefix' : '/webapi/',
+        'geo_prefix' : '/smapgeo/'
+        })
+    return HttpResponse(t.render(c))
 
 def t(request, tag, output='json'):
     q = lexerparser.query('.' + tag)
