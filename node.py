@@ -22,7 +22,6 @@ class Node(object):
 
     @property
     def areas(self):
-      print 'here!'
       return gis.Area.objects.filter(nodes__in=[x.link for x in self])
 
   def __init__(self, name):
@@ -87,6 +86,8 @@ class Node(object):
       if child.container != self.container:
         self.external_childs.append(child.container)
         child.external_parents.append(self.container)
+        self.container.external_childs.append(child.container)
+        child.container.external_parents.append(self.container)
       self.container.add_node_child(self, child)
 
   @_apply_to_multiple
@@ -102,6 +103,8 @@ class Node(object):
       if parent.container != self.container:
         self.external_parents.append(parent.container)
         parent.external_childs.append(self.container)
+        self.container.external_parents.append(parent.container)
+        parent.container.external_childs.append(self.container)
       self.container.add_node_parent(self, parent)
 
   @classmethod
@@ -122,6 +125,8 @@ class Container(object):
 
   def __init__(self, contents):
     self._nk = nx.DiGraph()
+    self.parents = []
+    self.children = []
     if contents:
       for obj in contents:
         obj.container = self

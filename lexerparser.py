@@ -38,22 +38,22 @@ class Lexer(object):
     return t
 
   def t_TYPE(self,t):
-    r'\#!?[A-Z0-9]+[ ]?'
+    r'\#[^!][A-Z0-9]+[ ]?'
     t.value = t.value.strip()
     return t
  
   def t_UUID(self,t):
-    r'\%!?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}[ ]?'
+    r'\%[^!][a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}[ ]?'
     t.value = t.value.strip()
     return t
 
   def t_VAR(self,t):
-    r'\@[a-zA-Z_][a-zA-Z0-9_]*[ ]?'
+    r'\@[^!]?[a-zA-Z_][a-zA-Z0-9_]*[ ]?'
     t.value = t.value.strip()
     return t
 
   def t_TAG(self,t):
-    r'\&!?[A-Z_]+[ ]?'
+    r'\&[^!][A-Z_]+[ ]?'
     t.value = t.value.strip()
     return t
 
@@ -100,6 +100,7 @@ class Parser(object):
     local_vars = {}
     for k in self.vars.iterkeys():
       local_vars[k[1:]] = self.vars[k]
+    local_vars['api'] = lambda x: get_methods(x)
     try:
       from IPython.frontend.terminal.embed import TerminalInteractiveShell
       from IPython.frontend.terminal.ipapp import load_default_config
