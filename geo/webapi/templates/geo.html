@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{ building.name }}</title>
+<style type="text/css">
+  #svgbasics { width: 1000px; height: 1000px; border: 1px solid #484; }
+
+  #body {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width:500px;
+  }
+
+  #buttons {
+    position: absolute;
+    top: 100px;
+    left: 720px;
+    width:100px;
+    height:240px;
+  }
+</style>
+<script type="text/javascript" src="/static/jquery-1.6.4.min.js"></script>
+<script type="text/javascript" src="/static/jquery.svg.min.js"></script>
+<script type="text/javascript">
+function getURLParameter(name) {
+    return decodeURI(
+        (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
+    );
+}
+$(function() {
+	$('#svgbasics').svg({loadURL: '{{ geo_prefix }}{{ building.id }}.svg', onLoad:function(){
+$('#svgbasics').css('height', '240').css('width', '700');
+$('.floor').each(function(index, element){
+  $('<input type="radio" name="radio" value="' + element.id + '" />'+ $(element).attr('inkscape:label') + '<label for="' + element.id + '">').change(function(){
+        radioValue = $(this).val();
+	    $('.floor').hide();
+        $('#' + radioValue).show();
+}).attr('checked', 'checked').appendTo('#buttons');
+  $('<br/>').appendTo('#buttons');
+});
+$('.area').click(function() {
+  building = '{{ building.name }}'
+  floor = $(this).parent().attr('inkscape:label');
+  area = $(this).children('title').text();
+  document.location.href = '/webapi/query.html?q=' + '.<!' + area + '<!' + floor + '<!' + building;
+})
+floor_name = getURLParameter('floor');
+if (floor_name != 'null') {
+  floor = $('g').filter(function(){return $(this).attr('inkscape:label')==floor_name;})
+  $('input[name=radio][value="' + floor.attr('id') + '"]').click();
+
+  area_name = getURLParameter('area');
+  if (floor_name != 'null') {
+    area = floor.find('title').filter(function(){return $(this).text() == area_name;})
+    area.click();
+  }
+}
+}});
+});
+</script>
+</head>
+<body>
+<h1>{{ building.name }}</h1>
+<div id="links">
+<p>
+<a href="{{ url_prefix }}geo.html">All buildings</a>
+<a href="{{ geo_prefix }}">Geo links page</a>
+<a href="{{ geo_prefix }}{{ building.id }}.svg">Download SVG</a>
+<a href="{{ geo_prefix }}upload">Upload new SVG</a>
+</p>
+</div>
+<div id="svgbasics"></div>
+<div id="buttons"></div>
+</body>
+</html>
+

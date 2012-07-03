@@ -8,12 +8,12 @@ from node import *
 from node_types import *
 from collections import deque
 import gis
-import test
+import sdh
 
 class Lexer(object):
 
   tokens = [
-      'NAME','TYPE','UUID','VAR','TAG','SPATIAL',
+      'NAME','UUID','VAR','TAG','SPATIAL',
       'UPSTREAM','DOWNSTREAM','EQUALS','KEYWORD','LASTVALUE',
       'LPAREN','RPAREN',
       ]
@@ -32,18 +32,23 @@ class Lexer(object):
     t.value = t.value.strip()
     return t
 
-  def t_SPATIAL(self,t):
-    r'!!?[\w\-\:\_\s]+'
+  def t_TAG(self,t):
+    r'\.([^!]?[A-Z_]+)?[ ]?'
     t.value = t.value.strip()
     return t
 
-  def t_TYPE(self,t):
-    r'\#[^!][A-Z0-9]+[ ]?'
+  def t_SPATIAL(self,t):
+    r'!([\w\-\:\_\s]+)?'
     t.value = t.value.strip()
     return t
+
+#  def t_TYPE(self,t):
+#    r'\#[^!][A-Z0-9]+[ ]?'
+#    t.value = t.value.strip()
+#    return t
  
   def t_UUID(self,t):
-    r'\%[^!][a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}[ ]?'
+    r'(\%|\^)[^!]?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}[ ]?'
     t.value = t.value.strip()
     return t
 
@@ -52,10 +57,6 @@ class Lexer(object):
     t.value = t.value.strip()
     return t
 
-  def t_TAG(self,t):
-    r'\&[^!][A-Z_]+[ ]?'
-    t.value = t.value.strip()
-    return t
 
   def t_LASTVALUE(self,t):
     r'\b\_\b'
@@ -87,7 +88,7 @@ class Parser(object):
   def __init__(self,debug_flag=False):
     self.debug = debug_flag
     self.lexer = lex(module=Lexer())
-    self.relationals = [getattr(test, i) for i in test.__dict__ if isinstance(getattr(test,i), Relational)]
+    self.relationals = [getattr(sdh, i) for i in sdh.__dict__ if isinstance(getattr(sdh,i), Relational)]
     self.domain = []
     self.vars = {}
     self.lastvalue = []
@@ -151,7 +152,7 @@ class Parser(object):
       extension = node.areas.all()
       if extension:
         flattened.extend(extension) 
-    return flattened
+    return list(set(flattened))
 
   def filter_dup_uids(self, target):
     """
@@ -214,10 +215,12 @@ class Parser(object):
       if current.external_parents and direction == "predecessors":
         for p in current.external_parents:
           if p not in already_visited:
+            already_visited.append(p)
             queue.appendleft(p)
       elif current.external_childs and direction == "successors":
         for c in current.external_childs:
           if c not in already_visited:
+            already_visited.append(c)
             queue.appendleft(c)
       #finally, add the current's container to the queue
       if not isinstance(current.container, Relational):
@@ -259,7 +262,7 @@ class Parser(object):
         target_regions.extend(gis.Area.objects.filter(regions__exact=area.regions))
       for area in self.get_areas(node):
         node_regions.extend(gis.Area.objects.filter(regions__exact=area.regions))
-      return filter(lambda x: x in target_regions, node_regions), None
+      return list(set(filter(lambda x: x in target_regions, node_regions))), None
     else: #neither node nor target is spatial, so we do nothing
       return node,target
 
@@ -296,7 +299,6 @@ class Parser(object):
     '''query : set'''
     p[0] = self.lastvalue = self.filter_dup_uids(p[1])
 
-
   def p_set_group(self, p):
     '''set : LPAREN query RPAREN'''
     p[0] = self.lastvalue = p[2]
@@ -316,17 +318,39 @@ class Parser(object):
     domain = p[0] if p[0] else self.relationals
     res = []
     for r in domain:
-      res.extend(r.search(lambda x: x.name == name_lookup))
+      res.extend(r.search(lambda x: name_lookup in x.name))
     p[0] = self.lastvalue = self.filter_dup_uids(res)
 
-  def p_set_type(self,p):
-    'set : TYPE'
-    type_lookup = p[1][1:].strip()
-    domain = p[0] if p[0] else self.relationals
+  def p_set_tag(self,p):
+    'set : TAG'
     res = []
+    tag_lookup = p[1][1:].strip()
+    domain = p[0] if p[0] else self.relationals
     for r in domain:
-      res.extend(r.search(lambda x: x.type() == type_lookup))
+      if tag_lookup:
+        res.extend(r.search(lambda x: x.type() == tag_lookup))
+      else:
+        res.extend(r.search(lambda x: True))
+    if tag_lookup:
+      domain = [r._nk.nodes() if isinstance(r,Relational) else r for r in domain]
+      domain = list(itertools.chain(*domain))
+      for d in domain:
+        if d[tag_lookup]:
+          if isinstance(d[tag_lookup], Node.NodeList):
+            res.extend(list(d[tag_lookup]))
+          else:
+            res.append(d[tag_lookup]) 
     p[0] = self.lastvalue = self.filter_dup_uids(res)
+
+
+#  def p_set_type(self,p):
+#    'set : TYPE'
+#    type_lookup = p[1][1:].strip()
+#    domain = p[0] if p[0] else self.relationals
+#    res = []
+#    for r in domain:
+#      res.extend(r.search(lambda x: x.type() == type_lookup))
+#    p[0] = self.lastvalue = self.filter_dup_uids(res)
 
   def p_set_uuid(self,p):
     'set : UUID'
@@ -341,30 +365,18 @@ class Parser(object):
     'set : VAR'
     p[0] = self.vars.get(p[1],[])
 
-  def p_set_tag(self,p):
-    'set : TAG'
-    tag_lookup = p[1][1:].strip()
-    domain = p[0] if p[0] else self.relationals
-    domain = [r._nk.nodes() if isinstance(r,Relational) else r for r in domain]
-    domain = list(itertools.chain(*domain))
-    res = []
-    for d in domain:
-      if d[tag_lookup]:
-        res.append(d[tag_lookup]) 
-    p[0] = self.lastvalue = res
-
   def p_error(self,p):
     if p:
       print "Syntax error!",p
 
   tokens = Lexer.tokens
 
-
 if __name__ == '__main__':
   debug= int(sys.argv[1]) if len(sys.argv) > 1 else 0
   lexer = lex(module=Lexer())
   parser = yacc(module=Parser(debug_flag=debug), write_tables=0)
   print "type 'help' for assistance"
+  import readline
   while True:
     try:
       query = raw_input("query> ")

@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import patterns, include, url
 import smapgeo.urls
+import webapi.urls
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -17,4 +18,5 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
 
     url(r'^smapgeo/', include(smapgeo.urls)),
+    url(r'^webapi/', include(webapi.urls)),
 )

@@ -31,6 +31,11 @@ class BuildingsList(object):
         for b in Building.objects.all():
             yield b
 
+    def __contains__(self, key):
+        if Building.objects.filter(name=key):
+            return True
+        return False
+
 buildings=BuildingsList()
 
 def search(string):

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Objects</title>
+</head>
+<body>
+{% for obj in objs %}
+<p>
+Name: {{ obj.name }}<br/>
+Type: {{ obj.type }}<br/>
+{% if obj.uuid %}
+UUID: <a href='{{ url_prefix }}uuid/{{ obj.uuid }}.html'>{{ obj.uuid }}</a><br/>
+{% endif %}
+{% if obj.building %}
+Building: <a href="{{ url_prefix }}geo.html?building={{ obj.building }}">{{ obj.building }}</a><br/>
+{% endif %}
+{% if obj.floor %}
+Floor: <a href="{{ url_prefix }}geo.html?building={{ obj.building }}&floor={{ obj.floor }}">{{ obj.floor }}</a><br/>
+{% endif %}
+{% if obj.building and obj.floor %}
+<a href="{{ url_prefix }}query.html?q=.<!{{ obj.name }} < !{{ obj.floor }} < !{{ obj.building }}">Objects and Devices in this area</a><br/>
+{% endif %}
+{% if obj.type == "Building" %}
+<a href="{{ url_prefix }}geo.html?building={{ obj.name }}">Geo view of this building</a><br/>
+{% endif %}
+{% endfor %}
+</p>
+</body>
+</html>

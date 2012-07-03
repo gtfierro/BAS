@@ -120,6 +120,7 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     'olwidget',
     'smapgeo',
+    'webapi',
 )
 
 # A sample logging configuration. The only tangible logging

@@ -101,6 +101,7 @@ def get_class(target):
   returns the class in generic_objects that [target] inherits from
   """
   classes = map(lambda x: x[1], inspect.getmembers(generic_objects,predicate=inspect.isclass))
+  classes.extend(map(lambda x: x[1], inspect.getmembers(bacnet_devices,predicate=inspect.isclass)))
   target_class = filter(lambda x: isinstance(target, x), classes)
   return target_class[0] if target_class else None
 
@@ -113,6 +114,8 @@ def get_methods(target):
   base_attributes = filter(lambda x: not x[0].startswith("_"), get_class(target).__dict__.keys())
   methods = filter(lambda x: inspect.ismethod(getattr(target, x)), base_attributes)
   interface = filter(lambda x: x.implementedBy(get_class(target)) if hasattr(x,'implementedBy') else False, vars(object_types).values())[0]
+  if not interface:
+    interface = filter(lambda x: x.implementedBy(get_class(target)) if hasattr(x,'implementedBy') else False, vars(device_types).values())[0]
   ret = {}
   for m in methods:
     ret[m] = inspect.getdoc(getattr(target,m))

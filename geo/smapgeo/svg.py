@@ -83,7 +83,7 @@ def building_to_svg(building):
         f.append(i)
         i.set('x', str(0))
         i.set('y', str(0))
-        i.set(addNS('href', 'xlink'), view.image)
+        i.set(addNS('href', 'xlink'), '/smapgeo/' + view.image)
 
         try:
             img = Image.open(os.path.join(settings.SMAPGEO_DATA_DIR, view.image))
