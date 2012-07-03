@@ -12,7 +12,7 @@ urlpatterns = patterns('',
     url(r'^uuid/(?P<uuid>[a-z0-9-]+)$', 'webapi.views.uuid', kwargs={'output':'json'}),
     url(r'^uuid/(?P<uuid>[a-z0-9-]+).html$', 'webapi.views.uuid', kwargs={'output':'html'}),
 
-    url(r'^uuid/(?P<uuid>[a-z0-9-]{35})/(?P<method>[a-z0-9_-]+)$', 'webapi.views.uuid_method', kwargs={'output':'json'}),
+    url(r'^uuid/(?P<uuid>[a-z0-9-]+)/(?P<method>[a-z0-9_-]+)$', 'webapi.views.uuid_method', kwargs={'output':'json'}),
 
     url(r'^query.html$', 'webapi.views.query', kwargs={'output': 'html'}),
     url(r'^query$', 'webapi.views.query', kwargs={'output':'json'}),
