@@ -121,11 +121,11 @@ def all_objs(request, output='json'):
 
 
 def uuid(request, uuid, output='json'):
-    q = lexerparser.query('%' + uuid)
+    q = lexerparser.query('^' + uuid)
     return Response.obj(output, q)
 
 def uuid_method(request, uuid, method, output='json'):
-    q = lexerparser.query('%' + uuid)
+    q = lexerparser.query('^' + uuid)
     if not q:
         Response.error(output, 'Invalid object')
     return call_method(request, q[0], method)
