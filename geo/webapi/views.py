@@ -22,7 +22,18 @@ class JSONResponse(HttpResponse):
             'name': obj.name,
             'type': 'Area',
             'floor': obj.floor.name,
-            'building': obj.floor.building.name
+            'building': obj.floor.building.name,
+            }
+        elif isinstance(obj, lexerparser.gis.Floor):
+            return {
+            'name': obj.name,
+            'type': 'Floor',
+            'building': obj.building.name,
+            }
+        elif isinstance(obj, lexerparser.gis.Building):
+            return {
+            'name': obj.name,
+            'type': 'Building'
             }
         else:
             return {
@@ -145,3 +156,18 @@ def query(request, output='json'):
         return Response.error(output, "Error processing query")
     return Response.objs(output, q)
 
+def geo(request):
+    t = loader.get_template('geo.html')
+    if 'building' not in request.GET:
+        return Response.objs('html', list(lexerparser.gis.buildings))
+    building_name = request.GET['building']
+    if building_name not in lexerparser.gis.buildings:
+        return Response.error('html', "Could not find building")
+    building = lexerparser.gis.buildings[building_name]
+    c = Context({
+        'heading' : 'Buildings',
+        'url_prefix' : '/webapi/',
+        'geo_prefix' : '/smapgeo/',
+        'building' : building
+        })
+    return HttpResponse(t.render(c))

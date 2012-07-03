@@ -7,6 +7,8 @@ urlpatterns = patterns('',
     url(r'^all$', 'webapi.views.all_objs', kwargs={'output':'json'}),
     url(r'^all.html$', 'webapi.views.all_objs', kwargs={'output':'html'}),
 
+    url(r'^geo.html$', 'webapi.views.geo'),
+
     url(r'^uuid/(?P<uuid>[a-z0-9-]+)$', 'webapi.views.uuid', kwargs={'output':'json'}),
     url(r'^uuid/(?P<uuid>[a-z0-9-]+).html$', 'webapi.views.uuid', kwargs={'output':'html'}),
 
