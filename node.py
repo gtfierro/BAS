@@ -45,7 +45,10 @@ class Node(object):
 
   def __cmp__(self, other):
     # use self.uuid to compare to other objects
-    return self.uid.__cmp__(other.uid)
+    if isinstance(other, Node):
+      return self.uid.__cmp__(other.uid)
+    else:
+      return NotImplemented
 
   def __hash__(self):
     #hack to get graph copy working
