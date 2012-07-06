@@ -1,6 +1,7 @@
 import sys, os
 from collections import deque
-sys.path.append(os.path.abspath('./web'))
+sys.path.append(os.path.abspath(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), 'web')))
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 from smapgeo.models import *
 from smapgeo import serialization
