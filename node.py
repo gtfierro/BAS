@@ -121,6 +121,17 @@ class Node(object):
   def areas(self):
     return self.container.areas if hasattr(self.container,'areas') and not self.link.areas.all() else self.link.areas
 
+  def __emittable__(self):
+    """Returns a dictionary representation of the object (passed to Web API)"""
+    import node_types
+    return {
+      'name': self.name,
+      'type': self.type(),
+      'uuid': str(self.uid),
+      'methods': node_types.get_methods(self),
+      }
+
+
 class Container(object):
   """
   Inheritable class for handling basic graph operations beyond what networkx provides

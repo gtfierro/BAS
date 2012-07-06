@@ -1,20 +1,26 @@
 from django.conf.urls.defaults import patterns, url
+import emitters # HACK: patched version of piston.emitters
+import html_emitter
+from piston.resource import Resource
+from piston.authentication import HttpBasicAuthentication
+from handlers import TagHandler, QueryHandler, AllHandler, UUIDHandler, UUIDMethodHandler
+
+auth = HttpBasicAuthentication(realm="My Realm")
+ad = { 'authentication': auth }
+
+tag_resource = Resource(handler=TagHandler, **ad)
+query_resource = Resource(handler=QueryHandler, **ad)
+all_resource = Resource(handler=AllHandler, **ad)
+uuid_resource = Resource(handler=UUIDHandler, **ad)
+uuid_method_resource = Resource(handler=UUIDMethodHandler, **ad)
 
 urlpatterns = patterns('',
-    url(r'^t/(?P<tag>\w+)$', 'webapi.views.t', kwargs={'output':'json'}),
-    url(r'^t/(?P<tag>\w+).html$', 'webapi.views.t', kwargs={'output':'html'}),
-
-    url(r'^all$', 'webapi.views.all_objs', kwargs={'output':'json'}),
-    url(r'^all.html$', 'webapi.views.all_objs', kwargs={'output':'html'}),
+    url(r'^t/(?P<tag>\w+)(\.(?P<emitter_format>.+))?$', tag_resource),
+    url(r'^query(\.(?P<emitter_format>.+))?$', query_resource),
+    url(r'^uuid/(?P<uuid>[a-z0-9-]+)(\.(?P<emitter_format>.+))?$', uuid_resource),
+    url(r'^uuid/(?P<uuid>[a-z0-9-]+)/(?P<method>[a-z0-9_-]+)$', uuid_method_resource),
+    url(r'^all(\.(?P<emitter_format>.+))?$', all_resource),
 
     url(r'^geo.html$', 'webapi.views.geo'),
-
-    url(r'^uuid/(?P<uuid>[a-z0-9-]+)$', 'webapi.views.uuid', kwargs={'output':'json'}),
-    url(r'^uuid/(?P<uuid>[a-z0-9-]+).html$', 'webapi.views.uuid', kwargs={'output':'html'}),
-
-    url(r'^uuid/(?P<uuid>[a-z0-9-]+)/(?P<method>[a-z0-9_-]+)$', 'webapi.views.uuid_method', kwargs={'output':'json'}),
-
-    url(r'^query.html$', 'webapi.views.query', kwargs={'output': 'html'}),
-    url(r'^query$', 'webapi.views.query', kwargs={'output':'json'}),
     url(r'^$', 'webapi.views.index'),
 )

@@ -60,6 +60,13 @@ class Building(models.Model, Serializable):
             f = Floor.from_dict(fj, building=b, shortname=shortname)
         return b
 
+    def __emittable__(self):
+        """Dictionary representation for appstack web api"""
+        return {
+            'name': self.name,
+            'type': 'Building'
+            }
+
 class Floor(models.Model, Serializable):
     shortname = models.CharField(max_length=25) # Computer id
     name = models.CharField(max_length=50)
@@ -114,6 +121,13 @@ class Floor(models.Model, Serializable):
             Area.from_dict(fj, floor=f, shortname=shortname)
         return f
 
+    def __emittable__(self):
+        """Dictionary representation for appstack web api"""
+        return {
+            'name': self.name,
+            'type': 'Floor',
+            'building': self.building.name
+            }
 
 class View(models.Model, Serializable):
     shortname = models.CharField(max_length=25) # Computer id
@@ -273,6 +287,15 @@ class Area(models.Model, Serializable):
             pass
         a.save()
         return a
+
+    def __emittable__(self):
+        """Dictionary representation for appstack web api"""
+        return {
+            'name': self.name,
+            'type': 'Area',
+            'floor': self.floor.name,
+            'building': self.floor.building.name
+            }
 
 class AreaMetadata(models.Model):
     id = models.AutoField(primary_key=True)
