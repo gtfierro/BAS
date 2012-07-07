@@ -53,7 +53,7 @@ class UUIDMethodHandler(BaseHandler):
             args = ()
             kwargs = {}
         elif len(request.GET) == 1 and request.GET.values()[0] == '':
-            args = (json.loads(request.GET.keys()[0]), )
+            args = [json.loads(x) for x in request.GET.keys()[0].split(',')]
             kwargs = {}
         else:
             args = ()
