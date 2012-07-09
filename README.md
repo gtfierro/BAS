@@ -1,8 +1,8 @@
-#AppStack for BACnet
+# AppStack for BACnet
 
 I'm creating this README file so that I can explain my logic for writing things the way they are and show how to make things work.
 
-##Requirements
+## Requirements
 * zope.interface
 * zope.schema
 * networkx
@@ -11,24 +11,92 @@ I'm creating this README file so that I can explain my logic for writing things 
 * collections.defaultdict
 * ply
 * pygraphviz
+* django
+* geodjango
+* spatialite
+* django-olwidget
 
-##Query Language
+## Setting up
+1. Install the appstack and all of its dependencies
+2. Create the geodjango database: ```cd web && ./createdb.sh``` Be sure to set up a username/password
+3. Symlink the database into the appstack folder: ```ln -s web/geodjango.db geodjango.db```
+4. (optional) Run the sMAP driver that supports data and actuation, e.g. ```smap/queue/queuedriver.ini``` (NOTE: installing this driver currently requires a one-line patch to sMAP)
+
+## Running
+1. Run sMAP drivers locally, or connect to sMAP drivers running on another machine
+2. Start the web frontend ```cd web && python manage.py runserver```
+
+### Web API
+
+Applications should use the web-based API to communicate with the appstack server. The python wrapper for the RESTful interface is the ```api``` package.
+
+The api can be used as follows:
+```
+import api
+a = api.AppstackAPI('username', 'password')
+all_lights = a('.LIG') # A query returns a list of objects/devices -- see query language
+x = a.uuid('21effa79-4f46-4d67-b229-e7075be4f105') # Get a device with a specific uuid
+level = x.get_level() # Calling methods on objects
+x.set_level(0)
+```
+
+## Inputting buildings into the database
+
+New buildings can be added from a variety of different file formats. The most common way is to load a JSON file or to use the web interface to create the building.
+
+### Relationship graph via Python script
+For an example of inputting the relationship graph, see ```sdh.py```
+
+### New building via JSON file
+1. Make a copy of the file ```data/template.json```
+2. Change the building name, and add floors as necessary. Be sure there is a ```floorplan``` view for each floor (as in the default file)
+3. Load the file into the database, either by uploading it at ```http://localhost:8000/smapgeo/upload```, or by running ```python manage.py loadjson path/to/building.json``
+4. Go to ```http://localhost:8000/admin/smapgeo/view/```. For each view of your new building, draw a representation of that floor on the map.
+    - Click on the "Edit" button and then press "Clear all"
+	- Find the location of the building by scrolling the map
+	- Click "Draw Polygons" in the "Edit" menu.
+    - Outline the floor on the map by drawing a rectangle. Be sure to draw in clockwise order, and create only four points. Click to create the first three points, and double-click to create the fourth point.
+5. You can use the admin web interface to draw areas on the may. However, it is easier to use Inkscape (see below).
+
+### New building via web interface
+1. Log in to the admin page, e.g. ```http://localhost:8000/admin/```
+2. Add a new building (by clicking on the 'Add' and then typing the name of the building.
+3. Next create the floors for the building. Shortname is typically 'Floor1' (no spaces), name is typically 'Floor 1'
+4. For each floor, create a view. The name of the view must be 'floorplan'. The image is the path to the floor plan image, relative to the ```data/``` directory. For the rectangle, draw a representation of the floor on the map.
+	- Find the location of the building by scrolling the map
+	- Click "Draw Polygons" in the "Edit" menu.
+    - Outline the floor on the map by drawing a rectangle. Be sure to draw in clockwise order, and create only four points. Click to create the first three points, and double-click to create the fourth point.
+5. You can use the admin web interface to draw areas on the may. However, it is easier to use Inkscape (see below).
+
+### Adding areas/zones using Inkscape
+1. Download an SVG from ```http://localhost:8000/smapgeo``` and open it in Inkscape.
+2. Each floor is a separate layer. To create an area, draw a shape on that layer.
+    - Select the new shape and go to Object>Object Properties (Ctrl-Shift-O)
+	- The ID for Floor 1, Area 1 should be "Floor1__Area1"
+	- The Title for Floor 1, Area 1 should be "Area 1"
+	- The Description can be used to specify metadata (not yet supported by the query system)
+3. Convert all shapes to path ("Edit>Select All" followed by "Path>Object to Path")
+4. Save the modified SVG file
+5. Re-upload it to the database by using the form at ```http://localhost:8000/smapgeo/upload```
+
+
+## Query Language
 Currently the query language has only been tested on the graph in the ```test.py``` file.
 Look in ```latex/query.pdf``` for help.
 
-###Syntax
+### Syntax
 The grammar is all in ```lexerparser.py``` at the top, but essentially your query must consist of at least one **TOKEN** follwed by an arbitrary number of interleaved **DELIMETERS** and **TOKENS**, ending with a **TOKEN**. **TOKEN**s can be 
 * ```#STR```: '#' followed by all caps, no spaces string. This resolves to the set all of all objects/nodes with type specified by 'STR'. Supported types can be found in ```node_types.py```.
 * ```$string name```: '$' followed by the name of an object. This **is** case sensitive. This resolves to the set of all objects named 'string name'.
 * ```%8d666322-745f-475f-a463-8329eb7547fa```: '%' followed by a UUID. This resolves to the object identified by that UUID.
 
-###Sample Queries
+### Sample Queries
 Run ```python lexerparser.py```, and you'll get a prompt looking something like ```query> ```. Try the following:
 * ```#SEN < #CCV < $Outside Air Damper```: the set of all sensors that are down stream of any of the cooling valves downstream of the Outside Air Damper
 * ```#DMP > #FAN ```: all dampers upstream of a fan
 * etc..
 
-###Sample Session
+### Sample Session
 ```
 query> #SEN                                                      
 Supply Fan Air Flow Sensor 40beebb2-ce59-482f-a016-581184b87d37  
@@ -59,13 +127,13 @@ Return Air Damper b6eb5953-4b71-41c8-8ecc-88a828f03353
 query>                                                           
 ```
 
-###What's next
+### What's next
 I'm working on expanding the sample graphs so that I can make sure that this works in the edge cases and with broader queries. There are bound to be bugs, but this is an MVP of sorts.
 
-##Creating Nodes and Objects
+## Creating Nodes and Objects
 ...and forcing them to adhere to our interfaces
 
-###On types
+### On types
 
 This is where ```node_types.py``` comes in. It has ```type_dict```, which contains stuff like the following:
 
