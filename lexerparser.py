@@ -33,7 +33,7 @@ class Lexer(object):
     return t
 
   def t_TAG(self,t):
-    r'\.([^!]?[A-Z_]+)?[ ]?'
+    r'(\.|\#|\&)([^!]?[A-Z_]+)?[ ]?'
     t.value = t.value.strip()
     return t
 
