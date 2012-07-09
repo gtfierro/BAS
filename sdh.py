@@ -205,19 +205,48 @@ hwl['HOT_WAT_RET_TMP_SEN'].add_child(hwl['HX'])
 hwl['HOT_WAT_PRS_DIF_SEN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
 hwl['HOT_WAT_PMP'].add_child(hwl['HOT_WAT_SUP_TMP_SEN'])
 
-vav1 = VAV(hvac, 'VAV 1', {'EXH_AIR_FAN':BACnetFAN('Exhaust Air Fan','BACNet point')})
-vav2 = VAV(hvac, 'VAV 2', {'EXH_AIR_FAN':BACnetFAN('Exhaust Air Fan','BACNet point')})
+def make_vav(floor, number, has_heat_cool=True, pxcm_number=10):
+    global hvac, hwl, cwl, ah1, ah2
+    path = '/Siemens/SDH.PXCM-{:02}/SDH/S{:1}-{:02}/'.format(pxcm_number, floor, number)
+    children = {
+        'AIR_VOLUME':BACnetSEN('Air Volume', path + 'AIR_VOLUME'),
+        'CLG_LOOPOUT':BACnetSEN('cooling temperature control loop output value', path + 'CLG_LOOPOUT'),
+        'CTL_FLOW_MAX':BACnetSEN('CTL Flow Max', path + 'CTL_FLOW_MAX'),
+        'CTL_FLOW_MIN':BACnetSEN('CTL Flow Min', path + 'CTL_FLOW_MIN'),
+        'CTL_STPT':BACnetSEN('CTL Setpoint', path + 'CTL_STPT'),
+        'DMPR_POS':BACnetSEN('Damper position', path + 'DMPR_POS'),
+        'ROOM_TEMP':BACnetSEN('Room temperature', path + 'ROOM_TEMP'),
+        }
+    if has_heat_cool:
+        children.update({
+        'HEAT.COOL':BACnetSEN('heat.cool', path + 'HEAT.COOL'),
+        'HTG_LOOPOUT':BACnetSEN('HTG Loopout', path + 'HTG Loopout'),
+        'VLV_POS':BACnetSEN('VLV position', path + 'VLV_POS'),
+        })
+    vav = VAV(hvac, 'VAV ' + str(number), children)
+    ah1.add_child(vav)
+    ah2.add_child(vav)
+    # ah1['SUP_AIR_FAN'].add_child(vav['EXH_AIR_FAN'])
+    # ah2['SUP_AIR_FAN'].add_child(vav['EXH_AIR_FAN'])
+    # hwl['HOT_WAT_SUP_TMP_SEN'].add_child(vav['EXH_AIR_FAN'])
+    # vav['EXH_AIR_FAN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
+    # vav['EXH_AIR_FAN'].add_child(cwl['CHL_WAT_PRS_DIF_SEN'])
 
-ah1['SUP_AIR_FAN'].add_child(vav1['EXH_AIR_FAN'])
-ah2['SUP_AIR_FAN'].add_child(vav2['EXH_AIR_FAN'])
-vav1['EXH_AIR_FAN'].add_child(ah1['RET_AIR_DMP'])
-vav2['EXH_AIR_FAN'].add_child(ah2['RET_AIR_DMP'])
-hwl['HOT_WAT_SUP_TMP_SEN'].add_child(vav1['EXH_AIR_FAN'])
-hwl['HOT_WAT_SUP_TMP_SEN'].add_child(vav2['EXH_AIR_FAN'])
-vav1['EXH_AIR_FAN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
-vav2['EXH_AIR_FAN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
-vav1['EXH_AIR_FAN'].add_child(cwl['CHL_WAT_PRS_DIF_SEN'])
-vav2['EXH_AIR_FAN'].add_child(cwl['CHL_WAT_PRS_DIF_SEN'])
+    floor_name = 'Floor' + str(floor)
+    area_name = 'vav' + str(number)
+    if 'Sutardja Dai Hall' in gis.buildings:
+        sdh = gis.buildings['Sutardja Dai Hall']
+        if floor_name in sdh and area_name in sdh[floor_name]:
+            vav.areas.add(sdh[floor_name][area_name])
+        else:
+            print 'VAV', number, 'on floor', floor, 'has no GIS area'
+    else:
+        print 'VAV GIS table not found'
+
+    return vav
+
+for x in range(1, 21 + 1):
+    make_vav(4, x, (x != 10 and x != 14))
 
 node_types.verify_devices()
 node_types.verify_objects()

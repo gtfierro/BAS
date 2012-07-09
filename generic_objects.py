@@ -45,7 +45,7 @@ class HWL(node.Obj):
 class VAV(node.Obj):
   implements(object_types.IVAV)
 
-  required_devices = ['EXH_AIR_FAN']
+  required_devices = [] #['EXH_AIR_FAN']
 
 class LIG(node.Obj):
   implements(object_types.ILIG)
