@@ -257,11 +257,10 @@ class Parser(object):
     if nodespatial and targetspatial: #resolve the derivative relationship spatially
       target_regions = []
       node_regions = []
-      #TODO: fix the filter stuff, decide what >,< mean
       for area in self.get_areas(target):
-        target_regions.extend(gis.Area.objects.filter(regions__exact=area.regions))
+        target_regions.extend(gis.Area.objects.filter(regions__intersects=area.regions))
       for area in self.get_areas(node):
-        node_regions.extend(gis.Area.objects.filter(regions__exact=area.regions))
+        node_regions.extend(gis.Area.objects.filter(regions__intersects=area.regions))
       return list(set(filter(lambda x: x in target_regions, node_regions))), None
     else: #neither node nor target is spatial, so we do nothing
       return node,target
@@ -292,6 +291,10 @@ class Parser(object):
         next_domain = [self.search_relatives(node, target,"predecessors") for node in domain]
       next_domain = filter(lambda x: x, next_domain)
       p[0] = self.lastvalue=self.filter_dup_uids(next_domain)
+    elif not self.isspatial(domain) and self.isspatial(target): #nodes in an area
+      domain_areas = self.nodes_to_areas(domain)
+      domain,target = self.resolve_spatial(domain_areas, p[3], p[2])
+      p[0] = self.lastvalue = self.areas_to_nodes(domain)
     else:
       p[0] = self.lastvalue=domain
 
