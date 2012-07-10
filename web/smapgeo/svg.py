@@ -33,7 +33,7 @@ def regions_to_path(regions):
     return ret
 
 
-def building_to_svg(building):
+def building_to_svg(building, use_style=True, floor_names=None, types=None):
     d = etree.fromstring("""
 <svg
   xmlns="http://www.w3.org/2000/svg"
@@ -49,22 +49,27 @@ def building_to_svg(building):
     d.append(title)
     title.text = building.name
 
-    s = d.makeelement(addNS('style', 'svg'))
-    d.append(s)
-    s.set('type', 'text/css')
-    s.text = """
-      .area {
-        fill: #0000ff;
-        fill-opacity: 0.3;
-        stroke-width: 2.0;
-        stroke: #000000;
-      }
-    """
+    if use_style:
+        s = d.makeelement(addNS('style', 'svg'))
+        d.append(s)
+        s.set('type', 'text/css')
+        s.text = """
+          .area {
+            fill: #0000ff;
+            fill-opacity: 0.3;
+            stroke-width: 2.0;
+            stroke: #000000;
+          }
+        """
 
-    max_width = 1000
-    max_height = 1000
+    max_width = 0
+    max_height = 0
 
-    for floor in building.floors.all():
+    if floor_names:
+        floors = building.floors.filter(name__in=floor_names)
+    else:
+        floors = building.floors.all()
+    for floor in floors:
         floor_id = floor.name.replace(' ', '_')
         f = d.makeelement(addNS('g', 'svg'))
         d.append(f)
@@ -78,6 +83,9 @@ def building_to_svg(building):
         if len(views) == 0 or views[0].image is None:
             continue
         view = views[0]
+        width, height = view.dimensions
+        max_width = max(max_width, width)
+        max_height = max(max_height, height)
 
         i = d.makeelement(addNS('image', 'svg'))
         f.append(i)
@@ -93,7 +101,11 @@ def building_to_svg(building):
         except:
             pass
 
-        for area in floor.areas.all():
+        if types:
+            areas = floor.areas.all() #TODO: filter areas by type
+        else:
+            areas = floor.areas.all()
+        for area in areas:
             area_id = area.name.replace(' ', '_')
             a = f.makeelement(addNS('path', 'svg'))
             f.append(a)

@@ -133,6 +133,16 @@ class View(models.Model, Serializable):
     rectangle = models.PolygonField()
 
     @property
+    def dimensions(self):
+        try:
+            img = Image.open(os.path.join(settings.SMAPGEO_DATA_DIR, self.image))
+            width, height = img.size
+        except:
+            print "ERROR: could not open image: " + self.image
+            width, height = 1, 1
+        return width, height
+
+    @property
     def mtx(self):
         try:
             img = Image.open(os.path.join(settings.SMAPGEO_DATA_DIR, self.image))
@@ -150,12 +160,7 @@ class View(models.Model, Serializable):
         return [[a / width, c / height, x], [b / width, d / height, y]]
     @mtx.setter
     def mtx(self, value):
-        try:
-            img = Image.open(os.path.join(settings.SMAPGEO_DATA_DIR, self.image))
-            width, height = img.size
-        except:
-            print "ERROR: could not open image: " + self.image
-            width, height = 1, 1
+        width, height = self.dimensions
         polygon = [[value[0][2], value[1][2]]]
         polygon.append([polygon[0][0] + value[0][0] * width,
                         polygon[0][1] + value[1][0] * width])

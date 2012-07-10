@@ -2,6 +2,7 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns('',
     (r'^/?$', 'smapgeo.views.index'),
+    (r'^geo.svg$', 'smapgeo.views.building_svg_params'),
     (r'^(?P<building_id>\w+).svg$', 'smapgeo.views.building_svg'),
     (r'^(?P<building_id>\w+).json$', 'smapgeo.views.building_json'),
     (r'^upload/$', 'smapgeo.views.upload'),
