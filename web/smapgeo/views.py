@@ -5,7 +5,6 @@ from django.core.context_processors import csrf
 from django.shortcuts import render_to_response
 from models import Building
 from svg import building_to_svg, svg_to_building
-from kml import buildings_to_kml, kml_to_buildings
 from django import forms
 import os
 
@@ -39,14 +38,6 @@ def building_json(request, building_id):
 
     return HttpResponse(b.dumps(), mimetype='application/json')
 
-def building_kml(request, building_id):
-    try:
-        b = Building.objects.get(id=building_id)
-    except:
-        return HttpResponse("Invalid Building")
-
-    return HttpResponse(buildings_to_kml(b), mimetype='application/vnd.google-earth.kml+xml')
-
 class UploadFileForm(forms.Form):
     file  = forms.FileField()
 
@@ -62,8 +53,6 @@ def upload(request):
                 Building.loads(f.read())
             elif f.name.endswith('.svg'):
                 svg_to_building(f.read())
-            elif f.name.endswith('.kml'):
-                kml_to_buildings(f.read())
             else:
                 return HttpResponse("This file type is not supported")
             return HttpResponseRedirect("/smapgeo/")

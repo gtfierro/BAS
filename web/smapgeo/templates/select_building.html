@@ -103,11 +103,6 @@
       {% if forloop.first %} ui-corner-top {% endif %}
       {% if forloop.last %} ui-corner-bottom {% endif %}
     ">{{ building.name }} (JSON)</a>
-  <a href="{{ url_prefix }}{{ building.id }}.kml"
-    class="big_button fg-button ui-state-default
-      {% if forloop.first %} ui-corner-top {% endif %}
-      {% if forloop.last %} ui-corner-bottom {% endif %}
-    ">{{ building.name }} (KML)</a>
  {% endfor %}
 </div>
 
