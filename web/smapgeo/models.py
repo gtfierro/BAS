@@ -29,7 +29,7 @@ class Building(models.Model, Serializable):
     objects = models.GeoManager()
 
     def __getitem__(self, key):
-        floors = self.floors.filter(shortname=key)
+        floors = self.floors.filter(name=key)
         if len(floors) == 0:
             raise KeyError("Floor not found in building")
         else:
@@ -39,10 +39,10 @@ class Building(models.Model, Serializable):
         assert False
 
     def __contains__(self, key):
-        return self.floors.filter(shortname=key).count() > 0
+        return self.floors.filter(name=key).count() > 0
 
     def items(self):
-        return [(x.shortname, x) for x in self.floors.all()]
+        return [(x.name, x) for x in self.floors.all()]
 
     def __unicode__(self):
         return self.name
@@ -50,14 +50,14 @@ class Building(models.Model, Serializable):
     def dict(self):
         return {
             'name': self.name,
-            'floors': py_to_dict(self)
+            'floors': {x.name.replace(' ', '_'): x.dict() for x in self.floors.all()}
             }
 
     @classmethod
     def from_dict(cls, j, args=None):
         b = find_or_create(cls, True, name=str(j['name']))
-        for shortname, fj in j['floors'].items():
-            f = Floor.from_dict(fj, building=b, shortname=shortname)
+        for fj in j['floors'].values():
+            f = Floor.from_dict(fj, building=b)
         return b
 
     def __emittable__(self):
@@ -68,14 +68,13 @@ class Building(models.Model, Serializable):
             }
 
 class Floor(models.Model, Serializable):
-    shortname = models.CharField(max_length=25) # Computer id
     name = models.CharField(max_length=50)
     building = models.ForeignKey(Building, related_name='floors')
 
     objects = models.GeoManager()
 
     def __getitem__(self, key):
-        areas = self.areas.filter(shortname=key)
+        areas = self.areas.filter(name=key)
         if len(areas) == 0:
             raise KeyError("Area not found in floor")
         else:
@@ -85,13 +84,13 @@ class Floor(models.Model, Serializable):
         assert False
 
     def __contains__(self, key):
-        return self.areas.filter(shortname=key).count() > 0
+        return self.areas.filter(name=key).count() > 0
 
     def items(self):
-        return [(x.shortname, x) for x in self.areas.all()]
+        return [(x.name, x) for x in self.areas.all()]
 
     def get_view(self, key):
-        views = self.views.filter(shortname=key)
+        views = self.views.filter(name=key)
         if len(views) == 0:
             raise KeyError("View not found in floor")
         else:
@@ -107,18 +106,16 @@ class Floor(models.Model, Serializable):
         return {
             'name': self.name,
             'areas': py_to_dict(self),
-            'views': {x.shortname: x.dict() for x in self.views.all()}
+            'views': {x.name: x.dict() for x in self.views.all()}
             }
 
     @classmethod
-    def from_dict(cls, j, building, shortname, **kwargs):
-        f = find_or_create(cls, False, building=building, shortname=shortname)
-        f.name = j['name']
-        f.save()
-        for shortname, fj in j['views'].items():
-            View.from_dict(fj, floor=f, shortname=shortname)
-        for shortname, fj in j['areas'].items():
-            Area.from_dict(fj, floor=f, shortname=shortname)
+    def from_dict(cls, j, building, **kwargs):
+        f = find_or_create(cls, True, building=building, name=j['name'])
+        for name, fj in j['views'].items():
+            View.from_dict(fj, floor=f, name=name)
+        for fj in j['areas'].values():
+            Area.from_dict(fj, floor=f)
         return f
 
     def __emittable__(self):
@@ -130,7 +127,7 @@ class Floor(models.Model, Serializable):
             }
 
 class View(models.Model, Serializable):
-    shortname = models.CharField(max_length=25) # Computer id
+    name = models.CharField(max_length=25) # Computer id
     floor = models.ForeignKey(Floor, related_name='views')
     image = models.CharField(max_length=200, blank=True)
     rectangle = models.PolygonField()
@@ -207,7 +204,7 @@ class View(models.Model, Serializable):
     def __unicode__(self):
         return "{}:{}:{}".format(self.floor.building.name,
                                  self.floor.name,
-                                 self.shortname)
+                                 self.name)
 
     def dict(self):
         return {
@@ -216,15 +213,14 @@ class View(models.Model, Serializable):
             }
 
     @classmethod
-    def from_dict(cls, j, floor, shortname, **kwargs):
-        v = find_or_create(cls, False, floor=floor, shortname=shortname)
+    def from_dict(cls, j, floor, name, **kwargs):
+        v = find_or_create(cls, False, floor=floor, name=name)
         v.image = j['image'] or ''
         v.mtx = j['mtx']
         v.save()
         return v
 
 class Area(models.Model, Serializable):
-    shortname = models.CharField(max_length=25)
     name = models.CharField(max_length=50)
     regions = models.MultiPolygonField()
     floor = models.ForeignKey(Floor, related_name='areas')
@@ -274,9 +270,8 @@ class Area(models.Model, Serializable):
             }
 
     @classmethod
-    def from_dict(cls, j, floor, shortname, **kwargs):
-        a = find_or_create(cls, False, shortname=shortname, floor=floor)
-        a.name = j['name']
+    def from_dict(cls, j, floor, **kwargs):
+        a = find_or_create(cls, False, floor=floor, name=j['name'])
         a.set_regions(j['regions'])
         a.save()
         a.streams.clear()

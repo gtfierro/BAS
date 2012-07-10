@@ -85,21 +85,21 @@ lightbank7_4 = LIG(l, 'Light Bank 4', {
 
 
 if 'Sutardja Dai Hall' in gis.buildings:
-    sdh_floor4 = gis.buildings['Sutardja Dai Hall']['Floor4']
-    lightbank4_1.areas.add(sdh_floor4['Zone1'])
-    lightbank4_2.areas.add(sdh_floor4['Zone2'])
-    lightbank4_3.areas.add(sdh_floor4['Zone3'])
-    lightbank4_4.areas.add(sdh_floor4['Zone4'])
-    lightbank4_5.areas.add(sdh_floor4['Zone5'])
+    sdh_floor4 = gis.buildings['Sutardja Dai Hall']['Floor 4']
+    lightbank4_1.areas.add(sdh_floor4['Zone 1'])
+    lightbank4_2.areas.add(sdh_floor4['Zone 2'])
+    lightbank4_3.areas.add(sdh_floor4['Zone 3'])
+    lightbank4_4.areas.add(sdh_floor4['Zone 4'])
+    lightbank4_5.areas.add(sdh_floor4['Zone 5'])
 
-    sdh_floor6 = gis.buildings['Sutardja Dai Hall']['Floor6']
-    lightbank6_1.areas.add(sdh_floor6['Zone1'])
+    sdh_floor6 = gis.buildings['Sutardja Dai Hall']['Floor 6']
+    lightbank6_1.areas.add(sdh_floor6['Zone 1'])
 
-    sdh_floor7 = gis.buildings['Sutardja Dai Hall']['Floor7']
-    lightbank7_1.areas.add(sdh_floor7['Zone1'])
-    lightbank7_2.areas.add(sdh_floor7['Zone2'])
-    lightbank7_3.areas.add(sdh_floor7['Zone3'])
-    lightbank7_4.areas.add(sdh_floor7['Zone4'])
+    sdh_floor7 = gis.buildings['Sutardja Dai Hall']['Floor 7']
+    lightbank7_1.areas.add(sdh_floor7['Zone 1'])
+    lightbank7_2.areas.add(sdh_floor7['Zone 2'])
+    lightbank7_3.areas.add(sdh_floor7['Zone 3'])
+    lightbank7_4.areas.add(sdh_floor7['Zone 4'])
 
 #Air Handler 1
 hvac = Relational('HVAC')
@@ -232,8 +232,8 @@ def make_vav(floor, number, has_heat_cool=True, pxcm_number=10):
     # vav['EXH_AIR_FAN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
     # vav['EXH_AIR_FAN'].add_child(cwl['CHL_WAT_PRS_DIF_SEN'])
 
-    floor_name = 'Floor' + str(floor)
-    area_name = 'vav' + str(number)
+    floor_name = 'Floor ' + str(floor)
+    area_name = 'VAV ' + str(number)
     if 'Sutardja Dai Hall' in gis.buildings:
         sdh = gis.buildings['Sutardja Dai Hall']
         if floor_name in sdh and area_name in sdh[floor_name]:

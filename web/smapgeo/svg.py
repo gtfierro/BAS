@@ -65,7 +65,7 @@ def building_to_svg(building):
     max_height = 1000
 
     for floor in building.floors.all():
-        floor_id = floor.shortname
+        floor_id = floor.name.replace(' ', '_')
         f = d.makeelement(addNS('g', 'svg'))
         d.append(f)
 
@@ -74,7 +74,7 @@ def building_to_svg(building):
         f.set('class', 'floor')
         f.set(addNS('label', 'inkscape'), floor.name)
 
-        views = floor.views.filter(shortname='floorplan')
+        views = floor.views.filter(name='floorplan')
         if len(views) == 0 or views[0].image is None:
             continue
         view = views[0]
@@ -94,7 +94,7 @@ def building_to_svg(building):
             pass
 
         for area in floor.areas.all():
-            area_id = area.shortname
+            area_id = area.name.replace(' ', '_')
             a = f.makeelement(addNS('path', 'svg'))
             f.append(a)
 
@@ -153,9 +153,7 @@ def svg_to_building(s):
 def parse_floor(b, group):
     if group.get(addNS('groupmode', 'inkscape')) != 'layer':
         return
-    f = find_or_create(Floor, save=False, shortname=group.get('id'), building=b)
-    f.name = group.get(addNS('label', 'inkscape'), 'Floor')
-    f.save()
+    f = find_or_create(Floor, save=True, name=group.get(addNS('label', 'inkscape'), 'Floor'), building=b)
 
     image = ""
     for node in group:
@@ -166,7 +164,7 @@ def parse_floor(b, group):
         return
 
     try:
-        v = View.objects.filter(floor=f, shortname='floorplan')[0]
+        v = View.objects.filter(floor=f, name='floorplan')[0]
     except IndexError:
         return
     v.image = 'floor_plans/' + image.split('/')[-1]
@@ -203,7 +201,7 @@ def parse_path(f, node):
     if t is not None:
         simpletransform.applyTransformToPath(simpletransform.parseTransform(t), p)
 
-    view = f.views.filter(shortname='floorplan')[0]
+    view = f.views.filter(name='floorplan')[0]
     simpletransform.applyTransformToPath(view.mtx, p)
     cspsubdiv.cspsubdiv(p, flatness)
     for sp in p:
@@ -214,14 +212,10 @@ def parse_path(f, node):
             region.pop() #Remove repeated last coordinate
         region.append(region[0])
         regions.append(region)
-    try:
-        id=node.get('id').split('__')[1]
-    except:
-        print 'Not parsing region', id
-        return
-    a = find_or_create(Area, save=False, floor=f, shortname=id)
+    a = find_or_create(Area, save=False, floor=f, name=name)
     a.set_regions(regions)
     a.save()
+    
     a.streams.clear()
     for uuid in streams:
         try:
@@ -234,5 +228,5 @@ def parse_path(f, node):
         m.tagval = value
         m.save()
     a.name = name
-    a.view = f.views.filter(shortname='floorplan')[0]
+    a.view = f.views.filter(name='floorplan')[0]
     a.save()
