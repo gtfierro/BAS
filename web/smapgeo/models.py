@@ -106,7 +106,7 @@ class Floor(models.Model, Serializable):
         assert False
 
     def __unicode__(self):
-        return self.name
+        return "{}:{}".format(self.building.name, self.name)
 
     def dict(self):
         return {
