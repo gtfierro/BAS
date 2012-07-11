@@ -102,9 +102,12 @@ def building_to_svg(building, use_style=True, floor_names=None, types=None):
             pass
 
         for area in floor.areas.all():
-            if types:
-                type_entry = AreaMetadata.objects.filter(area=area, tagname='Type')
-                if not type_entry or type_entry[0].tagval not in types:
+            type_entry = AreaMetadata.objects.filter(area=area, tagname='Type')
+            if type_entry:
+                area_type = type_entry[0].tagval
+            else:
+                area_type = None
+            if types and area_type not in types:
                     continue
             area_id = area.name.replace(' ', '_')
             a = f.makeelement(addNS('path', 'svg'))
@@ -119,7 +122,10 @@ def building_to_svg(building, use_style=True, floor_names=None, types=None):
             a.append(desc)
             desc.text = "\n".join([stream.uuid for stream in area.streams.all()] +
                                   ['{}={}'.format(m.tagname, m.tagval) for m in area.metadata.all()])
-            a.set('class', 'area')
+            if area_type:
+                a.set('class', 'area area_' + area_type)
+            else:
+                a.set('class', 'area')
 
             path = cubicsuperpath.CubicSuperPath(regions_to_path(area.get_regions()))
             simpletransform.applyTransformToPath(geoutil.inverse(view.mtx), path)
