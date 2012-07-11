@@ -61,7 +61,7 @@ For an example of inputting the relationship graph, see ```sdh.py```
 ### New building via web interface
 1. Log in to the admin page, e.g. ```http://localhost:8000/admin/```
 2. Add a new building (by clicking on the 'Add' and then typing the name of the building.
-3. Next create the floors for the building. Shortname is typically 'Floor1' (no spaces), name is typically 'Floor 1'
+3. Next create the floors for the building. Names are typically 'Floor 1', 'Floor 2', etc.
 4. For each floor, create a view. The name of the view must be 'floorplan'. The image is the path to the floor plan image, relative to the ```data/``` directory. For the rectangle, draw a representation of the floor on the map.
 	- Find the location of the building by scrolling the map
 	- Click "Draw Polygons" in the "Edit" menu.
@@ -72,8 +72,7 @@ For an example of inputting the relationship graph, see ```sdh.py```
 1. Download an SVG from ```http://localhost:8000/smapgeo``` and open it in Inkscape.
 2. Each floor is a separate layer. To create an area, draw a shape on that layer.
     - Select the new shape and go to Object>Object Properties (Ctrl-Shift-O)
-	- The ID for Floor 1, Area 1 should be "Floor1__Area1"
-	- The Title for Floor 1, Area 1 should be "Area 1"
+	- Set the Title to the name of the area, e.g. "Area 1"
 	- The Description can be used to specify metadata (not yet supported by the query system)
 3. Convert all shapes to path ("Edit>Select All" followed by "Path>Object to Path")
 4. Save the modified SVG file
