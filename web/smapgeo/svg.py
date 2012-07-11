@@ -101,11 +101,11 @@ def building_to_svg(building, use_style=True, floor_names=None, types=None):
         except:
             pass
 
-        if types:
-            areas = floor.areas.all() #TODO: filter areas by type
-        else:
-            areas = floor.areas.all()
-        for area in areas:
+        for area in floor.areas.all():
+            if types:
+                type_entry = AreaMetadata.objects.filter(area=area, tagname='Type')
+                if not type_entry or type_entry[0].tagval not in types:
+                    continue
             area_id = area.name.replace(' ', '_')
             a = f.makeelement(addNS('path', 'svg'))
             f.append(a)

@@ -28,6 +28,9 @@ class Building(models.Model, Serializable):
 
     objects = models.GeoManager()
 
+    class Meta:
+        ordering = ['name']
+
     def __getitem__(self, key):
         floors = self.floors.filter(name=key)
         if len(floors) == 0:
@@ -50,14 +53,14 @@ class Building(models.Model, Serializable):
     def dict(self):
         return {
             'name': self.name,
-            'floors': {x.name.replace(' ', '_'): x.dict() for x in self.floors.all()}
+            'floors': {x.name: x.dict() for x in self.floors.all()}
             }
 
     @classmethod
     def from_dict(cls, j, args=None):
         b = find_or_create(cls, True, name=str(j['name']))
-        for fj in j['floors'].values():
-            f = Floor.from_dict(fj, building=b)
+        for name, fj in j['floors'].items():
+            f = Floor.from_dict(fj, building=b, name=name)
         return b
 
     def __emittable__(self):
@@ -72,6 +75,9 @@ class Floor(models.Model, Serializable):
     building = models.ForeignKey(Building, related_name='floors')
 
     objects = models.GeoManager()
+
+    class Meta:
+        ordering = ['building', 'name']
 
     def __getitem__(self, key):
         areas = self.areas.filter(name=key)
@@ -104,18 +110,17 @@ class Floor(models.Model, Serializable):
 
     def dict(self):
         return {
-            'name': self.name,
             'areas': py_to_dict(self),
             'views': {x.name: x.dict() for x in self.views.all()}
             }
 
     @classmethod
-    def from_dict(cls, j, building, **kwargs):
-        f = find_or_create(cls, True, building=building, name=j['name'])
-        for name, fj in j['views'].items():
-            View.from_dict(fj, floor=f, name=name)
-        for fj in j['areas'].values():
-            Area.from_dict(fj, floor=f)
+    def from_dict(cls, j, building, name, **kwargs):
+        f = find_or_create(cls, True, building=building, name=name)
+        for name, vj in j['views'].items():
+            View.from_dict(vj, floor=f, name=name)
+        for name, fj in j['areas'].items():
+            Area.from_dict(fj, floor=f, name=name)
         return f
 
     def __emittable__(self):
@@ -131,6 +136,9 @@ class View(models.Model, Serializable):
     floor = models.ForeignKey(Floor, related_name='views')
     image = models.CharField(max_length=200, blank=True)
     rectangle = models.PolygonField()
+
+    class Meta:
+        ordering = ['floor', 'name']
 
     @property
     def dimensions(self):
@@ -231,6 +239,9 @@ class Area(models.Model, Serializable):
     floor = models.ForeignKey(Floor, related_name='areas')
     nodes = models.ManyToManyField(NodeLink, related_name='areas', blank=True)
 
+    class Meta:
+        ordering = ['floor', 'name']
+
     @property
     def streams(self):
         '''Backwards compatibility for when we were linking against sMAP streams'''
@@ -269,14 +280,14 @@ class Area(models.Model, Serializable):
 
     def dict(self):
         return {
-            'name': self.name,
             'regions': self.get_regions(),
             'streams': [x.uuid for x in self.streams.all()],
+            'metadata': {meta.tagname: meta.tagval for meta in self.metadata.all()}
             }
 
     @classmethod
-    def from_dict(cls, j, floor, **kwargs):
-        a = find_or_create(cls, False, floor=floor, name=j['name'])
+    def from_dict(cls, j, floor, name, **kwargs):
+        a = find_or_create(cls, False, floor=floor, name=name)
         a.set_regions(j['regions'])
         a.save()
         a.streams.clear()
@@ -285,6 +296,14 @@ class Area(models.Model, Serializable):
                 a.streams.add(NodeLink.objects.get(uuid=streamuuid))
         except:
             pass
+
+        try:
+            for tag, value in j['metadata'].items():
+                m = find_or_create(AreaMetadata, save=False, area=a, tagname=tag)
+                m.tagval = value
+                m.save()
+        except:
+            raise
         a.save()
         return a
 
@@ -304,6 +323,11 @@ class AreaMetadata(models.Model):
     tagval = models.TextField()
 
     objects = models.GeoManager()
+
+    class Meta:
+        ordering = ['area', 'tagname']
+        verbose_name_plural = "area metadata"
+
 
     def __unicode__(self):
         return "{}.{}={}".format(self.area, self.tagname, self.tagval.split('\n')[0])
