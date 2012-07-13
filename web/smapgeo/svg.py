@@ -33,7 +33,7 @@ def regions_to_path(regions):
     return ret
 
 
-def building_to_svg(building, use_style=True, floor_names=None, types=None):
+def building_to_svg(building, use_style=True, root_path="", floor_names=None, types=None):
     d = etree.fromstring("""
 <svg
   xmlns="http://www.w3.org/2000/svg"
@@ -91,7 +91,7 @@ def building_to_svg(building, use_style=True, floor_names=None, types=None):
         f.append(i)
         i.set('x', str(0))
         i.set('y', str(0))
-        i.set(addNS('href', 'xlink'), '/smapgeo/' + view.image)
+        i.set(addNS('href', 'xlink'),  root_path + '/smapgeo/' + view.image)
 
         try:
             img = Image.open(os.path.join(settings.SMAPGEO_DATA_DIR, view.image))

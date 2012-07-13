@@ -42,7 +42,7 @@ def building_svg_params(request):
     except:
         return HttpResponseNotFound("Building not found")
 
-    return HttpResponse(building_to_svg(b, False, floor_names, types), mimetype='image/svg+xml')
+    return HttpResponse(building_to_svg(b, False, "http://127.0.0.1:8000", floor_names, types), mimetype='image/svg+xml')
 
 
 def building_json(request, building_id):
