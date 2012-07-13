@@ -60,7 +60,13 @@ $(function() {
     });
     $root.appstack('area').click(function() {
       var $this = $(this);
-      document.location.href = '/webapi/query.html?q=' + '.<!' + $this.appstack('area_name') + '<!' + $this.appstack('floor_name') + '<!' + $this.appstack('building_name');
+	  $('#devices p').remove();
+      //document.location.href = '/webapi/query.html?q=' + '.<' + $this.appstack('query');
+      $this.appstack('devices', function(d) {
+        d.each(function(i, dev) {
+          $('<p><a href="/webapi/uuid/' + dev.get('uuid') + '.html">' + dev.get('name') + '</a></p>').appendTo('#devices');
+        });
+      });
 	});
 
     floor_name = getURLParameter('floor');
@@ -87,6 +93,7 @@ $(function() {
 </div>
 <div id="svgbasics"></div>
 <div id="buttons"></div>
+<div id="devices"></div>
 </body>
 </html>
 
