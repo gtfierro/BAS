@@ -26,20 +26,6 @@ I'm creating this README file so that I can explain my logic for writing things 
 1. Run sMAP drivers locally, or connect to sMAP drivers running on another machine
 2. Start the web frontend ```cd web && python manage.py runserver```
 
-### Web API
-
-Applications should use the web-based API to communicate with the appstack server. The python wrapper for the RESTful interface is the ```api``` package.
-
-The api can be used as follows:
-```
-import api
-a = api.AppstackAPI('username', 'password')
-all_lights = a('.LIG') # A query returns a list of objects/devices -- see query language
-x = a.uuid('21effa79-4f46-4d67-b229-e7075be4f105') # Get a device with a specific uuid
-level = x.get_level() # Calling methods on objects
-x.set_level(0)
-```
-
 ## Inputting buildings into the database
 
 New buildings can be added from a variety of different file formats. The most common way is to load a JSON file or to use the web interface to create the building.
