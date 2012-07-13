@@ -19,6 +19,7 @@
 		'building' : null,
 		'floors' : [],
 		'types' : [],
+		'all' : true,
 		'onLoad' : function() {}
 	  }, options);
 
@@ -33,7 +34,9 @@
 	  var url = settings.url + '/smapgeo/geo.svg?' + $.param({
 		'building': this.building,
 	   	'floors': this.floors,
-	   	'types': this.types});
+	   	'types': this.types,
+		'all': settings.all
+	  });
 	  $container.svg({loadURL: url, onLoad: settings.onLoad});
 	},
 

@@ -33,7 +33,7 @@ def regions_to_path(regions):
     return ret
 
 
-def building_to_svg(building, use_style=True, root_path="", floor_names=None, types=None):
+def building_to_svg(building, use_style=True, root_path="", floor_names=None, types=None, all_floors=True):
     d = etree.fromstring("""
 <svg
   xmlns="http://www.w3.org/2000/svg"
@@ -101,6 +101,7 @@ def building_to_svg(building, use_style=True, root_path="", floor_names=None, ty
         except:
             pass
 
+        keep_floor = all_floors
         for area in floor.areas.all():
             type_entry = AreaMetadata.objects.filter(area=area, tagname='Type')
             if type_entry:
@@ -108,7 +109,10 @@ def building_to_svg(building, use_style=True, root_path="", floor_names=None, ty
             else:
                 area_type = None
             if types and area_type not in types:
-                    continue
+                continue
+
+            keep_floor = True
+
             area_id = area.name.replace(' ', '_')
             a = f.makeelement(addNS('path', 'svg'))
             f.append(a)
@@ -130,6 +134,10 @@ def building_to_svg(building, use_style=True, root_path="", floor_names=None, ty
             path = cubicsuperpath.CubicSuperPath(regions_to_path(area.get_regions()))
             simpletransform.applyTransformToPath(geoutil.inverse(view.mtx), path)
             a.set('d', cubicsuperpath.formatPath(path))
+
+        if not keep_floor:
+            d.remove(f)
+
 
     d.set('width', str(max_width))
     d.set('height', str(max_height))
