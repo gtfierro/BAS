@@ -55,13 +55,24 @@
 	  }
 	},
 
+	_isAppstack: function(container, type) {
+	  var $container = $(container);
+	  if ($container.is('svg') && type === 'building'){
+		return true;
+	  } else if ($container.is('g') && type === 'floor') {
+		return true;
+	  } else if ($container.is('path')  && type === 'area') {
+		return true;
+	  } else {
+		return false;
+	  }
+	},
+
 	_nameAppstack: function(container) {
 	  var $container = $(container)
-	  if ($container.is('g')) {
-		// We have a floor
+	  if ($container.appstack('is', 'floor')) {
 		return $container.attr('inkscape:label');
-	  } else if ($container.is('path')) {
-		// We have an area
+	  } else if ($container.appstack('is', 'area')) {
 		return $container.children('title').text();
 	  } else {
 		return undefined;
@@ -70,7 +81,7 @@
 
 	_area_nameAppstack: function(container) {
 	  var $container = $(container)
-	  if ($container.is('path')) {
+	  if ($container.appstack('is', 'area')) {
 		return $container.children('title').text();
 	  } else {
 		return undefined;
@@ -79,11 +90,9 @@
 
 	_floor_nameAppstack: function(container) {
 	  var $container = $(container)
-	  if ($container.is('g')) {
-		// We have a floor
+	  if ($container.appstack('is', 'floor')) {
 		return $container.attr('inkscape:label');
-	  } else if ($container.is('path')) {
-		// We have an area
+	  } else if ($container.appstack('is', 'area')) {
 		return $container.parent('g').attr('inkscape:label');
 	  } else {
 		return undefined;
@@ -92,14 +101,11 @@
 
 	_building_nameAppstack: function(container) {
 	  var $container = $(container)
-	  if ($container.is('svg')){
-		// We have a building
+	  if ($container.appstack('is', 'building')) {
 		return $container.children('title').text();
-	  } else if ($container.is('g')) {
-		// We have a floor
+	  } else if ($container.appstack('is', 'floor')) {
 		return $container.parent('svg').children('title').text();
-	  } else if ($container.is('path')) {
-		// We have an area
+	  } else if ($container.appstack('is', 'area')) {
 		return $container.parent('g').parent('svg').children('title').text();
 	  } else {
 		return undefined;
@@ -108,14 +114,11 @@
 
 	_queryAppstack: function(container) {
 	  var $container = $(container)
-	  if ($container.is('svg')){
-		// We have a building
+	  if ($container.appstack('is', 'building')) {
 		return '!' + $container.appstack('building_name')
-	  } else if ($container.is('g')) {
-		// We have a floor
+	  } else if ($container.appstack('is', 'floor')) {
 		return '!' + $container.appstack('floor_name')  + '<!' + $container.appstack('building_name')
-	  } else if ($container.is('path')) {
-		// We have an area
+	  } else if ($container.appstack('is', 'area')) {
 		return '!' + $container.appstack('area_name') + '<!' + $container.appstack('floor_name')  + '<!' + $container.appstack('building_name')
 	  } else {
 		return undefined;
