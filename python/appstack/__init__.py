@@ -42,7 +42,7 @@ class APIBuilding(APINode):
 class APIFloor(APINode):
     def __init__(self, api, name, building):
         APINode.__init__(self, api, name, 'Floor')
-        self.building = APIBuilding(building)
+        self.building = APIBuilding(api, building)
 
     def __repr__(self):
         return 'APIFloor(' + self.name + ', ' + self.building + ')'
@@ -50,8 +50,8 @@ class APIFloor(APINode):
 class APIArea(APINode):
     def __init__(self, api, name, building, floor):
         APINode.__init__(self, api, name, 'Area')
-        self.building = APIBuilding(building)
-        self.floor = APIFloor(floor)
+        self.building = APIBuilding(api, building)
+        self.floor = APIFloor(api, floor, building)
 
     def __repr__(self):
         return 'APIArea(' + self.name + ', ' + self.building + ', ' + self.floor + ')'
