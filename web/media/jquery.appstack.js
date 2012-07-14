@@ -247,7 +247,7 @@
 		if (obj.hasOwnProperty("methods") && obj.methods.hasOwnProperty(method)) {
 		  var url = appQuery.settings.url + "/webapi/uuid/" + obj.uuid + "/" + method + "?" + param;
 		  $.ajax(url, {}).done( function( data ) {
-			callback(obj, data);
+			callback(appQuery(obj), data);
 		  });
 		}
 	  });
