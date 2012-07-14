@@ -10,6 +10,11 @@ url = "https://emsalc.berkeley.edu/_common/webservices/Eval?wsdl"
 client = suds.client.Client(url, username="akrioukov", password="Tangle57")
 
 allbancroft = pickle.load(open('geopath.db')) #dict of key = alc point, value = geotree path to that point e.g.  u'vfd_min': u'#doe_library/#doe_penthouse/#doe_cooling_towers/vfd_min',
+children_dict = {}
+print 'getting geo children from SOAP...'
+for v in allbancroft.itervalues():
+  path = '/'.join(v.split('/')[:-1])
+  children_dict[v] = client.service.getFilteredChildren(path,'WEB_GEO')
 
 def get_dict(keyword):
   """
@@ -26,8 +31,7 @@ def get_dict(keyword):
       point = v.split('/')[-1]
       d[string]['location'] = v.split('/')[:v.split('/').index(string)]
       d[string]['points'].append(point)
-      path = '/'.join(v.split('/')[:-1])
-      children = client.service.getFilteredChildren(path,'WEB_GEO')
+      children = children_dict[v]
       val = filter(lambda x: x.referenceName == point, children)[0]
       d[string]['point_names'].append(str(val.displayName))
   return d
