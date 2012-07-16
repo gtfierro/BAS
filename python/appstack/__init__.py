@@ -3,15 +3,11 @@ from requests.auth import HTTPBasicAuth
 from uuid import UUID
 from types import MethodType
 
-class APINode(object):
-    def __init__(self, api, name, type, uuid=None, methods=None):
+class Node(object):
+    def __init__(self, api, name, type, methods=None):
         self.api = api
         self.name = name
         self.type = type
-        if uuid is None:
-            self.uuid = None
-        else:
-            self.uuid = UUID(uuid)
         if methods:
             for name in methods:
                 self._bind_method(name, methods[name])
@@ -22,41 +18,55 @@ class APINode(object):
             return api.call(self,  name, *args, **kwargs)
         call_method.__name__ = str(name)
         call_method.__doc__ = str(doc)
-        setattr(self, name, MethodType(call_method, self, APINode))
+        setattr(self, name, MethodType(call_method, self, Node))
 
     def __str__(self):
         return self.name
 
     def __repr__(self):
-        return 'APINode(' + self.name + ', ' + self.type + ', ' + str(self.uuid) + ')'
+        return '<Node:{0} {1}>'.format(self.type, self.name)
+
+class Resource(Node):
+    def __init__(self, api, name, type, uuid, methods=None):
+        Node.__init__(self, api, name, type, methods)
+        self.api = api
+        self.name = name
+        self.type = type
+        self.uuid = UUID(uuid)
+        if methods:
+            for name in methods:
+                self._bind_method(name, methods[name])
 
 
-class APIBuilding(APINode):
+    def __repr__(self):
+        return '<Resource:{0}, {1}, {2}>'.format(self.type, self.name, self.uuid)
+
+class Building(Node):
     def __init__(self, api, name):
-        APINode.__init__(self, api, name, 'Building')
+        Node.__init__(self, api, name, 'Building')
 
     def __repr__(self):
-        return 'APIBuilding(' + self.name + ')'
+        return '<Building {0}>'.format(self.name)
 
 
-class APIFloor(APINode):
+class Floor(Node):
     def __init__(self, api, name, building):
-        APINode.__init__(self, api, name, 'Floor')
-        self.building = APIBuilding(api, building)
+        Node.__init__(self, api, name, 'Floor')
+        self.building = Building(api, building)
 
     def __repr__(self):
-        return 'APIFloor(' + self.name + ', ' + self.building + ')'
+        return '<Floor {0}:{1}>'.format(self.building, self.name)
 
-class APIArea(APINode):
+class Area(Node):
     def __init__(self, api, name, building, floor):
-        APINode.__init__(self, api, name, 'Area')
-        self.building = APIBuilding(api, building)
-        self.floor = APIFloor(api, floor, building)
+        Node.__init__(self, api, name, 'Area')
+        self.building = Building(api, building)
+        self.floor = Floor(api, floor, building)
 
     def __repr__(self):
-        return 'APIArea(' + self.name + ', ' + self.building + ', ' + self.floor + ')'
+        return '<Area {0}:{1}:{2}>'.format(self.building, self.floor, self.name)
 
-class AppstackAPI(object):
+class Appstack(object):
     def __init__(self, user, password, url='http://localhost:8000'):
         self.url = url + '/webapi'
         self.auth = HTTPBasicAuth(user, password)
@@ -69,13 +79,13 @@ class AppstackAPI(object):
         elif 'type' not in obj or 'name' not in obj:
             return obj
         elif obj['type'] == 'Building':
-            return APIBuilding(self, obj['name'])
+            return Building(self, obj['name'])
         elif obj['type'] == 'Floor':
-            return APIFloor(self, obj['name'], obj['building'])
+            return Floor(self, obj['name'], obj['building'])
         elif obj['type'] == 'Area':
-            return APIArea(self, obj['name'], obj['building'], obj['floor'])
+            return Area(self, obj['name'], obj['building'], obj['floor'])
         else:
-            return APINode(self, obj['name'], obj['type'], obj['uuid'], obj['methods'])
+            return Resource(self, obj['name'], obj['type'], obj['uuid'], obj['methods'])
 
     def _request(self, path):
         r = requests.get(self.url + path, auth=self.auth)
