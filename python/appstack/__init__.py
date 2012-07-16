@@ -26,6 +26,16 @@ class Node(object):
     def __repr__(self):
         return '<Node:{0} {1}>'.format(self.type, self.name)
 
+    def __eq__(self, other):
+        return (isinstance(other, Node) and
+                self.api == other.api and
+                self.name == other.name and
+                self.type == other.type)
+
+    def __ne__(self, other):
+        return not (self == other)
+
+
 class Resource(Node):
     def __init__(self, api, name, type, uuid, methods=None):
         Node.__init__(self, api, name, type, methods)
@@ -37,9 +47,16 @@ class Resource(Node):
             for name in methods:
                 self._bind_method(name, methods[name])
 
-
     def __repr__(self):
         return '<Resource:{0}, {1}, {2}>'.format(self.type, self.name, self.uuid)
+
+    def __eq__(self, other):
+        return (isinstance(other, Resource) and
+                self.api == other.api and
+                self.name == other.name and
+                self.type == other.type and
+                self.uuid == other.uuid)
+
 
 class Building(Node):
     def __init__(self, api, name):
@@ -48,6 +65,10 @@ class Building(Node):
     def __repr__(self):
         return '<Building {0}>'.format(self.name)
 
+    def __eq__(self, other):
+        return (isinstance(other, Building) and
+                self.api == other.api and
+                self.name == other.name)
 
 class Floor(Node):
     def __init__(self, api, name, building):
@@ -57,6 +78,11 @@ class Floor(Node):
     def __repr__(self):
         return '<Floor {0}:{1}>'.format(self.building, self.name)
 
+    def __eq__(self, other):
+        return (isinstance(other, Floor) and
+                self.building == other.building and
+                self.name == other.name)
+
 class Area(Node):
     def __init__(self, api, name, building, floor):
         Node.__init__(self, api, name, 'Area')
@@ -65,6 +91,12 @@ class Area(Node):
 
     def __repr__(self):
         return '<Area {0}:{1}:{2}>'.format(self.building, self.floor, self.name)
+
+    def __eq__(self, other):
+        return (isinstance(other, Area) and
+                self.floor == other.floor and
+                self.name == other.name)
+
 
 class Appstack(object):
     def __init__(self, user, password, url='http://localhost:8000'):
