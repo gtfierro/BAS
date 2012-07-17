@@ -13,9 +13,9 @@ import sdh
 class Lexer(object):
 
   tokens = [
-      'NAME','UUID','VAR','TAG','SPATIAL',
+      'NAME','UUID','VAR','TAG','SPATIAL', 'ATTRIBUTE', 'VALUE',
       'UPSTREAM','DOWNSTREAM','EQUALS','KEYWORD','LASTVALUE',
-      'LPAREN','RPAREN',
+      'LPAREN','RPAREN', 'RBRACK','LBRACK',
       ]
 
   #Tokens
@@ -24,6 +24,8 @@ class Lexer(object):
   t_DOWNSTREAM  = r'<'
   t_LPAREN      = r'\('
   t_RPAREN      = r'\)'
+  t_LBRACK      = r'\['
+  t_RBRACK      = r'\]'
   t_EQUALS      = r'='
   t_ignore      = ' \t'
 
@@ -42,11 +44,6 @@ class Lexer(object):
     t.value = t.value.strip()
     return t
 
-#  def t_TYPE(self,t):
-#    r'\#[^!][A-Z0-9]+[ ]?'
-#    t.value = t.value.strip()
-#    return t
- 
   def t_UUID(self,t):
     r'(\%|\^)[^!]?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}[ ]?'
     t.value = t.value.strip()
@@ -57,6 +54,15 @@ class Lexer(object):
     t.value = t.value.strip()
     return t
 
+  def t_ATTRIBUTE(self, t):
+    r'(?<=\[)[ ]?[a-zA-Z\-:_ ]+[ ]?(?=\]|=)'
+    t.value = t.value.strip()
+    return t
+ 
+  def t_VALUE(self, t):
+    r'(?<==)[ ]?[a-zA-Z\-:_\d ]+[ ]?(?=\])'
+    t.value = t.value.strip()
+    return t
 
   def t_LASTVALUE(self,t):
     r'\b\_\b'
@@ -302,6 +308,16 @@ class Parser(object):
     '''query : set'''
     p[0] = self.lastvalue = self.filter_dup_uids(p[1])
 
+  def p_query_attr(self, p):
+    '''query : set LBRACK ATTRIBUTE RBRACK
+             | set LBRACK ATTRIBUTE EQUALS VALUE RBRACK'''
+    if len(p) == 6:
+      truth = lambda x: p[3] in x.metadata and (x.metadata[p[3]] == p[5] or x.metadata[p[3]] == int(p[5]))
+    else:
+      truth = lambda x: p[3] in x.metadata
+    res = filter(truth, p[1])
+    p[0] = self.lastvalue = res
+
   def p_set_group(self, p):
     '''set : LPAREN query RPAREN'''
     p[0] = self.lastvalue = p[2]
@@ -344,16 +360,6 @@ class Parser(object):
           else:
             res.append(d[tag_lookup]) 
     p[0] = self.lastvalue = self.filter_dup_uids(res)
-
-
-#  def p_set_type(self,p):
-#    'set : TYPE'
-#    type_lookup = p[1][1:].strip()
-#    domain = p[0] if p[0] else self.relationals
-#    res = []
-#    for r in domain:
-#      res.extend(r.search(lambda x: x.type() == type_lookup))
-#    p[0] = self.lastvalue = self.filter_dup_uids(res)
 
   def p_set_uuid(self,p):
     'set : UUID'

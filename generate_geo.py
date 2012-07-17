@@ -82,23 +82,23 @@ class Building(object):
 
 ################################################################################
 
-# Create a building with some floors
-b = Building('Test Building', ['Floor 1', 'Floor 2', 'Floor 3'])
-
-# Add more floors programmatically
-b.add_floor('Floor 4')
-
-# New lighting zone. (The third argument is type. 'lighting' is used for lighting zones,
-#                   'hvac' for VAVs, and 'thermostat' for physical thermostat locations)
-b.add_area('Floor 1', 'Zone 1', 'lighting')
-
-# New VAV area
-b.add_area('Floor 1', 'VAV 12', 'hvac')
-
-# Write JSON to a file
-## The final JSON file should then be copied to the data/ directory, and createdb.sh
-## should be modified to load it into the database automatically
-# b.dump(open('test.json', 'w'))
-
-# Or the data can be written directly to the database
-b.register()
+## Create a building with some floors
+#b = Building('Test Building', ['Floor 1', 'Floor 2', 'Floor 3'])
+#
+## Add more floors programmatically
+#b.add_floor('Floor 4')
+#
+## New lighting zone. (The third argument is type. 'lighting' is used for lighting zones,
+##                   'hvac' for VAVs, and 'thermostat' for physical thermostat locations)
+#b.add_area('Floor 1', 'Zone 1', 'lighting')
+#
+## New VAV area
+#b.add_area('Floor 1', 'VAV 12', 'hvac')
+#
+## Write JSON to a file
+### The final JSON file should then be copied to the data/ directory, and createdb.sh
+### should be modified to load it into the database automatically
+## b.dump(open('test.json', 'w'))
+#
+## Or the data can be written directly to the database
+#b.register()
