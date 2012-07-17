@@ -16,54 +16,9 @@ I'm creating this README file so that I can explain my logic for writing things 
 * spatialite
 * django-olwidget
 
-## Setting up
-1. Install the appstack and all of its dependencies
-2. Create the geodjango database: ```cd web && ./createdb.sh``` Be sure to set up a username/password
-3. Symlink the database into the appstack folder: ```ln -s web/geodjango.db geodjango.db```
-4. (optional) Run the sMAP driver that supports data and actuation, e.g. ```smap/queue/queuedriver.ini``` (NOTE: installing this driver currently requires a one-line patch to sMAP)
-
-## Running
-1. Run sMAP drivers locally, or connect to sMAP drivers running on another machine
-2. Start the web frontend ```cd web && python manage.py runserver```
-
-## Inputting buildings into the database
-
-New buildings can be added from a variety of different file formats. The most common way is to load a JSON file or to use the web interface to create the building.
-
-### Relationship graph via Python script
-For an example of inputting the relationship graph, see ```sdh.py```
-
-### New building via JSON file
-1. Make a copy of the file ```data/template.json```
-2. Change the building name, and add floors as necessary. Be sure there is a ```floorplan``` view for each floor (as in the default file)
-3. Load the file into the database, either by uploading it at ```http://localhost:8000/smapgeo/upload```, or by running ```python manage.py loadjson path/to/building.json``
-4. Go to ```http://localhost:8000/admin/smapgeo/view/```. For each view of your new building, draw a representation of that floor on the map.
-    - Click on the "Edit" button and then press "Clear all"
-	- Find the location of the building by scrolling the map
-	- Click "Draw Polygons" in the "Edit" menu.
-    - Outline the floor on the map by drawing a rectangle. Be sure to draw in clockwise order, and create only four points. Click to create the first three points, and double-click to create the fourth point.
-5. You can use the admin web interface to draw areas on the may. However, it is easier to use Inkscape (see below).
-
-### New building via web interface
-1. Log in to the admin page, e.g. ```http://localhost:8000/admin/```
-2. Add a new building (by clicking on the 'Add' and then typing the name of the building.
-3. Next create the floors for the building. Names are typically 'Floor 1', 'Floor 2', etc.
-4. For each floor, create a view. The name of the view must be 'floorplan'. The image is the path to the floor plan image, relative to the ```data/``` directory. For the rectangle, draw a representation of the floor on the map.
-	- Find the location of the building by scrolling the map
-	- Click "Draw Polygons" in the "Edit" menu.
-    - Outline the floor on the map by drawing a rectangle. Be sure to draw in clockwise order, and create only four points. Click to create the first three points, and double-click to create the fourth point.
-5. You can use the admin web interface to draw areas on the may. However, it is easier to use Inkscape (see below).
-
-### Adding areas/zones using Inkscape
-1. Download an SVG from ```http://localhost:8000/smapgeo``` and open it in Inkscape.
-2. Each floor is a separate layer. To create an area, draw a shape on that layer.
-    - Select the new shape and go to Object>Object Properties (Ctrl-Shift-O)
-	- Set the Title to the name of the area, e.g. "Area 1"
-	- The Description can be used to specify metadata (not yet supported by the query system)
-3. Convert all shapes to path ("Edit>Select All" followed by "Path>Object to Path")
-4. Save the modified SVG file
-5. Re-upload it to the database by using the form at ```http://localhost:8000/smapgeo/upload```
-
+## Installing and running
+See [Appstack Setup](https://github.com/krioukov/LoCalProjects/wiki/Appstack-Setup).
+For adding new buildings or areas, see [Geo Data Input](https://github.com/krioukov/LoCalProjects/wiki/Geo-Data-Input)
 
 ## Query Language
 Currently the query language has only been tested on the graph in the ```test.py``` file.
