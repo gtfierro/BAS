@@ -39,7 +39,7 @@ class BACnetCCV(node.Device):
 
 class BACnetDMP(node.Device):
   implements(device_types.DDMP)
-  def __init__(self, name, point, setpoint):
+  def __init__(self, name, point, setpoint=None):
       node.Device.__init__(self, name)
       self.point = point
       self.setpoint = setpoint
@@ -48,8 +48,10 @@ class BACnetDMP(node.Device):
       return read_point(self.point, root=ROOT_SIEMENS)
 
   def set_percent_open(self, value):
-      write_point(self.setpoint, value, type='real', root=ROOT_SIEMENS)
-
+      if self.setpoint is not None:
+          write_point(self.setpoint, value, type='real', root=ROOT_SIEMENS)
+      else:
+          return "No setpoint given"
 
 class BACnetSEN(node.Device):
   implements(device_types.DSEN)
@@ -77,7 +79,7 @@ class BACnetTOW(node.Device):
 
 class BACnetVLV(node.Device):
   implements(device_types.DVLV)
-  def __init__(self, name, point, setpoint):
+  def __init__(self, name, point, setpoint=None):
       node.Device.__init__(self, name)
       self.point = point
       self.setpoint = setpoint
@@ -86,7 +88,10 @@ class BACnetVLV(node.Device):
       return read_point(self.point, root=ROOT_SIEMENS)
 
   def set_percent_open(self, value):
-      write_point(self.setpoint, value, type='real', root=ROOT_SIEMENS)
+      if self.setpoint is not None:
+          write_point(self.setpoint, value, type='real', root=ROOT_SIEMENS)
+      else:
+          return "No setpoint given"
 
 class BACnetHX(node.Device):
   implements(device_types.DHX)
