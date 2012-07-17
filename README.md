@@ -75,6 +75,44 @@ The grammar is all in ```lexerparser.py``` at the top, but essentially your quer
 * ```$string name```: '$' followed by the name of an object. This **is** case sensitive. This resolves to the set of all objects named 'string name'.
 * ```%8d666322-745f-475f-a463-8329eb7547fa```: '%' followed by a UUID. This resolves to the object identified by that UUID.
 
+####Grammar
+```
+UPSTREAM    = r'>' 
+DOWNSTREAM  = r'<'
+LPAREN      = r'\('
+RPAREN      = r'\)'
+LBRACK      = r'\['
+RBRACK      = r'\]'
+EQUALS      = r'='
+LASTVALUE   = r'\b\_\b'
+NAME        = r'\$[^!][\w\-\:\_\s]+'
+TAG         = r'(\.|\#|\&)([^!]?[A-Z_]+)?[ ]?'
+SPATIAL     = r'!([\w\-\:\_\s]+)?'
+UUID        = r'(\%|\^)[^!]?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}[ ]?'
+VAR         = r'\@[^!]?[a-zA-Z_][a-zA-Z0-9_]*[ ]?'
+ATTRIBUTE   = r'(?<=\[)[ ]?[a-zA-Z\-:_ ]+[ ]?(?=\]|=)'
+VALUE       = r'(?<==)[ ]?[a-zA-Z\-:_\d ]+[ ]?(?=\])'
+KEYWORD     = r'\b(help|types|prefixes|examples|tags|actuate)\b'
+
+statement   :   KEYWORD
+            |   VAR EQUALS query
+            |   query
+
+query       :   query UPSTREAM set
+            |   query DOWNSTREAM set
+            |   set
+            |   set LBRACK ATTRIBUTE RBRACK
+            |   set LBRACK ATTRIBUTE EQUALS VALUE RBRACK
+
+set         :   LPAREN query RPAREN
+            |   LASTVALUE
+            |   SPATIAL
+            |   NAME
+            |   TAG
+            |   UUID
+            |   VAR
+```
+
 ### Sample Queries
 Run ```python lexerparser.py```, and you'll get a prompt looking something like ```query> ```. Try the following:
 * ```#SEN < #CCV < $Outside Air Damper```: the set of all sensors that are down stream of any of the cooling valves downstream of the Outside Air Damper
