@@ -302,8 +302,8 @@ class Area(models.Model, Serializable):
                 m = find_or_create(AreaMetadata, save=False, area=a, tagname=tag)
                 m.tagval = value
                 m.save()
-        except:
-            raise
+        except KeyError:
+            pass
         a.save()
         return a
 
