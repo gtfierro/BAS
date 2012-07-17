@@ -5,6 +5,8 @@ import json
 from zope.interface import implements
 
 ROOT='http://127.0.0.1:8080/data/WattStopper'
+# Port forwarding:  ssh -L 8081:localhost:8080 user@<ip>
+ROOT_SIEMENS='http://127.0.0.1:8081/data/Siemens'
 
 def read_point(point, root=ROOT):
   time, reading = requests.get(root + point).json['Readings'][-1]
@@ -12,9 +14,9 @@ def read_point(point, root=ROOT):
 
 def write_point(point, value, type=None, root=ROOT):
     if type:
-        write_multiple_points({point: {'type': type, 'value': value}})
+        write_multiple_points({point: {'type': type, 'value': value}}, root)
     else:
-        write_multiple_points({point: {'value': value}})
+        write_multiple_points({point: {'value': value}}, root)
 
 def write_multiple_points(data, root=ROOT):
     requests.post(root+'/write', json.dumps(data))
@@ -37,9 +39,17 @@ class BACnetCCV(node.Device):
 
 class BACnetDMP(node.Device):
   implements(device_types.DDMP)
-  def __init__(self, name, point):
+  def __init__(self, name, point, setpoint):
       node.Device.__init__(self, name)
       self.point = point
+      self.setpoint = setpoint
+
+  def get_percent_open(self):
+      return read_point(self.point, root=ROOT_SIEMENS)
+
+  def set_percent_open(self, value):
+      write_point(self.setpoint, value, type='real', root=ROOT_SIEMENS)
+
 
 class BACnetSEN(node.Device):
   implements(device_types.DSEN)
@@ -67,9 +77,16 @@ class BACnetTOW(node.Device):
 
 class BACnetVLV(node.Device):
   implements(device_types.DVLV)
-  def __init__(self, name, point):
+  def __init__(self, name, point, setpoint):
       node.Device.__init__(self, name)
       self.point = point
+      self.setpoint = setpoint
+
+  def get_percent_open(self):
+      return read_point(self.point, root=ROOT_SIEMENS)
+
+  def set_percent_open(self, value):
+      write_point(self.setpoint, value, type='real', root=ROOT_SIEMENS)
 
 class BACnetHX(node.Device):
   implements(device_types.DHX)

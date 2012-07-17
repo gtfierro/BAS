@@ -137,17 +137,17 @@ ah1['RET_FAN'].add_child(ah1['MIX_AIR_TMP_SEN'])
 
 #Air Handler 2
 ah2 = AHU(hvac, 'Air Handler 2', {
-            'OUT_AIR_DMP': BACnetDMP('Outside Air Damper','BACnet point name'),
+            'OUT_AIR_DMP': BACnetDMP('Outside Air Damper','BACnet point name', 'BACnet setpoint name'),
             'OUT_AIR_TMP_SEN': BACnetSEN('Outside Air Temp Sensor','BACnet point name'),
             'MIX_AIR_TMP_SEN': BACnetSEN('Mixed Air Temp Sensor','BACnet point name'),
             'RET_FAN': BACnetFAN('Return Fan','BACnet point name'),
-            'EXH_AIR_DMP': BACnetDMP('Exhaust Air Damper','BACnet point name'),
+            'EXH_AIR_DMP': BACnetDMP('Exhaust Air Damper','BACnet point name', 'BACnet setpoint name'),
             'RET_AIR_HUM_SEN': BACnetSEN('Return Air Humidity Sensor','BACnet point name'),
             'RET_AIR_TMP_SEN': BACnetSEN('Return Air Temp Sensor','BACnet point name'),
-            'RET_AIR_DMP': BACnetDMP('Return Air Damper','BACnet point name'),
+            'RET_AIR_DMP': BACnetDMP('Return Air Damper','BACnet point name', 'BACnet setpoint name'),
             'RET_AIR_PRS_SEN': BACnetSEN('Return Air Pressure Sensor','BACnet point name'),
             'RET_AIR_FLW_SEN': BACnetSEN('Return Air Flow Sensor','BACnet point name'),
-            'COO_VLV': BACnetVLV('Cooling Valve','BACnet point name'),
+            'COO_VLV': BACnetVLV('Cooling Valve','BACnet point name', 'BACnet setpoint name'),
             'SUP_AIR_FAN': BACnetFAN('Supply Air Fan','BACnet point name'),
             'SUP_AIR_FLW_SEN': BACnetSEN('Supply Air Flow Sensor','BACnet point name'),
             'SUP_AIR_TMP_SEN': BACnetSEN('Supply Air Temp Sensor','BACnet point name'),
@@ -205,23 +205,23 @@ hwl['HOT_WAT_RET_TMP_SEN'].add_child(hwl['HX'])
 hwl['HOT_WAT_PRS_DIF_SEN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
 hwl['HOT_WAT_PMP'].add_child(hwl['HOT_WAT_SUP_TMP_SEN'])
 
-def make_vav(floor, number, has_heat_cool=True, pxcm_number=10):
+def make_vav(floor, number, has_heat_cool=True, pxcm_number=11):
     global hvac, hwl, cwl, ah1, ah2
-    path = '/Siemens/SDH.PXCM-{:02}/SDH/S{:1}-{:02}/'.format(pxcm_number, floor, number)
+    path = '/SDH.PXCM-{:02}/SDH/S{:1}-{:02}/'.format(pxcm_number, floor, number)
     children = {
         'AIR_VOLUME':BACnetSEN('Air Volume', path + 'AIR_VOLUME'),
         'CLG_LOOPOUT':BACnetSEN('cooling temperature control loop output value', path + 'CLG_LOOPOUT'),
         'CTL_FLOW_MAX':BACnetSEN('CTL Flow Max', path + 'CTL_FLOW_MAX'),
         'CTL_FLOW_MIN':BACnetSEN('CTL Flow Min', path + 'CTL_FLOW_MIN'),
         'CTL_STPT':BACnetSEN('CTL Setpoint', path + 'CTL_STPT'),
-        'DMPR_POS':BACnetSEN('Damper position', path + 'DMPR_POS'),
+        'DMPR_POS':BACnetDMP('Damper position', path + 'DMPR_POS', path + 'DMPR_COMD'),
         'ROOM_TEMP':BACnetSEN('Room temperature', path + 'ROOM_TEMP'),
         }
     if has_heat_cool:
         children.update({
         'HEAT.COOL':BACnetSEN('heat.cool', path + 'HEAT.COOL'),
         'HTG_LOOPOUT':BACnetSEN('HTG Loopout', path + 'HTG Loopout'),
-        'VLV_POS':BACnetSEN('VLV position', path + 'VLV_POS'),
+        'VLV_POS':BACnetVLV('VLV position', path + 'VLV_POS', path + 'VLV_COMD'),
         })
     vav = VAV(hvac, 'VAV ' + str(number), children)
     ah1.add_child(vav)
