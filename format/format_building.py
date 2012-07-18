@@ -33,7 +33,18 @@ def store_child(path):
         child_path = path + c if path == '/' else path + '/' + c
         store_child(child_path)
 
-store_child('#doe_library')
+#store_child('#doe_library')
+
+def pickilizify(ddict):
+  """
+  creates a pickleable version of a default dict
+  """
+  res = {}
+  for d in ddict:
+    res[d] = dict(ddict[d])
+    for dd in ddict[d]:
+      res[d][dd] = dict(ddict[d][dd])
+  return res
 
 
 class DictGen(object):
@@ -134,7 +145,7 @@ class Formatter(object):
 
   def __init__(self, building):
     self.building = building
-    self.building_dict = pickle.load(open(building+'.db'))
+    self.building_dict = pickle.load(open('alc_bancroft.db'))
     with open('test.py','wb') as f:
       #write all the imports
       f.write("""from node import Relational
@@ -146,39 +157,30 @@ import node_types
 
 gis.NodeLink.objects.all().delete()\n""")
 
-  def setlist(self, list_file):
-    self.list_file = pickle.load(open(list_file))
-
   def setrelational(self, relational_type):
     self.relational_type = relational_type
-    with open(self.building+'.py','a') as f:
-      f.write("%s = relational('%s')\n" % (relational_type,relational_type))
+    with open('test.py','a') as f:
+      f.write("%s = Relational('%s')\n" % (relational_type,relational_type))
 
-  def build_objects(self):
-    f = open(self.building+'.py','a')
+  def build_objects(self,otype):
+    f = open('test.py','a')
 
-    for line in self.list_file:
-      type=line[0]
-      name=line[1].replace('-','_').replace(':','_').replace(' ','_').replace('#','')
-      location=line[2]
-      line_string = "%s = %s(%s, '%s', {\n" % (name,type,self.relational_type,name)
-      if len(line) > 3:
-        for item in line[3:]:
-          tag_name, tag_type, device_name, tag_path = item
-          if tag_type:
-            line_string += "'%s' : %s( '%s','%s'),\n" % (tag_name, tag_type, device_name, tag_path)
-      line_string += '})\n'
+    for line in self.building_dict['hvac'][otype]:
+      if line.startswith('#'):
+        name = line[1:].replace('-','_').replace(':','_')
+      print self.building_dict['hvac'][otype][line]
+      type = node_types.tag_to_class(otype)
+      line_string = "%s = %s(%s, '%s', {})\n" % (name,type,'hvac',name)
       f.write(line_string)
-
     f.close()
 
 if __name__=='__main__':
-  d = DictGen('Bancroft Library')
-  d.generate_dict('vav','VAV','hvac')
-  d.generate_dict('ah', 'AHU','hvac')
-  d.make_building()
-  pickle.dump(d.building_dict,open('alc_bancroft.db','w'))
+  #d = DictGen('Bancroft Library')
+  #d.generate_dict('vav','VAV','hvac')
+  #d.generate_dict('ah', 'AHU','hvac')
+  #d.make_building()
+  #pickle.dump(pickilizify(d.building_dict),open('alc_bancroft.db','w'))
   f = Formatter('Bancroft Library')
-
-
-
+  f.setrelational('hvac')
+  f.build_objects('VAV')
+  #f.build_objects('AHU')

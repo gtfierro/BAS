@@ -46,7 +46,7 @@ $(function() {
       );
   }
 
-  $('#svgbasics').appstack({building: 'Sutardja Dai Hall',
+  $('#svgbasics').appstack({building: getURLParameter('building'),
                             url: '',
                             onLoad: function() {
     var $root = $(this);

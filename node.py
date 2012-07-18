@@ -220,6 +220,8 @@ class Container(object):
     searches dfs preorder for nodes for which the function [fn] evaluates to true
     It appends all True values to a results list, and applies [retfn] to them
     """
+    if not self._nk.nodes():
+      return []
     results = []
     #apply fn to arbitrary node, make sure that it is a binary fxn
     tmp = self._nk.nodes()[0]

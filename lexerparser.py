@@ -9,6 +9,7 @@ from node_types import *
 from collections import deque
 import gis
 import sdh
+import bancroft
 
 class Lexer(object):
 
@@ -95,6 +96,7 @@ class Parser(object):
     self.debug = debug_flag
     self.lexer = lex(module=Lexer())
     self.relationals = [getattr(sdh, i) for i in sdh.__dict__ if isinstance(getattr(sdh,i), Relational)]
+    self.relationals.extend([getattr(bancroft, i) for i in bancroft.__dict__ if isinstance(getattr(bancroft,i), Relational)])
     self.domain = []
     self.vars = {}
     self.lastvalue = []
