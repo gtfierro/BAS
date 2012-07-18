@@ -154,8 +154,7 @@ from bacnet_devices import *
 import networkx as nx
 import gis
 import node_types
-
-gis.NodeLink.objects.all().delete()\n""")
+\n""")
 
   def setrelational(self, relational_type):
     self.relational_type = relational_type
@@ -171,6 +170,8 @@ gis.NodeLink.objects.all().delete()\n""")
       print self.building_dict['hvac'][otype][line]
       type = node_types.tag_to_class(otype)
       line_string = "%s = %s(%s, '%s', {})\n" % (name,type,'hvac',name)
+      area = re.match('.*\d(?=\w)?',line)
+      line_string += "try:\n  %s.areas.add(gis.buildings['Bancroft Library']['%s']['%s'])\nexcept:\n  pass\n" % (name, self.building_dict['hvac'][otype][line]['location'][1][5:],area.group())
       f.write(line_string)
     f.close()
 

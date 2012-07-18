@@ -8,6 +8,9 @@ from node import *
 from node_types import *
 from collections import deque
 import gis
+# Delete all NodeLink objects: we don't have persistent UUIDs so they need to be
+# regenerated each time
+gis.NodeLink.objects.all().delete()
 import sdh
 import bancroft
 
