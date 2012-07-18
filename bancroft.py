@@ -5,7 +5,7 @@ import networkx as nx
 import gis
 import node_types
 
-gis.NodeLink.objects.all().delete()
+#gis.NodeLink.objects.all().delete()
 hvac = Relational('hvac')
 doe_vav_b_4_03n = VAV(hvac, 'doe_vav_b_4_03n', {})
 doe_vav_b_4_13n = VAV(hvac, 'doe_vav_b_4_13n', {})
