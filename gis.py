@@ -46,19 +46,21 @@ def search(string):
   """
   domain = deque()
   results = []
+  alreadyvisited = []
   #initialize queue with buildings
   for b in list(buildings):
     domain.appendleft(b)
   while domain:
     current = domain.pop()
+    alreadyvisited.append(current)
     if string in current.name:
       results.append(current)
     if hasattr(current,'floors'):
-      for f in list(current.floors.all()):
+      for f in filter(lambda x: x not in alreadyvisited, list(current.floors.all())):
         domain.appendleft(f)
     #maybe buildings will have areas too, so this is `if` instead of `elif`
     if hasattr(current,'areas'):
-      for a in list(current.areas.all()):
-        domain.appendleft(a)
+      for a in filter(lambda x: x not in alreadyvisited, list(current.areas.all())):
+        domain.appendleft(a) 
   return results
 
