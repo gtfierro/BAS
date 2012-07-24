@@ -27,7 +27,11 @@ class IVAV(Interface):
   """
   Interface for the Variable Air Volume boxes
   """
-  pass
+  def get_airflow():
+    """get airflow of the VAV"""
+
+  def set_airflow(airflow):
+    """set the airflow setpoint for the VAV to be [airflow]"""
 
 class ILIG(Interface):
   """

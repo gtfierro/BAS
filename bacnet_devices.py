@@ -7,8 +7,10 @@ from zope.interface import implements
 ROOT='http://127.0.0.1:8080/data/WattStopper'
 # Port forwarding:  ssh -L 8081:localhost:8080 user@<ip>
 ROOT_SIEMENS='http://127.0.0.1:8081/data/Siemens'
+ROOT_BANCROFT='http://127.0.0.1:8082/data/Bancroft'
 
 def read_point(point, root=ROOT):
+  print root+point
   time, reading = requests.get(root + point).json['Readings'][-1]
   return reading
 
@@ -52,6 +54,24 @@ class BACnetDMP(node.Device):
           write_point(self.setpoint, value, type='real', root=ROOT_SIEMENS)
       else:
           return "No setpoint given"
+
+#TODO: test this class
+
+class BancroftDMP(node.Device):
+  implements(device_types.DDMP)
+
+  def __init__(self, name, point, setpoint=None):
+    node.Device.__init__(self, name)
+    self.device_id = point
+    self.setpoint = setpoint
+    self.point = point
+
+  def get_percent_open(self):
+    #point is something like device240202/flow_tab_1
+    return read_point(self.point+'/DAMPER_OUTPUT',root=ROOT_BANCROFT)
+ 
+  def set_percent_open(self, value):
+    return write_point(self.point+'/DAMPER_LOCK',value, type='real',root=ROOT_BANCROFT)
 
 class BACnetSEN(node.Device):
   implements(device_types.DSEN)

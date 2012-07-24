@@ -161,17 +161,21 @@ import node_types
     with open('test.py','a') as f:
       f.write("%s = Relational('%s')\n" % (relational_type,relational_type))
 
-  def build_objects(self,otype):
+  def build(self):
     f = open('test.py','a')
 
-    for line in self.building_dict['hvac'][otype]:
+    for line in self.building_dict[self.relational_type]['VAV']:
       if line.startswith('#'):
         name = line[1:].replace('-','_').replace(':','_')
-      print self.building_dict['hvac'][otype][line]
-      type = node_types.tag_to_class(otype)
-      line_string = "%s = %s(%s, '%s', {})\n" % (name,type,'hvac',name)
+      print self.building_dict[self.relational_type]['VAV'][line]
+      type = node_types.tag_to_class('VAV')
       area = re.match('.*\d(?=\w)?',line)
-      line_string += "try:\n  %s.areas.add(gis.buildings['Bancroft Library']['%s']['%s'])\nexcept:\n  pass\n" % (name, self.building_dict['hvac'][otype][line]['location'][1][5:],area.group())
+      full_area = re.match('.*\d\w?',line)
+      #initialize VAV
+      point_name = '/device'+get_value(full_area.group()+'/~net/~parent/driver/device/object_identifier')[2:]+'/flow_tab_1'
+      line_string = "%s = %s(%s, '%s', {'EXH_AIR_DMP':BancroftDMP('Exhaust Air Damper','%s')})\n" % (name,type,self.relational_type,name,point_name)
+      #link gis to VAV
+      line_string += "try:\n  %s.areas.add(gis.buildings['Bancroft Library']['%s']['%s'])\nexcept:\n  print 'could not link %s %s'\n" % (name, self.building_dict[self.relational_type]['VAV'][line]['location'][1][5:],area.group()[1:], 'VAV', area.group()[1:])
       f.write(line_string)
     f.close()
 
@@ -183,5 +187,4 @@ if __name__=='__main__':
   #pickle.dump(pickilizify(d.building_dict),open('alc_bancroft.db','w'))
   f = Formatter('Bancroft Library')
   f.setrelational('hvac')
-  f.build_objects('VAV')
-  #f.build_objects('AHU')
+  f.build()
