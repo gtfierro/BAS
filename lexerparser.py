@@ -246,16 +246,6 @@ class Parser(object):
     """
     nodes = [nodes] if not isinstance(nodes,list) else nodes
     return all(map(lambda x: not isinstance(x, (Relational, Node)),nodes))
-  
-  def expand_by_intersection(self, areas):
-    """
-    given an area or list of areas, returns the list of areas that intersect with those areas
-    """
-    areas = [areas] if not isinstance(areas, list) else areas
-    res = []
-    for a in areas:
-      res.extend(gis.Area.objects.filter(regions__intersects=a.regions))
-    return res
 
   def allow_intersection(self, a1, a2):
     """
@@ -267,8 +257,18 @@ class Parser(object):
     if a1f == a2f and a1f.building == a2f.building:
       return True
     return False
+  
+  def expand_by_intersection(self, areas):
+    """
+    given an area or list of areas, returns the list of areas that intersect with those areas
+    """
+    areas = [areas] if not isinstance(areas, list) else areas
+    res = []
+    for a in areas:
+      res.extend(gis.Area.objects.filter(regions__intersects=a.regions))
+    return False if res == areas else res
 
-  def resolve_spatial(self,node,target,direction):
+  def resolve_spatial(self,node,target,direction,intersect=False):
     """
     resolve queries before we send them along to be resolved so that we're dealing with a constant datatype: spatials or objects
 
@@ -287,17 +287,9 @@ class Parser(object):
       target = self.nodes_to_areas(target)
       targetspatial = True
     if nodespatial and targetspatial: #resolve the derivative relationship spatially
-      target_regions = self.get_areas(target)
-      node_regions = self.get_areas(node)
-      for area in target_regions:
-        target_regions.extend(filter(lambda x: self.allow_intersection(area, x), gis.Area.objects.filter(regions__intersects=area.regions)))
-      for area in node_regions:
-        node_regions.extend(filter(lambda x: self.allow_intersection(area, x), gis.Area.objects.filter(regions__intersects=area.regions)))
-      #filter extensions by allow_intersection
-      trs = set(target_regions)
-      nrs = set(node_regions)
-      return list(trs.intersection(nrs)), None
-      #return list(set(filter(lambda x: x in target_regions, node_regions))), None
+      target_regions = set(self.get_areas(target))
+      node_regions = set(self.get_areas(node))
+      return list(target_regions.intersection(node_regions)), None
     else: #neither node nor target is spatial, so we do nothing
       return node,target
 
@@ -330,6 +322,8 @@ class Parser(object):
     elif not self.isspatial(domain) and self.isspatial(target): #nodes in an area
       domain_areas = self.nodes_to_areas(domain)
       domain,target = self.resolve_spatial(domain_areas, p[3], p[2])
+      while not (domain and target):
+        domain,target = self.resolve_spatial(domain_areas, p[3], p[2], True)
       p[0] = self.lastvalue = self.areas_to_nodes(domain)
     else:
       p[0] = self.lastvalue=domain
@@ -359,9 +353,6 @@ class Parser(object):
   def p_set_spatial(self, p):
     '''set : SPATIAL'''
     name_lookup = p[1][1:].strip()
-#    print 'starts as',self.get_areas(gis.search(name_lookup))
-#    print 
-#    print 'and becomes', [gis.Area.objects.filter(regions__intersects=area.regions) for area in self.get_areas(gis.search(name_lookup))]
     p[0] = self.lastvalue = gis.search(name_lookup)
 
   def p_set_name(self,p):
