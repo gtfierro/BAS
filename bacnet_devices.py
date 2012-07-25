@@ -33,6 +33,14 @@ class BACnetFAN(node.Device):
       node.Device.__init__(self, name)
       self.point = point
 
+class BancroftFAN(node.Device):
+  implements(device_types.DFAN)
+
+  def __init__(self, name, point_spd, point_pow=None):
+    node.Device.__init__(self, name)
+    self.point_spd = point_spd
+    self.point_pow = point_pow
+
 class BACnetCCV(node.Device):
   implements(device_types.DCCV)
   def __init__(self, name, point):
@@ -57,7 +65,7 @@ class BACnetDMP(node.Device):
 
 #TODO: test this class
 
-class BancroftDMP(node.Device):
+class BancroftVAVDMP(node.Device):
   implements(device_types.DDMP)
 
   def __init__(self, name, point, setpoint=None):
@@ -73,11 +81,40 @@ class BancroftDMP(node.Device):
   def set_percent_open(self, value):
     return write_point(self.point+'/DAMPER_LOCK',value, type='real',root=ROOT_BANCROFT)
 
+class BancroftAHUDMP(node.Device):
+  implements(device_types.DDMP)
+
+  def __init__(self, name, point, setpoint=None):
+    node.Device.__init__(self, name)
+    self.device_id = point
+    self.setpoint = setpoint
+    self.point = point
+
+  def get_percent_open(self):
+    #point is something like device240202/flow_tab_1
+    return read_point(self.point,root=ROOT_BANCROFT)
+ 
+  def set_percent_open(self, value):
+    return write_point(self.point, value, type='real',root=ROOT_BANCROFT)
+
 class BACnetSEN(node.Device):
   implements(device_types.DSEN)
   def __init__(self, name, point):
       node.Device.__init__(self, name)
       self.point = point
+  
+  def read(self):
+    return read_point(self.point,root=ROOT_SIEMENS)
+
+class BancroftSEN(node.Device):
+  implements(device_types.DSEN)
+  def __init__(self, name, point):
+      node.Device.__init__(self, name)
+      self.point = point
+
+  def read(self):
+    return read_point(self.point,root=ROOT_BANCROFT)
+
 
 class BACnetCHR(node.Device):
   implements(device_types.DCHR)
