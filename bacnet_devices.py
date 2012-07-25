@@ -6,8 +6,8 @@ from zope.interface import implements
 
 ROOT='http://127.0.0.1:8080/data/WattStopper'
 # Port forwarding:  ssh -L 8081:localhost:8080 user@<ip>
-ROOT_SIEMENS='http://127.0.0.1:8081/data/Siemens'
-ROOT_BANCROFT='http://127.0.0.1:8082/data/Bancroft'
+ROOT_SIEMENS='http://127.0.0.1:8080/data/Siemens'
+ROOT_BANCROFT='http://127.0.0.1:8080/data/Bancroft'
 
 def read_point(point, root=ROOT):
   print root+point
