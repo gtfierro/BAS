@@ -5,10 +5,6 @@ import networkx as nx
 import gis
 import node_types
 
-# Delete all NodeLink objects: we don't have persistent UUIDs so they need to be
-# regenerated each time
-gis.NodeLink.objects.all().delete()
-
 # Lights
 l = Relational('Lights')
 # Floor 4
@@ -104,14 +100,14 @@ if 'Sutardja Dai Hall' in gis.buildings:
 #Air Handler 1
 hvac = Relational('HVAC')
 ah1 = AHU(hvac, 'Air Handler 1', {
-            'OUT_AIR_DMP': BACnetDMP('Outside Air Damper','BACnet point name'),
+            'OUT_AIR_DMP': BACnetDMP('Outside Air Damper','BACnet point name', 'BACnet setpoint name'),
             'OUT_AIR_TMP_SEN': BACnetSEN('Outside Air Temp Sensor','BACnet point name'),
             'MIX_AIR_TMP_SEN': BACnetSEN('Mixed Air Temp Sensor','BACnet point name'),
             'RET_FAN': BACnetFAN('Return Fan','BACnet point name'),
-            'EXH_AIR_DMP': BACnetDMP('Exhaust Air Damper','BACnet point name'),
+            'EXH_AIR_DMP': BACnetDMP('Exhaust Air Damper','BACnet point name', 'BACnet setpoint name'),
             'RET_AIR_HUM_SEN': BACnetSEN('Return Air Humidity Sensor','BACnet point name'),
             'RET_AIR_TMP_SEN': BACnetSEN('Return Air Temp Sensor','BACnet point name'),
-            'RET_AIR_DMP': BACnetDMP('Return Air Damper','BACnet point name'),
+            'RET_AIR_DMP': BACnetDMP('Return Air Damper','BACnet point name', 'BACnet setpoint name'),
             'RET_AIR_PRS_SEN': BACnetSEN('Return Air Pressure Sensor','BACnet point name'),
             'RET_AIR_FLW_SEN': BACnetSEN('Return Air Flow Sensor','BACnet point name'),
             'COO_VLV': BACnetVLV('Cooling Valve','BACnet point name'),
@@ -214,14 +210,14 @@ def make_vav(floor, number, has_heat_cool=True, pxcm_number=11):
         'CTL_FLOW_MAX':BACnetSEN('CTL Flow Max', path + 'CTL_FLOW_MAX'),
         'CTL_FLOW_MIN':BACnetSEN('CTL Flow Min', path + 'CTL_FLOW_MIN'),
         'CTL_STPT':BACnetSEN('CTL Setpoint', path + 'CTL_STPT'),
-        'DMPR_POS':BACnetDMP('Damper position', path + 'DMPR_POS', path + 'DMPR_COMD'),
+        'DMPR_POS':BACnetDMP('Damper', path + 'DMPR_POS', path + 'DMPR_COMD'),
         'ROOM_TEMP':BACnetSEN('Room temperature', path + 'ROOM_TEMP'),
         }
     if has_heat_cool:
         children.update({
         'HEAT.COOL':BACnetSEN('heat.cool', path + 'HEAT.COOL'),
         'HTG_LOOPOUT':BACnetSEN('HTG Loopout', path + 'HTG Loopout'),
-        'VLV_POS':BACnetVLV('VLV position', path + 'VLV_POS', path + 'VLV_COMD'),
+        'VLV_POS':BACnetVLV('VLV (valve)', path + 'VLV_POS', path + 'VLV_COMD'),
         })
     vav = VAV(hvac, 'VAV ' + str(number), children)
     ah1.add_child(vav)

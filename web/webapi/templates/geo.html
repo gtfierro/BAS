@@ -46,7 +46,7 @@ $(function() {
       );
   }
 
-  $('#svgbasics').appstack({building: 'Sutardja Dai Hall',
+  $('#svgbasics').appstack({building: getURLParameter('building'),
                             url: '',
                             onLoad: function() {
     var $root = $(this);
@@ -61,7 +61,7 @@ $(function() {
     $root.appstack('area').click(function() {
       var $this = $(this);
 	  $('#devices p').remove();
-      //document.location.href = '/webapi/query.html?q=' + '.<' + $this.appstack('query');
+      document.location.href = '/webapi/query.html?q=' + '.<' + $this.appstack('query');
       $this.appstack('devices', function(d) {
         d.each(function(i, dev) {
           $('<p><a href="/webapi/uuid/' + dev.get('uuid') + '.html">' + dev.get('name') + '</a></p>').appendTo('#devices');

@@ -15,7 +15,8 @@
 	  var $container = $(container);
 
 	  var settings = $.extend({
-		'url' : 'http://127.0.0.1:8000',
+    'url' : 'http://0.0.0.0:8000',
+		/*'url' : 'http://127.0.0.1:8000',*/
 		'building' : null,
 		'floors' : [],
 		'types' : [],
@@ -118,11 +119,11 @@
 	_queryAppstack: function(container) {
 	  var $container = $(container)
 	  if ($container.appstack('is', 'building')) {
-		return '!' + $container.appstack('building_name')
+		return '%21' + $container.appstack('building_name')
 	  } else if ($container.appstack('is', 'floor')) {
-		return '!' + $container.appstack('floor_name')  + '<!' + $container.appstack('building_name')
+		return '%21' + $container.appstack('floor_name')  + '<%21' + $container.appstack('building_name')
 	  } else if ($container.appstack('is', 'area')) {
-		return '!' + $container.appstack('area_name') + '<!' + $container.appstack('floor_name')  + '<!' + $container.appstack('building_name')
+		return '%21' + $container.appstack('area_name') + '<%21' + $container.appstack('floor_name')  + '<%21' + $container.appstack('building_name')
 	  } else {
 		return undefined;
 	  }
@@ -201,7 +202,7 @@
 	filter: function( type ) {
 	  var keyword = type.slice(0, 1);
 	  var match = type.slice(1);
-	  if (keyword === '!') {
+	  if (keyword === '%21') {
 		this.objects = this.objects.filter( function(obj) {
 		  if ( obj.type === 'Area' || obj.type === 'Floor' || obj.type === 'Building') {
 			if ( obj.name.search(match) !== -1 ) {

@@ -42,10 +42,17 @@ class HWL(node.Obj):
   required_setpoints = ['HOT_WAT_RET_TMP_STP','HOT_WAT_PRS_DIF_STP','HOT_WAT_SUP_TMP_STP']
   required_devices = ['HX','HOT_WAT_RET_TMP_SEN','HOT_WAT_PRS_DIF_SEN','HOT_WAT_PMP','HOT_WAT_SUP_TMP_SEN']
 
+#TODO: write methods for bancroft for VAV
 class VAV(node.Obj):
   implements(object_types.IVAV)
 
   required_devices = [] #['EXH_AIR_FAN']
+
+  def get_airflow(self):
+    pass
+
+  def set_airflow(self, airflow):
+    pass
 
 class LIG(node.Obj):
   implements(object_types.ILIG)

@@ -8,7 +8,11 @@ from node import *
 from node_types import *
 from collections import deque
 import gis
+# Delete all NodeLink objects: we don't have persistent UUIDs so they need to be
+# regenerated each time
+gis.NodeLink.objects.all().delete()
 import sdh
+import bancroft
 
 class Lexer(object):
 
@@ -40,7 +44,7 @@ class Lexer(object):
     return t
 
   def t_SPATIAL(self,t):
-    r'!([\w\-\:\_\s]+)?'
+    r'!\#?([\w\-\:\_\s]+)?'
     t.value = t.value.strip()
     return t
 
@@ -95,6 +99,7 @@ class Parser(object):
     self.debug = debug_flag
     self.lexer = lex(module=Lexer())
     self.relationals = [getattr(sdh, i) for i in sdh.__dict__ if isinstance(getattr(sdh,i), Relational)]
+    self.relationals.extend([getattr(bancroft, i) for i in bancroft.__dict__ if isinstance(getattr(bancroft,i), Relational)])
     self.domain = []
     self.vars = {}
     self.lastvalue = []
@@ -242,7 +247,28 @@ class Parser(object):
     nodes = [nodes] if not isinstance(nodes,list) else nodes
     return all(map(lambda x: not isinstance(x, (Relational, Node)),nodes))
 
-  def resolve_spatial(self,node,target,direction):
+  def allow_intersection(self, a1, a2):
+    """
+    double checks that the gis areas a1, a2 are on the same floor and building
+    returns T/F
+    """
+    a1f = a1.floor
+    a2f = a2.floor
+    if a1f == a2f and a1f.building == a2f.building:
+      return True
+    return False
+  
+  def expand_by_intersection(self, areas):
+    """
+    given an area or list of areas, returns the list of areas that intersect with those areas
+    """
+    areas = [areas] if not isinstance(areas, list) else areas
+    res = []
+    for a in areas:
+      res.extend(gis.Area.objects.filter(regions__intersects=a.regions))
+    return False if res == areas else res
+
+  def resolve_spatial(self,node,target,direction,intersect=False):
     """
     resolve queries before we send them along to be resolved so that we're dealing with a constant datatype: spatials or objects
 
@@ -261,13 +287,9 @@ class Parser(object):
       target = self.nodes_to_areas(target)
       targetspatial = True
     if nodespatial and targetspatial: #resolve the derivative relationship spatially
-      target_regions = []
-      node_regions = []
-      for area in self.get_areas(target):
-        target_regions.extend(gis.Area.objects.filter(regions__intersects=area.regions))
-      for area in self.get_areas(node):
-        node_regions.extend(gis.Area.objects.filter(regions__intersects=area.regions))
-      return list(set(filter(lambda x: x in target_regions, node_regions))), None
+      target_regions = set(self.get_areas(target))
+      node_regions = set(self.get_areas(node))
+      return list(target_regions.intersection(node_regions)), None
     else: #neither node nor target is spatial, so we do nothing
       return node,target
 
@@ -300,6 +322,8 @@ class Parser(object):
     elif not self.isspatial(domain) and self.isspatial(target): #nodes in an area
       domain_areas = self.nodes_to_areas(domain)
       domain,target = self.resolve_spatial(domain_areas, p[3], p[2])
+      while not (domain and target):
+        domain,target = self.resolve_spatial(domain_areas, p[3], p[2], True)
       p[0] = self.lastvalue = self.areas_to_nodes(domain)
     else:
       p[0] = self.lastvalue=domain

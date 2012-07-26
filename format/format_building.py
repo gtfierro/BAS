@@ -33,7 +33,18 @@ def store_child(path):
         child_path = path + c if path == '/' else path + '/' + c
         store_child(child_path)
 
-store_child('#doe_library')
+#store_child('#doe_library')
+
+def pickilizify(ddict):
+  """
+  creates a pickleable version of a default dict
+  """
+  res = {}
+  for d in ddict:
+    res[d] = dict(ddict[d])
+    for dd in ddict[d]:
+      res[d][dd] = dict(ddict[d][dd])
+  return res
 
 
 class DictGen(object):
@@ -134,7 +145,7 @@ class Formatter(object):
 
   def __init__(self, building):
     self.building = building
-    self.building_dict = pickle.load(open(building+'.db'))
+    self.building_dict = pickle.load(open('alc_bancroft.db'))
     with open('test.py','wb') as f:
       #write all the imports
       f.write("""from node import Relational
@@ -143,42 +154,83 @@ from bacnet_devices import *
 import networkx as nx
 import gis
 import node_types
-
-gis.NodeLink.objects.all().delete()\n""")
-
-  def setlist(self, list_file):
-    self.list_file = pickle.load(open(list_file))
+\n""")
 
   def setrelational(self, relational_type):
     self.relational_type = relational_type
-    with open(self.building+'.py','a') as f:
-      f.write("%s = relational('%s')\n" % (relational_type,relational_type))
+    with open('test.py','a') as f:
+      f.write("%s = Relational('%s')\n" % (relational_type,relational_type))
 
-  def build_objects(self):
-    f = open(self.building+'.py','a')
-
-    for line in self.list_file:
-      type=line[0]
-      name=line[1].replace('-','_').replace(':','_').replace(' ','_').replace('#','')
-      location=line[2]
-      line_string = "%s = %s(%s, '%s', {\n" % (name,type,self.relational_type,name)
-      if len(line) > 3:
-        for item in line[3:]:
-          tag_name, tag_type, device_name, tag_path = item
-          if tag_type:
-            line_string += "'%s' : %s( '%s','%s'),\n" % (tag_name, tag_type, device_name, tag_path)
-      line_string += '})\n'
+  def build(self):
+    f = open('test.py','a')
+    #make AHUs
+    for line in filter(lambda x: 'interface' not in x, self.building_dict[self.relational_type]['AHU']):
+      if line.startswith('#'):
+        name = line[1:].replace('-','_').replace(':','_')
+      else:
+        continue
+      type = node_types.tag_to_class('AHU')
+      line_string = "%s = AHU(%s, '%s',{\n" % (name, self.relational_type, name)
+      point_base = '/device'+get_value(line+'/~net/~parent/driver/device/object_identifier')[2:]
+      line_string += "\t'OUT_AIR_DMP':BancroftAHUDMP('Outside Air Damper','BACnet point name'),\n"
+      line_string += "\t'OUT_AIR_TMP_SEN':BancroftSEN('Outside Air Temp Sensor','%s'),\n"  % (point_base+'/oat')
+      line_string += "\t'MIX_AIR_TMP_SEN':BancroftSEN('Mixed Air Temp Sensor','%s'),\n" % (point_base+'/aha_mat')
+      line_string += "\t'RET_FAN':BACnetFAN('Return Fan','BACnet point name'),\n"
+      line_string += "\t'RET_AIR_FLW_SEN':BACnetSEN('Return Air Flow Sensor','BACnet point name'),\n"
+      line_string += "\t'EXH_AIR_DMP':BACnetDMP('Exhaust Air Damper','BACnet point name'),\n"
+      line_string += "\t'EXH_AIR_TMP_SEN':BancroftSEN('Exhaust Air Temp Sensor','%s'),\n" % (point_base+'/dh1_eat')
+      line_string += "\t'RET_AIR_HUM_SEN':BancroftSEN('Return Air Humidity Sensor','%s'),\n" % (point_base+'/avg_spc_hum')
+      line_string += "\t'RET_AIR_TMP_SEN':BancroftSEN('Return Air Temp Sensor','%s'),\n" % (point_base+'/aha_rat')
+      line_string += "\t'RET_AIR_DMP':BACnetDMP('Return Air Damper','BACnet point name'),\n"
+      line_string += "\t'RET_AIR_PRS_SEN':BancroftSEN('Return Air Pressure Sensor','%s'),\n" % (point_base+'/a_sys_bldg_press')
+      line_string += "\t'COO_VLV':BACnetVLV('Cooling Valve','%s'),\n" % (point_base+'/aha_chwv')
+      line_string += "\t'SUP_AIR_FAN':BancroftFAN('Supply Air Fan','%s'),\n" % (point_base+'/m373')
+      line_string += "\t'SUP_AIR_FLW_SEN':BancroftSEN('Supply Air Flow Sensor','%s'),\n" % (point_base+'/sa_cfm')
+      line_string += "\t'SUP_AIR_TMP_SEN':BancroftSEN('Supply Air Temp Sensor','%s'),\n" % (point_base+'/ag_spc_temp')
+      line_string += "\t'SUP_AIR_PRS_SEN':BACnetSEN('Supply Air Pressure Sensor','BACnet point name'),\n"
+      line_string += "})\n"
+      #location
+      #line_string += "%s.areas.add(gis.buildings['Bancroft Library'])\n" % name
       f.write(line_string)
 
+
+    #make VAVs
+    for line in self.building_dict[self.relational_type]['VAV']:
+      if line.startswith('#'):
+        name = line[1:].replace('-','_').replace(':','_')
+      print self.building_dict[self.relational_type]['VAV'][line]
+      type = node_types.tag_to_class('VAV')
+      area = re.match('.*\d(?=\w)?',line)
+      full_area = re.match('.*\d\w?',line)
+      #initialize VAV
+      point_name = '/device'+get_value(full_area.group()+'/~net/~parent/driver/device/object_identifier')[2:]+'/flow_tab_1'
+      line_string = "%s = %s(%s, '%s', {'EXH_AIR_DMP':BancroftVAVDMP('Exhaust Air Damper','%s')})\n" % (name,type,self.relational_type,name,point_name)
+      #link gis to VAV
+      line_string += "try:\n  %s.areas.add(gis.buildings['Bancroft Library']['%s']['%s'])\nexcept:\n  print 'could not link %s %s'\n" % (name,  self.building_dict['hvac']['VAV'][line]['location'][1][5:],area.group()[1:], 'VAV', area.group()[1:])
+      f.write(line_string)
+
+    #link VAVs to AHUs
+    for line in filter(lambda x: 'interface' not in x, self.building_dict[self.relational_type]['AHU']):
+      if line.startswith('#'):
+        ahu_name = line[1:].replace('-','_').replace(':','_')
+      else:
+        continue
+      ahu_id = re.search('(?<=ah\-)([a-z])',line).group()
+      for vav in self.building_dict[self.relational_type]['VAV']:
+        if line.startswith('#'):
+          vav_name = vav[1:].replace('-','_').replace(':','_')
+        print 'linking',vav_name
+        vav_ahu_id = re.search('(?<=vav\_)([a-z])',vav).group()
+        if vav_ahu_id == ahu_id:
+          f.write('%s.add_child(%s)\n' % (ahu_name, vav_name))
     f.close()
 
 if __name__=='__main__':
-  d = DictGen('Bancroft Library')
-  d.generate_dict('vav','VAV','hvac')
-  d.generate_dict('ah', 'AHU','hvac')
-  d.make_building()
-  pickle.dump(d.building_dict,open('alc_bancroft.db','w'))
+  #d = DictGen('Bancroft Library')
+  #d.generate_dict('vav','VAV','hvac')
+  #d.generate_dict('ah', 'AHU','hvac')
+  #d.make_building()
+  #pickle.dump(pickilizify(d.building_dict),open('alc_bancroft.db','w'))
   f = Formatter('Bancroft Library')
-
-
-
+  f.setrelational('hvac')
+  f.build()

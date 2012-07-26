@@ -18,7 +18,7 @@ Building: <a href="{{ url_prefix }}geo.html?building={{ obj.building }}">{{ obj.
 Floor: <a href="{{ url_prefix }}geo.html?building={{ obj.building }}&floor={{ obj.floor }}">{{ obj.floor }}</a><br/>
 {% endif %}
 {% if obj.building and obj.floor %}
-<a href="{{ url_prefix }}query.html?q=.<!{{ obj.name }} < !{{ obj.floor }} < !{{ obj.building }}">Objects and Devices in this area</a><br/>
+<a href="{{ url_prefix }}query.html?q=.<%21{{ obj.name }} < %21{{ obj.floor }} < %21{{ obj.building }}">Objects and Devices in this area</a><br/>
 {% endif %}
 {% if obj.type == "Building" %}
 <a href="{{ url_prefix }}geo.html?building={{ obj.name }}">Geo view of this building</a><br/>

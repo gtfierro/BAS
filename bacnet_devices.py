@@ -6,9 +6,11 @@ from zope.interface import implements
 
 ROOT='http://127.0.0.1:8080/data/WattStopper'
 # Port forwarding:  ssh -L 8081:localhost:8080 user@<ip>
-ROOT_SIEMENS='http://127.0.0.1:8081/data/Siemens'
+ROOT_SIEMENS='http://127.0.0.1:8080/data/Siemens'
+ROOT_BANCROFT='http://127.0.0.1:8080/data/Bancroft'
 
 def read_point(point, root=ROOT):
+  print root+point
   time, reading = requests.get(root + point).json['Readings'][-1]
   return reading
 
@@ -31,6 +33,14 @@ class BACnetFAN(node.Device):
       node.Device.__init__(self, name)
       self.point = point
 
+class BancroftFAN(node.Device):
+  implements(device_types.DFAN)
+
+  def __init__(self, name, point_spd, point_pow=None):
+    node.Device.__init__(self, name)
+    self.point_spd = point_spd
+    self.point_pow = point_pow
+
 class BACnetCCV(node.Device):
   implements(device_types.DCCV)
   def __init__(self, name, point):
@@ -39,7 +49,7 @@ class BACnetCCV(node.Device):
 
 class BACnetDMP(node.Device):
   implements(device_types.DDMP)
-  def __init__(self, name, point, setpoint):
+  def __init__(self, name, point, setpoint=None):
       node.Device.__init__(self, name)
       self.point = point
       self.setpoint = setpoint
@@ -48,14 +58,63 @@ class BACnetDMP(node.Device):
       return read_point(self.point, root=ROOT_SIEMENS)
 
   def set_percent_open(self, value):
-      write_point(self.setpoint, value, type='real', root=ROOT_SIEMENS)
+      if self.setpoint is not None:
+          write_point(self.setpoint, value, type='real', root=ROOT_SIEMENS)
+      else:
+          return "No setpoint given"
 
+#TODO: test this class
+
+class BancroftVAVDMP(node.Device):
+  implements(device_types.DDMP)
+
+  def __init__(self, name, point, setpoint=None):
+    node.Device.__init__(self, name)
+    self.device_id = point
+    self.setpoint = setpoint
+    self.point = point
+
+  def get_percent_open(self):
+    #point is something like device240202/flow_tab_1
+    return read_point(self.point+'/DAMPER_OUTPUT',root=ROOT_BANCROFT)
+ 
+  def set_percent_open(self, value):
+    return write_point(self.point+'/DAMPER_LOCK',value, type='real',root=ROOT_BANCROFT)
+
+class BancroftAHUDMP(node.Device):
+  implements(device_types.DDMP)
+
+  def __init__(self, name, point, setpoint=None):
+    node.Device.__init__(self, name)
+    self.device_id = point
+    self.setpoint = setpoint
+    self.point = point
+
+  def get_percent_open(self):
+    #point is something like device240202/flow_tab_1
+    return read_point(self.point,root=ROOT_BANCROFT)
+ 
+  def set_percent_open(self, value):
+    return write_point(self.point, value, type='real',root=ROOT_BANCROFT)
 
 class BACnetSEN(node.Device):
   implements(device_types.DSEN)
   def __init__(self, name, point):
       node.Device.__init__(self, name)
       self.point = point
+  
+  def read(self):
+    return read_point(self.point,root=ROOT_SIEMENS)
+
+class BancroftSEN(node.Device):
+  implements(device_types.DSEN)
+  def __init__(self, name, point):
+      node.Device.__init__(self, name)
+      self.point = point
+
+  def read(self):
+    return read_point(self.point,root=ROOT_BANCROFT)
+
 
 class BACnetCHR(node.Device):
   implements(device_types.DCHR)
@@ -77,7 +136,7 @@ class BACnetTOW(node.Device):
 
 class BACnetVLV(node.Device):
   implements(device_types.DVLV)
-  def __init__(self, name, point, setpoint):
+  def __init__(self, name, point, setpoint=None):
       node.Device.__init__(self, name)
       self.point = point
       self.setpoint = setpoint
@@ -86,7 +145,10 @@ class BACnetVLV(node.Device):
       return read_point(self.point, root=ROOT_SIEMENS)
 
   def set_percent_open(self, value):
-      write_point(self.setpoint, value, type='real', root=ROOT_SIEMENS)
+      if self.setpoint is not None:
+          write_point(self.setpoint, value, type='real', root=ROOT_SIEMENS)
+      else:
+          return "No setpoint given"
 
 class BACnetHX(node.Device):
   implements(device_types.DHX)

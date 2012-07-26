@@ -107,9 +107,10 @@ def tag_to_class(t):
   given a tag [t] as a string like 'OUT_AIR_DMP', it returns the class driver for that tag
   """
   classes=map(lambda x: x[1], inspect.getmembers(bacnet_devices,predicate=inspect.isclass))
+  classes.extend(map(lambda x: x[1], inspect.getmembers(generic_objects,predicate=inspect.isclass)))
   tag = t.split('_')[-1]
   target_class = filter(lambda x: x.__name__[-3:] == tag, classes)
-  return target_class[0] if target_class else None
+  return target_class[0].__name__ if target_class else None
 
 def string_to_class(s):
   """
