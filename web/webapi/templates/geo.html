@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{ building.name }}</title>
+<style type="text/css">
+  #svgbasics { width: 700px; height: 240px; border: 1px solid #484; }
+
+  #body {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width:500px;
+  }
+
+  #buttons {
+    position: absolute;
+    top: 100px;
+    left: 720px;
+    width:100px;
+    height:240px;
+  }
+
+  .area {
+    fill: #0000ff;
+    fill-opacity: 0.3;
+    stroke-width: 2.0;
+    stroke: #000000;
+  }
+
+  .area:hover {
+    fill-opacity: 0.6;
+  }
+
+  .area_lighting {
+    fill: #ffff00;
+  }
+</style>
+<script type="text/javascript" src="/static/jquery-1.6.4.min.js"></script>
+<script type="text/javascript" src="/static/jquery.svg.min.js"></script>
+<script type="text/javascript" src="/static/jquery.appstack.js"></script>
+<script type="text/javascript">
+$(function() {
+  function getURLParameter(name) {
+      return decodeURI(
+          (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
+      );
+  }
+
+  $('#svgbasics').appstack({building: 'Sutardja Dai Hall',
+                            url: '',
+                            onLoad: function() {
+    var $root = $(this);
+    $root.appstack('floor').each(function(index, element) {
+      $('<input type="radio" name="radio" value="' + $(element).appstack('name') + '" />'+ $(element).attr('inkscape:label') + '<label for="' + $(element).appstack('name') + '">').change(function(){
+        radioValue = $(this).val();
+        $root.appstack('floor').hide();
+        $root.appstack('floor', radioValue).show();
+      }).attr('checked', 'checked').appendTo('#buttons');
+      $('<br/>').appendTo('#buttons');
+    });
+    $root.appstack('area').click(function() {
+      var $this = $(this);
+	  $('#devices p').remove();
+      //document.location.href = '/webapi/query.html?q=' + '.<' + $this.appstack('query');
+      $this.appstack('devices', function(d) {
+        d.each(function(i, dev) {
+          $('<p><a href="/webapi/uuid/' + dev.get('uuid') + '.html">' + dev.get('name') + '</a></p>').appendTo('#devices');
+        });
+      });
+	});
+
+    floor_name = getURLParameter('floor');
+    if (floor_name != 'null') {
+      $('input[name=radio][value="' + floor_name + '"]').click();
+      var area_name = getURLParameter('area');
+      if (area_name != 'null') {
+        $root.appstack('floor', floor_name).appstack('area', area_name).click();
+      }
+    }
+  }});
+})
+</script>
+</head>
+<body>
+<h1>{{ building.name }}</h1>
+<div id="links">
+<p>
+<a href="{{ url_prefix }}geo.html">All buildings</a>
+<a href="{{ geo_prefix }}">Geo links page</a>
+<a href="{{ geo_prefix }}{{ building.id }}.svg">Download SVG</a>
+<a href="{{ geo_prefix }}upload">Upload new SVG</a>
+</p>
+</div>
+<div id="svgbasics"></div>
+<div id="buttons"></div>
+<div id="devices"></div>
+</body>
+</html>
+

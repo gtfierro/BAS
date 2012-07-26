@@ -1,12 +1,12 @@
 from django.conf import settings
 from django.template import Context, loader
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest, HttpResponseNotFound
 from django.core.context_processors import csrf
 from django.shortcuts import render_to_response
 from models import Building
 from svg import building_to_svg, svg_to_building
-from kml import buildings_to_kml, kml_to_buildings
 from django import forms
+import json
 import os
 
 def floorplan(request, name):
@@ -31,6 +31,21 @@ def building_svg(request, building_id):
 
     return HttpResponse(building_to_svg(b), mimetype='image/svg+xml')
 
+def building_svg_params(request):
+    if 'building' not in request.GET:
+      return HttpResponseBadRequest("Invalid Building")
+    building = request.GET.get('building')
+    floor_names = request.GET.getlist('floors[]')
+    types = request.GET.getlist('types[]')
+    all_floors = ( request.GET.get('all', 'true') == 'true' )
+    try:
+        b = Building.objects.get(name=building)
+    except:
+        return HttpResponseNotFound("Building not found")
+
+    return HttpResponse(building_to_svg(b, False, "http://127.0.0.1:8000", floor_names, types, all_floors), mimetype='image/svg+xml')
+
+
 def building_json(request, building_id):
     try:
         b = Building.objects.get(id=building_id)
@@ -38,14 +53,6 @@ def building_json(request, building_id):
         return HttpResponse("Invalid Building")
 
     return HttpResponse(b.dumps(), mimetype='application/json')
-
-def building_kml(request, building_id):
-    try:
-        b = Building.objects.get(id=building_id)
-    except:
-        return HttpResponse("Invalid Building")
-
-    return HttpResponse(buildings_to_kml(b), mimetype='application/vnd.google-earth.kml+xml')
 
 class UploadFileForm(forms.Form):
     file  = forms.FileField()
@@ -62,8 +69,6 @@ def upload(request):
                 Building.loads(f.read())
             elif f.name.endswith('.svg'):
                 svg_to_building(f.read())
-            elif f.name.endswith('.kml'):
-                kml_to_buildings(f.read())
             else:
                 return HttpResponse("This file type is not supported")
             return HttpResponseRedirect("/smapgeo/")

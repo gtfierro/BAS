@@ -13,9 +13,9 @@ import sdh
 class Lexer(object):
 
   tokens = [
-      'NAME','UUID','VAR','TAG','SPATIAL',
+      'NAME','UUID','VAR','TAG','SPATIAL', 'ATTRIBUTE', 'VALUE',
       'UPSTREAM','DOWNSTREAM','EQUALS','KEYWORD','LASTVALUE',
-      'LPAREN','RPAREN',
+      'LPAREN','RPAREN', 'RBRACK','LBRACK',
       ]
 
   #Tokens
@@ -24,6 +24,8 @@ class Lexer(object):
   t_DOWNSTREAM  = r'<'
   t_LPAREN      = r'\('
   t_RPAREN      = r'\)'
+  t_LBRACK      = r'\['
+  t_RBRACK      = r'\]'
   t_EQUALS      = r'='
   t_ignore      = ' \t'
 
@@ -42,11 +44,6 @@ class Lexer(object):
     t.value = t.value.strip()
     return t
 
-#  def t_TYPE(self,t):
-#    r'\#[^!][A-Z0-9]+[ ]?'
-#    t.value = t.value.strip()
-#    return t
- 
   def t_UUID(self,t):
     r'(\%|\^)[^!]?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}[ ]?'
     t.value = t.value.strip()
@@ -57,6 +54,15 @@ class Lexer(object):
     t.value = t.value.strip()
     return t
 
+  def t_ATTRIBUTE(self, t):
+    r'(?<=\[)[ ]?[a-zA-Z\-:_ ]+[ ]?(?=\]|=)'
+    t.value = t.value.strip()
+    return t
+ 
+  def t_VALUE(self, t):
+    r'(?<==)[ ]?[a-zA-Z\-:_\d ]+[ ]?(?=\])'
+    t.value = t.value.strip()
+    return t
 
   def t_LASTVALUE(self,t):
     r'\b\_\b'
@@ -257,11 +263,10 @@ class Parser(object):
     if nodespatial and targetspatial: #resolve the derivative relationship spatially
       target_regions = []
       node_regions = []
-      #TODO: fix the filter stuff, decide what >,< mean
       for area in self.get_areas(target):
-        target_regions.extend(gis.Area.objects.filter(regions__exact=area.regions))
+        target_regions.extend(gis.Area.objects.filter(regions__intersects=area.regions))
       for area in self.get_areas(node):
-        node_regions.extend(gis.Area.objects.filter(regions__exact=area.regions))
+        node_regions.extend(gis.Area.objects.filter(regions__intersects=area.regions))
       return list(set(filter(lambda x: x in target_regions, node_regions))), None
     else: #neither node nor target is spatial, so we do nothing
       return node,target
@@ -292,12 +297,26 @@ class Parser(object):
         next_domain = [self.search_relatives(node, target,"predecessors") for node in domain]
       next_domain = filter(lambda x: x, next_domain)
       p[0] = self.lastvalue=self.filter_dup_uids(next_domain)
+    elif not self.isspatial(domain) and self.isspatial(target): #nodes in an area
+      domain_areas = self.nodes_to_areas(domain)
+      domain,target = self.resolve_spatial(domain_areas, p[3], p[2])
+      p[0] = self.lastvalue = self.areas_to_nodes(domain)
     else:
       p[0] = self.lastvalue=domain
 
   def p_query_set(self,p):
     '''query : set'''
     p[0] = self.lastvalue = self.filter_dup_uids(p[1])
+
+  def p_query_attr(self, p):
+    '''query : set LBRACK ATTRIBUTE RBRACK
+             | set LBRACK ATTRIBUTE EQUALS VALUE RBRACK'''
+    if len(p) == 6:
+      truth = lambda x: p[3] in x.metadata and (x.metadata[p[3]] == p[5] or x.metadata[p[3]] == int(p[5]))
+    else:
+      truth = lambda x: p[3] in x.metadata
+    res = filter(truth, p[1])
+    p[0] = self.lastvalue = res
 
   def p_set_group(self, p):
     '''set : LPAREN query RPAREN'''
@@ -341,16 +360,6 @@ class Parser(object):
           else:
             res.append(d[tag_lookup]) 
     p[0] = self.lastvalue = self.filter_dup_uids(res)
-
-
-#  def p_set_type(self,p):
-#    'set : TYPE'
-#    type_lookup = p[1][1:].strip()
-#    domain = p[0] if p[0] else self.relationals
-#    res = []
-#    for r in domain:
-#      res.extend(r.search(lambda x: x.type() == type_lookup))
-#    p[0] = self.lastvalue = self.filter_dup_uids(res)
 
   def p_set_uuid(self,p):
     'set : UUID'

@@ -1,8 +1,8 @@
-#AppStack for BACnet
+# AppStack for BACnet
 
 I'm creating this README file so that I can explain my logic for writing things the way they are and show how to make things work.
 
-##Requirements
+## Requirements
 * zope.interface
 * zope.schema
 * networkx
@@ -11,24 +11,70 @@ I'm creating this README file so that I can explain my logic for writing things 
 * collections.defaultdict
 * ply
 * pygraphviz
+* django
+* geodjango
+* spatialite
+* django-olwidget
 
-##Query Language
+## Installing and running
+See [Appstack Setup](https://github.com/krioukov/LoCalProjects/wiki/Appstack-Setup).
+For adding new buildings or areas, see [Geo Data Input](https://github.com/krioukov/LoCalProjects/wiki/Geo-Data-Input)
+
+## Query Language
 Currently the query language has only been tested on the graph in the ```test.py``` file.
 Look in ```latex/query.pdf``` for help.
 
-###Syntax
+### Syntax
 The grammar is all in ```lexerparser.py``` at the top, but essentially your query must consist of at least one **TOKEN** follwed by an arbitrary number of interleaved **DELIMETERS** and **TOKENS**, ending with a **TOKEN**. **TOKEN**s can be 
 * ```#STR```: '#' followed by all caps, no spaces string. This resolves to the set all of all objects/nodes with type specified by 'STR'. Supported types can be found in ```node_types.py```.
 * ```$string name```: '$' followed by the name of an object. This **is** case sensitive. This resolves to the set of all objects named 'string name'.
 * ```%8d666322-745f-475f-a463-8329eb7547fa```: '%' followed by a UUID. This resolves to the object identified by that UUID.
 
-###Sample Queries
+####Grammar
+```
+UPSTREAM    = r'>' 
+DOWNSTREAM  = r'<'
+LPAREN      = r'\('
+RPAREN      = r'\)'
+LBRACK      = r'\['
+RBRACK      = r'\]'
+EQUALS      = r'='
+LASTVALUE   = r'\b\_\b'
+NAME        = r'\$[^!][\w\-\:\_\s]+'
+TAG         = r'(\.|\#|\&)([^!]?[A-Z_]+)?[ ]?'
+SPATIAL     = r'!([\w\-\:\_\s]+)?'
+UUID        = r'(\%|\^)[^!]?[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}[ ]?'
+VAR         = r'\@[^!]?[a-zA-Z_][a-zA-Z0-9_]*[ ]?'
+ATTRIBUTE   = r'(?<=\[)[ ]?[a-zA-Z\-:_ ]+[ ]?(?=\]|=)'
+VALUE       = r'(?<==)[ ]?[a-zA-Z\-:_\d ]+[ ]?(?=\])'
+KEYWORD     = r'\b(help|types|prefixes|examples|tags|actuate)\b'
+
+statement   :   KEYWORD
+            |   VAR EQUALS query
+            |   query
+
+query       :   query UPSTREAM set
+            |   query DOWNSTREAM set
+            |   set
+            |   set LBRACK ATTRIBUTE RBRACK
+            |   set LBRACK ATTRIBUTE EQUALS VALUE RBRACK
+
+set         :   LPAREN query RPAREN
+            |   LASTVALUE
+            |   SPATIAL
+            |   NAME
+            |   TAG
+            |   UUID
+            |   VAR
+```
+
+### Sample Queries
 Run ```python lexerparser.py```, and you'll get a prompt looking something like ```query> ```. Try the following:
 * ```#SEN < #CCV < $Outside Air Damper```: the set of all sensors that are down stream of any of the cooling valves downstream of the Outside Air Damper
 * ```#DMP > #FAN ```: all dampers upstream of a fan
 * etc..
 
-###Sample Session
+### Sample Session
 ```
 query> #SEN                                                      
 Supply Fan Air Flow Sensor 40beebb2-ce59-482f-a016-581184b87d37  
@@ -59,13 +105,13 @@ Return Air Damper b6eb5953-4b71-41c8-8ecc-88a828f03353
 query>                                                           
 ```
 
-###What's next
+### What's next
 I'm working on expanding the sample graphs so that I can make sure that this works in the edge cases and with broader queries. There are bound to be bugs, but this is an MVP of sorts.
 
-##Creating Nodes and Objects
+## Creating Nodes and Objects
 ...and forcing them to adhere to our interfaces
 
-###On types
+### On types
 
 This is where ```node_types.py``` comes in. It has ```type_dict```, which contains stuff like the following:
 

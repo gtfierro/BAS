@@ -45,7 +45,10 @@ class Node(object):
 
   def __cmp__(self, other):
     # use self.uuid to compare to other objects
-    return self.uid.__cmp__(other.uid)
+    if isinstance(other, Node):
+      return self.uid.__cmp__(other.uid)
+    else:
+      return NotImplemented
 
   def __hash__(self):
     #hack to get graph copy working
@@ -117,6 +120,17 @@ class Node(object):
   @property
   def areas(self):
     return self.container.areas if hasattr(self.container,'areas') and not self.link.areas.all() else self.link.areas
+
+  def __emittable__(self):
+    """Returns a dictionary representation of the object (passed to Web API)"""
+    import node_types
+    return {
+      'name': self.name,
+      'type': self.type(),
+      'uuid': str(self.uid),
+      'methods': node_types.get_methods(self),
+      }
+
 
 class Container(object):
   """

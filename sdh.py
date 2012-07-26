@@ -84,22 +84,22 @@ lightbank7_4 = LIG(l, 'Light Bank 4', {
                       })
 
 
+if 'Sutardja Dai Hall' in gis.buildings:
+    sdh_floor4 = gis.buildings['Sutardja Dai Hall']['Floor 4']
+    lightbank4_1.areas.add(sdh_floor4['Zone 1'])
+    lightbank4_2.areas.add(sdh_floor4['Zone 2'])
+    lightbank4_3.areas.add(sdh_floor4['Zone 3'])
+    lightbank4_4.areas.add(sdh_floor4['Zone 4'])
+    lightbank4_5.areas.add(sdh_floor4['Zone 5'])
 
-sdh_floor4 = gis.buildings['Sutardja Dai Hall']['Floor4']
-lightbank4_1.areas.add(sdh_floor4['Zone1'])
-lightbank4_2.areas.add(sdh_floor4['Zone2'])
-lightbank4_3.areas.add(sdh_floor4['Zone3'])
-lightbank4_4.areas.add(sdh_floor4['Zone4'])
-lightbank4_5.areas.add(sdh_floor4['Zone5'])
+    sdh_floor6 = gis.buildings['Sutardja Dai Hall']['Floor 6']
+    lightbank6_1.areas.add(sdh_floor6['Zone 1'])
 
-sdh_floor6 = gis.buildings['Sutardja Dai Hall']['Floor6']
-lightbank6_1.areas.add(sdh_floor6['Zone1'])
-
-sdh_floor7 = gis.buildings['Sutardja Dai Hall']['Floor7']
-lightbank7_1.areas.add(sdh_floor7['Zone1'])
-lightbank7_2.areas.add(sdh_floor7['Zone2'])
-lightbank7_3.areas.add(sdh_floor7['Zone3'])
-lightbank7_4.areas.add(sdh_floor7['Zone4'])
+    sdh_floor7 = gis.buildings['Sutardja Dai Hall']['Floor 7']
+    lightbank7_1.areas.add(sdh_floor7['Zone 1'])
+    lightbank7_2.areas.add(sdh_floor7['Zone 2'])
+    lightbank7_3.areas.add(sdh_floor7['Zone 3'])
+    lightbank7_4.areas.add(sdh_floor7['Zone 4'])
 
 #Air Handler 1
 hvac = Relational('HVAC')
@@ -137,17 +137,17 @@ ah1['RET_FAN'].add_child(ah1['MIX_AIR_TMP_SEN'])
 
 #Air Handler 2
 ah2 = AHU(hvac, 'Air Handler 2', {
-            'OUT_AIR_DMP': BACnetDMP('Outside Air Damper','BACnet point name'),
+            'OUT_AIR_DMP': BACnetDMP('Outside Air Damper','BACnet point name', 'BACnet setpoint name'),
             'OUT_AIR_TMP_SEN': BACnetSEN('Outside Air Temp Sensor','BACnet point name'),
             'MIX_AIR_TMP_SEN': BACnetSEN('Mixed Air Temp Sensor','BACnet point name'),
             'RET_FAN': BACnetFAN('Return Fan','BACnet point name'),
-            'EXH_AIR_DMP': BACnetDMP('Exhaust Air Damper','BACnet point name'),
+            'EXH_AIR_DMP': BACnetDMP('Exhaust Air Damper','BACnet point name', 'BACnet setpoint name'),
             'RET_AIR_HUM_SEN': BACnetSEN('Return Air Humidity Sensor','BACnet point name'),
             'RET_AIR_TMP_SEN': BACnetSEN('Return Air Temp Sensor','BACnet point name'),
-            'RET_AIR_DMP': BACnetDMP('Return Air Damper','BACnet point name'),
+            'RET_AIR_DMP': BACnetDMP('Return Air Damper','BACnet point name', 'BACnet setpoint name'),
             'RET_AIR_PRS_SEN': BACnetSEN('Return Air Pressure Sensor','BACnet point name'),
             'RET_AIR_FLW_SEN': BACnetSEN('Return Air Flow Sensor','BACnet point name'),
-            'COO_VLV': BACnetVLV('Cooling Valve','BACnet point name'),
+            'COO_VLV': BACnetVLV('Cooling Valve','BACnet point name', 'BACnet setpoint name'),
             'SUP_AIR_FAN': BACnetFAN('Supply Air Fan','BACnet point name'),
             'SUP_AIR_FLW_SEN': BACnetSEN('Supply Air Flow Sensor','BACnet point name'),
             'SUP_AIR_TMP_SEN': BACnetSEN('Supply Air Temp Sensor','BACnet point name'),
@@ -205,19 +205,48 @@ hwl['HOT_WAT_RET_TMP_SEN'].add_child(hwl['HX'])
 hwl['HOT_WAT_PRS_DIF_SEN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
 hwl['HOT_WAT_PMP'].add_child(hwl['HOT_WAT_SUP_TMP_SEN'])
 
-vav1 = VAV(hvac, 'VAV 1', {'EXH_AIR_FAN':BACnetFAN('Exhaust Air Fan','BACNet point')})
-vav2 = VAV(hvac, 'VAV 2', {'EXH_AIR_FAN':BACnetFAN('Exhaust Air Fan','BACNet point')})
+def make_vav(floor, number, has_heat_cool=True, pxcm_number=11):
+    global hvac, hwl, cwl, ah1, ah2
+    path = '/SDH.PXCM-{:02}/SDH/S{:1}-{:02}/'.format(pxcm_number, floor, number)
+    children = {
+        'AIR_VOLUME':BACnetSEN('Air Volume', path + 'AIR_VOLUME'),
+        'CLG_LOOPOUT':BACnetSEN('cooling temperature control loop output value', path + 'CLG_LOOPOUT'),
+        'CTL_FLOW_MAX':BACnetSEN('CTL Flow Max', path + 'CTL_FLOW_MAX'),
+        'CTL_FLOW_MIN':BACnetSEN('CTL Flow Min', path + 'CTL_FLOW_MIN'),
+        'CTL_STPT':BACnetSEN('CTL Setpoint', path + 'CTL_STPT'),
+        'DMPR_POS':BACnetDMP('Damper position', path + 'DMPR_POS', path + 'DMPR_COMD'),
+        'ROOM_TEMP':BACnetSEN('Room temperature', path + 'ROOM_TEMP'),
+        }
+    if has_heat_cool:
+        children.update({
+        'HEAT.COOL':BACnetSEN('heat.cool', path + 'HEAT.COOL'),
+        'HTG_LOOPOUT':BACnetSEN('HTG Loopout', path + 'HTG Loopout'),
+        'VLV_POS':BACnetVLV('VLV position', path + 'VLV_POS', path + 'VLV_COMD'),
+        })
+    vav = VAV(hvac, 'VAV ' + str(number), children)
+    ah1.add_child(vav)
+    ah2.add_child(vav)
+    # ah1['SUP_AIR_FAN'].add_child(vav['EXH_AIR_FAN'])
+    # ah2['SUP_AIR_FAN'].add_child(vav['EXH_AIR_FAN'])
+    # hwl['HOT_WAT_SUP_TMP_SEN'].add_child(vav['EXH_AIR_FAN'])
+    # vav['EXH_AIR_FAN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
+    # vav['EXH_AIR_FAN'].add_child(cwl['CHL_WAT_PRS_DIF_SEN'])
 
-ah1['SUP_AIR_FAN'].add_child(vav1['EXH_AIR_FAN'])
-ah2['SUP_AIR_FAN'].add_child(vav2['EXH_AIR_FAN'])
-vav1['EXH_AIR_FAN'].add_child(ah1['RET_AIR_DMP'])
-vav2['EXH_AIR_FAN'].add_child(ah2['RET_AIR_DMP'])
-hwl['HOT_WAT_SUP_TMP_SEN'].add_child(vav1['EXH_AIR_FAN'])
-hwl['HOT_WAT_SUP_TMP_SEN'].add_child(vav2['EXH_AIR_FAN'])
-vav1['EXH_AIR_FAN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
-vav2['EXH_AIR_FAN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
-vav1['EXH_AIR_FAN'].add_child(cwl['CHL_WAT_PRS_DIF_SEN'])
-vav2['EXH_AIR_FAN'].add_child(cwl['CHL_WAT_PRS_DIF_SEN'])
+    floor_name = 'Floor ' + str(floor)
+    area_name = 'VAV ' + str(number)
+    if 'Sutardja Dai Hall' in gis.buildings:
+        sdh = gis.buildings['Sutardja Dai Hall']
+        if floor_name in sdh and area_name in sdh[floor_name]:
+            vav.areas.add(sdh[floor_name][area_name])
+        else:
+            print 'VAV', number, 'on floor', floor, 'has no GIS area'
+    else:
+        print 'VAV GIS table not found'
+
+    return vav
+
+for x in range(1, 21 + 1):
+    make_vav(4, x, (x != 10 and x != 14))
 
 node_types.verify_devices()
 node_types.verify_objects()

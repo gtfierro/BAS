@@ -28,8 +28,11 @@ class Building(models.Model, Serializable):
 
     objects = models.GeoManager()
 
+    class Meta:
+        ordering = ['name']
+
     def __getitem__(self, key):
-        floors = self.floors.filter(shortname=key)
+        floors = self.floors.filter(name=key)
         if len(floors) == 0:
             raise KeyError("Floor not found in building")
         else:
@@ -39,10 +42,10 @@ class Building(models.Model, Serializable):
         assert False
 
     def __contains__(self, key):
-        return self.floors.filter(shortname=key).count() > 0
+        return self.floors.filter(name=key).count() > 0
 
     def items(self):
-        return [(x.shortname, x) for x in self.floors.all()]
+        return [(x.name, x) for x in self.floors.all()]
 
     def __unicode__(self):
         return self.name
@@ -50,25 +53,34 @@ class Building(models.Model, Serializable):
     def dict(self):
         return {
             'name': self.name,
-            'floors': py_to_dict(self)
+            'floors': {x.name: x.dict() for x in self.floors.all()}
             }
 
     @classmethod
     def from_dict(cls, j, args=None):
         b = find_or_create(cls, True, name=str(j['name']))
-        for shortname, fj in j['floors'].items():
-            f = Floor.from_dict(fj, building=b, shortname=shortname)
+        for name, fj in j['floors'].items():
+            f = Floor.from_dict(fj, building=b, name=name)
         return b
 
+    def __emittable__(self):
+        """Dictionary representation for appstack web api"""
+        return {
+            'name': self.name,
+            'type': 'Building'
+            }
+
 class Floor(models.Model, Serializable):
-    shortname = models.CharField(max_length=25) # Computer id
     name = models.CharField(max_length=50)
     building = models.ForeignKey(Building, related_name='floors')
 
     objects = models.GeoManager()
 
+    class Meta:
+        ordering = ['building', 'name']
+
     def __getitem__(self, key):
-        areas = self.areas.filter(shortname=key)
+        areas = self.areas.filter(name=key)
         if len(areas) == 0:
             raise KeyError("Area not found in floor")
         else:
@@ -78,13 +90,13 @@ class Floor(models.Model, Serializable):
         assert False
 
     def __contains__(self, key):
-        return self.areas.filter(shortname=key).count() > 0
+        return self.areas.filter(name=key).count() > 0
 
     def items(self):
-        return [(x.shortname, x) for x in self.areas.all()]
+        return [(x.name, x) for x in self.areas.all()]
 
     def get_view(self, key):
-        views = self.views.filter(shortname=key)
+        views = self.views.filter(name=key)
         if len(views) == 0:
             raise KeyError("View not found in floor")
         else:
@@ -94,32 +106,49 @@ class Floor(models.Model, Serializable):
         assert False
 
     def __unicode__(self):
-        return self.name
+        return "{}:{}".format(self.building.name, self.name)
 
     def dict(self):
         return {
-            'name': self.name,
             'areas': py_to_dict(self),
-            'views': {x.shortname: x.dict() for x in self.views.all()}
+            'views': {x.name: x.dict() for x in self.views.all()}
             }
 
     @classmethod
-    def from_dict(cls, j, building, shortname, **kwargs):
-        f = find_or_create(cls, False, building=building, shortname=shortname)
-        f.name = j['name']
-        f.save()
-        for shortname, fj in j['views'].items():
-            View.from_dict(fj, floor=f, shortname=shortname)
-        for shortname, fj in j['areas'].items():
-            Area.from_dict(fj, floor=f, shortname=shortname)
+    def from_dict(cls, j, building, name, **kwargs):
+        f = find_or_create(cls, True, building=building, name=name)
+        for name, vj in j['views'].items():
+            View.from_dict(vj, floor=f, name=name)
+        for name, fj in j['areas'].items():
+            Area.from_dict(fj, floor=f, name=name)
         return f
 
+    def __emittable__(self):
+        """Dictionary representation for appstack web api"""
+        return {
+            'name': self.name,
+            'type': 'Floor',
+            'building': self.building.name
+            }
 
 class View(models.Model, Serializable):
-    shortname = models.CharField(max_length=25) # Computer id
+    name = models.CharField(max_length=25) # Computer id
     floor = models.ForeignKey(Floor, related_name='views')
     image = models.CharField(max_length=200, blank=True)
     rectangle = models.PolygonField()
+
+    class Meta:
+        ordering = ['floor', 'name']
+
+    @property
+    def dimensions(self):
+        try:
+            img = Image.open(os.path.join(settings.SMAPGEO_DATA_DIR, self.image))
+            width, height = img.size
+        except:
+            print "ERROR: could not open image: " + self.image
+            width, height = 1, 1
+        return width, height
 
     @property
     def mtx(self):
@@ -139,12 +168,7 @@ class View(models.Model, Serializable):
         return [[a / width, c / height, x], [b / width, d / height, y]]
     @mtx.setter
     def mtx(self, value):
-        try:
-            img = Image.open(os.path.join(settings.SMAPGEO_DATA_DIR, self.image))
-            width, height = img.size
-        except:
-            print "ERROR: could not open image: " + self.image
-            width, height = 1, 1
+        width, height = self.dimensions
         polygon = [[value[0][2], value[1][2]]]
         polygon.append([polygon[0][0] + value[0][0] * width,
                         polygon[0][1] + value[1][0] * width])
@@ -193,7 +217,7 @@ class View(models.Model, Serializable):
     def __unicode__(self):
         return "{}:{}:{}".format(self.floor.building.name,
                                  self.floor.name,
-                                 self.shortname)
+                                 self.name)
 
     def dict(self):
         return {
@@ -202,19 +226,21 @@ class View(models.Model, Serializable):
             }
 
     @classmethod
-    def from_dict(cls, j, floor, shortname, **kwargs):
-        v = find_or_create(cls, False, floor=floor, shortname=shortname)
+    def from_dict(cls, j, floor, name, **kwargs):
+        v = find_or_create(cls, False, floor=floor, name=name)
         v.image = j['image'] or ''
         v.mtx = j['mtx']
         v.save()
         return v
 
 class Area(models.Model, Serializable):
-    shortname = models.CharField(max_length=25)
     name = models.CharField(max_length=50)
     regions = models.MultiPolygonField()
     floor = models.ForeignKey(Floor, related_name='areas')
     nodes = models.ManyToManyField(NodeLink, related_name='areas', blank=True)
+
+    class Meta:
+        ordering = ['floor', 'name']
 
     @property
     def streams(self):
@@ -254,15 +280,14 @@ class Area(models.Model, Serializable):
 
     def dict(self):
         return {
-            'name': self.name,
             'regions': self.get_regions(),
             'streams': [x.uuid for x in self.streams.all()],
+            'metadata': {meta.tagname: meta.tagval for meta in self.metadata.all()}
             }
 
     @classmethod
-    def from_dict(cls, j, floor, shortname, **kwargs):
-        a = find_or_create(cls, False, shortname=shortname, floor=floor)
-        a.name = j['name']
+    def from_dict(cls, j, floor, name, **kwargs):
+        a = find_or_create(cls, False, floor=floor, name=name)
         a.set_regions(j['regions'])
         a.save()
         a.streams.clear()
@@ -271,8 +296,25 @@ class Area(models.Model, Serializable):
                 a.streams.add(NodeLink.objects.get(uuid=streamuuid))
         except:
             pass
+
+        try:
+            for tag, value in j['metadata'].items():
+                m = find_or_create(AreaMetadata, save=False, area=a, tagname=tag)
+                m.tagval = value
+                m.save()
+        except:
+            raise
         a.save()
         return a
+
+    def __emittable__(self):
+        """Dictionary representation for appstack web api"""
+        return {
+            'name': self.name,
+            'type': 'Area',
+            'floor': self.floor.name,
+            'building': self.floor.building.name
+            }
 
 class AreaMetadata(models.Model):
     id = models.AutoField(primary_key=True)
@@ -281,6 +323,11 @@ class AreaMetadata(models.Model):
     tagval = models.TextField()
 
     objects = models.GeoManager()
+
+    class Meta:
+        ordering = ['area', 'tagname']
+        verbose_name_plural = "area metadata"
+
 
     def __unicode__(self):
         return "{}.{}={}".format(self.area, self.tagname, self.tagval.split('\n')[0])

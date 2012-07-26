@@ -33,7 +33,7 @@ def regions_to_path(regions):
     return ret
 
 
-def building_to_svg(building):
+def building_to_svg(building, use_style=True, root_path="", floor_names=None, types=None, all_floors=True):
     d = etree.fromstring("""
 <svg
   xmlns="http://www.w3.org/2000/svg"
@@ -49,23 +49,28 @@ def building_to_svg(building):
     d.append(title)
     title.text = building.name
 
-    s = d.makeelement(addNS('style', 'svg'))
-    d.append(s)
-    s.set('type', 'text/css')
-    s.text = """
-      .area {
-        fill: #0000ff;
-        fill-opacity: 0.3;
-        stroke-width: 2.0;
-        stroke: #000000;
-      }
-    """
+    if use_style:
+        s = d.makeelement(addNS('style', 'svg'))
+        d.append(s)
+        s.set('type', 'text/css')
+        s.text = """
+          .area {
+            fill: #0000ff;
+            fill-opacity: 0.3;
+            stroke-width: 2.0;
+            stroke: #000000;
+          }
+        """
 
-    max_width = 1000
-    max_height = 1000
+    max_width = 0
+    max_height = 0
 
-    for floor in building.floors.all():
-        floor_id = floor.shortname
+    if floor_names:
+        floors = building.floors.filter(name__in=floor_names)
+    else:
+        floors = building.floors.all()
+    for floor in floors:
+        floor_id = floor.name.replace(' ', '_')
         f = d.makeelement(addNS('g', 'svg'))
         d.append(f)
 
@@ -74,16 +79,19 @@ def building_to_svg(building):
         f.set('class', 'floor')
         f.set(addNS('label', 'inkscape'), floor.name)
 
-        views = floor.views.filter(shortname='floorplan')
+        views = floor.views.filter(name='floorplan')
         if len(views) == 0 or views[0].image is None:
             continue
         view = views[0]
+        width, height = view.dimensions
+        max_width = max(max_width, width)
+        max_height = max(max_height, height)
 
         i = d.makeelement(addNS('image', 'svg'))
         f.append(i)
         i.set('x', str(0))
         i.set('y', str(0))
-        i.set(addNS('href', 'xlink'), '/smapgeo/' + view.image)
+        i.set(addNS('href', 'xlink'),  root_path + '/smapgeo/' + view.image)
 
         try:
             img = Image.open(os.path.join(settings.SMAPGEO_DATA_DIR, view.image))
@@ -93,8 +101,19 @@ def building_to_svg(building):
         except:
             pass
 
+        keep_floor = all_floors
         for area in floor.areas.all():
-            area_id = area.shortname
+            type_entry = AreaMetadata.objects.filter(area=area, tagname='Type')
+            if type_entry:
+                area_type = type_entry[0].tagval
+            else:
+                area_type = None
+            if types and area_type not in types:
+                continue
+
+            keep_floor = True
+
+            area_id = area.name.replace(' ', '_')
             a = f.makeelement(addNS('path', 'svg'))
             f.append(a)
 
@@ -107,11 +126,18 @@ def building_to_svg(building):
             a.append(desc)
             desc.text = "\n".join([stream.uuid for stream in area.streams.all()] +
                                   ['{}={}'.format(m.tagname, m.tagval) for m in area.metadata.all()])
-            a.set('class', 'area')
+            if area_type:
+                a.set('class', 'area area_' + area_type)
+            else:
+                a.set('class', 'area')
 
             path = cubicsuperpath.CubicSuperPath(regions_to_path(area.get_regions()))
             simpletransform.applyTransformToPath(geoutil.inverse(view.mtx), path)
             a.set('d', cubicsuperpath.formatPath(path))
+
+        if not keep_floor:
+            d.remove(f)
+
 
     d.set('width', str(max_width))
     d.set('height', str(max_height))
@@ -153,9 +179,7 @@ def svg_to_building(s):
 def parse_floor(b, group):
     if group.get(addNS('groupmode', 'inkscape')) != 'layer':
         return
-    f = find_or_create(Floor, save=False, shortname=group.get('id'), building=b)
-    f.name = group.get(addNS('label', 'inkscape'), 'Floor')
-    f.save()
+    f = find_or_create(Floor, save=True, name=group.get(addNS('label', 'inkscape'), 'Floor'), building=b)
 
     image = ""
     for node in group:
@@ -166,7 +190,7 @@ def parse_floor(b, group):
         return
 
     try:
-        v = View.objects.filter(floor=f, shortname='floorplan')[0]
+        v = View.objects.filter(floor=f, name='floorplan')[0]
     except IndexError:
         return
     v.image = 'floor_plans/' + image.split('/')[-1]
@@ -203,7 +227,7 @@ def parse_path(f, node):
     if t is not None:
         simpletransform.applyTransformToPath(simpletransform.parseTransform(t), p)
 
-    view = f.views.filter(shortname='floorplan')[0]
+    view = f.views.filter(name='floorplan')[0]
     simpletransform.applyTransformToPath(view.mtx, p)
     cspsubdiv.cspsubdiv(p, flatness)
     for sp in p:
@@ -214,14 +238,10 @@ def parse_path(f, node):
             region.pop() #Remove repeated last coordinate
         region.append(region[0])
         regions.append(region)
-    try:
-        id=node.get('id').split('__')[1]
-    except:
-        print 'Not parsing region', id
-        return
-    a = find_or_create(Area, save=False, floor=f, shortname=id)
+    a = find_or_create(Area, save=False, floor=f, name=name)
     a.set_regions(regions)
     a.save()
+    
     a.streams.clear()
     for uuid in streams:
         try:
@@ -234,5 +254,5 @@ def parse_path(f, node):
         m.tagval = value
         m.save()
     a.name = name
-    a.view = f.views.filter(shortname='floorplan')[0]
+    a.view = f.views.filter(name='floorplan')[0]
     a.save()

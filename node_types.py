@@ -78,12 +78,18 @@ def get_required_setpoints(s):
   else:
     return getattr(bacnet_devices, s).required_setpoints
 
-def get_required_points(s):
+def get_required_points(s,expand=False):
   """ Return list of required points for a given string e.g. 'AH' """
   if s in vars(generic_objects):
+    if expand:
+      return [get_tag_name(x) for x in getattr(generic_objects, s).required_devices]
+    else:
       return getattr(generic_objects, s).required_devices
   else:
-    return getattr(bacnet_devices, s).required_points
+    if expand:
+      return [get_tag_name(x) for x in getattr(bacnet_devices, s).required_devices]
+    else:
+      return getattr(bacnet_devices, s).required_points
 
 def verify_list(l):
   for el in l:
@@ -95,6 +101,24 @@ def verify_devices():
 
 def verify_objects():
   return verify_list(list_objects())
+
+def tag_to_class(t):
+  """
+  given a tag [t] as a string like 'OUT_AIR_DMP', it returns the class driver for that tag
+  """
+  classes=map(lambda x: x[1], inspect.getmembers(bacnet_devices,predicate=inspect.isclass))
+  tag = t.split('_')[-1]
+  target_class = filter(lambda x: x.__name__[-3:] == tag, classes)
+  return target_class[0] if target_class else None
+
+def string_to_class(s):
+  """
+  given string [s], returns a reference to the class within generic_objects or bacnet_devices
+  """
+  classes = map(lambda x: x[1], inspect.getmembers(generic_objects,predicate=inspect.isclass))
+  classes.extend(map(lambda x: x[1], inspect.getmembers(bacnet_devices,predicate=inspect.isclass)))
+  target_class = filter(lambda x: x.__name__ == s, classes)
+  return target_class[0] if target_class else None
 
 def get_class(target):
   """
