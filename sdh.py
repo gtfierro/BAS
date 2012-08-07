@@ -2,6 +2,7 @@ from node import Relational
 from generic_objects import *
 from bacnet_devices import *
 import networkx as nx
+import sys
 import gis
 import node_types
 
