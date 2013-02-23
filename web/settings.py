@@ -148,3 +148,4 @@ LOGGING = {
 }
 
 SMAPGEO_DATA_DIR = os.path.abspath(os.path.join(PROJECT_PATH, '../data'))
+LOGIN_REDIRECT_URL = '/webapi/index.html'
