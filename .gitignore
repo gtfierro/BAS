@@ -1,5 +1,8 @@
 # Python
 *.pyc
 
+# Extra parser files
+parser.out
+
 # databases
 *.db
