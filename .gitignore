@@ -3,6 +3,7 @@
 
 # Extra parser files
 parser.out
+parsetab.py
 
 # databases
 *.db
