@@ -22,5 +22,7 @@ urlpatterns = patterns('',
     url(r'^all(\.(?P<emitter_format>.+))?$', all_resource),
 
     url(r'^geo.html$', 'webapi.views.geo'),
-    url(r'^$', 'webapi.views.index'),
+    url(r'^index.html$', 'webapi.views.index'),
+    url(r'^$', 'django.contrib.auth.views.login', {
+          'template_name': 'login.html'})
 )
