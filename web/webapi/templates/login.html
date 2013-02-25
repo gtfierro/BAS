@@ -1,29 +1,37 @@
 <!DOCTYPE html>
-<html>
-<head>
-<title>Appstack Web API Login</title>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Appstack Web API Login</title>
 
-{% block body %}
-      <section>
-      {% if form.errors %}
-      <p>Your username and password didn't match, please try again.</p>
-      {% endif %}
+    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.0/css/bootstrap.min.css" rel="stylesheet" media="all" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.0/bootstrap.min.js"></script>
 
-      <form method="post" action=".">
-        {% csrf_token %}
-        <p>
-        <label for="id_username">Username:</label>
-            {{ form.username }}
-        </p>
-        <p>
-        <label for="id_password">Password:</label>
-            {{ form.password }}
-        </p>
-        <input type="submit" value="login" />
-      </form>
-      </section>
+  </head>
+  <body class="container">
+    <h1>Appstack Web API Login</h1>
 
-{% endblock %}
+    {% block body %}
+    <section class='form-horizontal'>
+    {% if form.errors %}
+    <p>Your username and password didn't match, please try again.</p>
+    {% endif %}
 
-</head>
+    <form method="post" action=".">
+      {% csrf_token %}
+      <p>
+      <label for="id_username">Username:</label>
+      {{ form.username }}
+      </p>
+      <p>
+      <label for="id_password">Password:</label>
+      {{ form.password }}
+      </p>
+      <input type="submit" value="login" />
+    </form>
+    </section>
+
+    {% endblock %}
+
+  </body>
 </html>
