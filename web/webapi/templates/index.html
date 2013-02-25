@@ -25,9 +25,11 @@
         // only make AJAX calls every 250ms
         $('#q').on('keyup', $.debounce(250, false, function(e) {
           var url = 'query';
+          var geourl = 'geo';
           
           if ($('#format').val() === 'HTML') {
             url += '.html';
+            geourl += '.html';
           }
             
           // URL-encode form field
@@ -35,6 +37,9 @@
 
           // load the results into the results <div>
           $('#results').addClass('loading').load(url, function() {
+            $(this).removeClass('loading');
+          });
+          $('#georesults').addClass('loading').load(geourl, function() {
             $(this).removeClass('loading');
           });
         }));
@@ -62,8 +67,8 @@
     <p><a href='all.html' id="all">All objects and devices</a></p>
     
     <div class="row">
-      <div class="span6">
-        <form class="form-horizontal">
+      <div class="span4">
+        <form>
           <div class="control-group">
             <label class="control-label" for="q">Query:</label>
             <div class="controls">
@@ -83,7 +88,8 @@
         </form>
       </div>
 
-      <div class="span6" id="results"></div>
+      <div class="span4" id="results"></div>
+      <div class="span4" id="georesults"></div>
     </div>
   </body>
 </html>
