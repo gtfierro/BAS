@@ -1,39 +1,89 @@
 <!DOCTYPE html>
-<html>
-<head>
-<title>Appstack Web API</title>
-</head>
-<body>
-<h1>Appstack HTML Pages</h1>
-<p><a href='geo.html'>All buildings</a></p>
-<p><a href='all.html'>All objects and devices</a></p>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Appstack Web API</title>
 
-<p>
-<form action="query.html" method="get">
-Query: <input type="text" name="q" />
-<input type="submit" value="Submit" />
-</form> 
-</p>
+    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.0/css/bootstrap.min.css" rel="stylesheet" media="all" />
 
-<h1>Appstack JSON API</h1>
-<p><a href='all'>All objects and devices</a></p>
-<p><a href='t/LIG'>Sample tag/type lookup</a></p>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.0/bootstrap.min.js"></script>
 
-<p>
-<form action="query" method="get">
-Query: <input type="text" name="q" />
-<input type="submit" value="Submit" />
-</form> 
-</p>
+    <style>
+      .loading { background: url('loading.gif') center center no-repeat; }
+    </style>
 
-<p>
-To call a method on a device, send a GET request to the right URL:
-<ul>
-<li>webapi/uuid/1ea52aab-0a17-4d77-9b5c-72835d802e06/get_level</li>
-<li>webapi/uuid/1ea52aab-0a17-4d77-9b5c-72835d802e06/set_level?3</li>
-<li>webapi/uuid/1ea52aab-0a17-4d77-9b5c-72835d802e06/set_level?level=3</li>
-</ul>
-</p>
+    <script>
+      jQuery(function($) {
+        // don't actually submit the form
+        $('form').submit(function(e) {
+          e.preventDefault(); 
+          return false;
+        });
+      
+        // only make AJAX calls every 250ms
+        $('#q').on('keyup', $.debounce(250, false, function(e) {
+          var url = 'query';
+          
+          if ($('#format').val() === 'HTML') {
+            url += '.html';
+          }
+            
+          // URL-encode form field
+          url += '?' + $(this).serialize();
 
-</body>
+          // load the results into the results <div>
+          $('#results').addClass('loading').load(url, function() {
+            $(this).removeClass('loading');
+          });
+        }));
+
+        // dumb edge-case
+        $('#format').change(function() {
+          $('#q').keyup();
+        });
+
+        $('#all-buildings').on('click', function(e) {
+          e.preventDefault();
+          $('#q').val('!').keyup(); // trigger AJAX programatically
+        });
+
+        $('#all').on('click', function(e) {
+          e.preventDefault();
+          $('#q').val('.').keyup();
+        });
+      });
+    </script>
+  </head>
+  <body class="container">
+    <h1>Appstack HTML Pages</h1>
+    <p><a href='geo.html' id="all-buildings">All buildings</a></p>
+    <p><a href='all.html' id="all">All objects and devices</a></p>
+    
+    <div class="row">
+      <div class="span6">
+        <form class="form-horizontal">
+          <div class="control-group">
+            <label class="control-label" for="q">Query:</label>
+            <div class="controls">
+              <input autofocus autocomplete="off" id="q" value="" type="text" name="q" /></label>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label class="control-label" for="format">Format:</label>
+            <div class="controls">
+              <select id="format" name="format">
+                <option>HTML</option>
+                <option>JSON</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="span6" id="results"></div>
+    </div>
+  </body>
 </html>
