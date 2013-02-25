@@ -25,20 +25,24 @@
         // only make AJAX calls every 250ms
         $('#q').on('keyup', $.debounce(250, false, function(e) {
           var url = 'query';
-          var geourl = 'geo';
           
           if ($('#format').val() === 'HTML') {
             url += '.html';
-            geourl += '.html';
           }
             
+          var query = $(this).serialize();
+          var geourl = url;
+
           // URL-encode form field
-          url += '?' + $(this).serialize();
+          url += '?' + query;
+          geourl += '?q=%21%20>%20' + query.slice(2);
+          console.log("geo: %s", geourl);
 
           // load the results into the results <div>
           $('#results').addClass('loading').load(url, function() {
             $(this).removeClass('loading');
           });
+
           $('#georesults').addClass('loading').load(geourl, function() {
             $(this).removeClass('loading');
           });
@@ -88,8 +92,15 @@
         </form>
       </div>
 
-      <div class="span4" id="results"></div>
-      <div class="span4" id="georesults"></div>
+      <div class="span4">
+        <h4>Devices</h4>
+        <div id="results"></div>
+      </div>
+
+      <div class="span4">
+        <h4>Areas</h4>
+        <div id="georesults"></div>
+      </div>
     </div>
   </body>
 </html>
