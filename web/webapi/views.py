@@ -22,6 +22,15 @@ def index(request):
     return HttpResponse(t.render(c))
 
 @login_required
+def actuate(request):
+    t = loader.get_template('actuate.html')
+    c = RequestContext(request, {
+        'url_prefix' : '/webapi/',
+        'geo_prefix' : '/smapgeo/'
+        })
+    return HttpResponse(t.render(c))
+
+@login_required
 def geo(request):
     t = loader.get_template('geo.html')
     if 'building' not in request.GET:
