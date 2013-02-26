@@ -57,7 +57,7 @@
         $('.results').on('click', 'a.uuid', function(e) {
           e.preventDefault();
           var url = $(this).attr('href');
-          $('#details').load(url, function() {});
+          $('#details').load(url);
         });
 
         // dumb edge-case
@@ -110,7 +110,7 @@
         </form>
 
         <h4>Object Details</h4>
-        <div class='results' id='details'></div>
+        <div id='details'></div>
       </div>
 
       <div class="span4">
