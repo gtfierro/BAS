@@ -22,7 +22,7 @@
     Floor: <a class="floorplan" href="{{ url_prefix }}geo.html?building={{ obj.building }}&floor={{ obj.floor }}">{{ obj.floor }}</a><br/>
     {% endif %}
     {% if obj.building and obj.floor %}
-    <a class="buildingfloor" href="{{ url_prefix }}query.html?q=.<%21{{ obj.name }} < %21{{ obj.floor }} < %21{{ obj.building }}">Objects and Devices in this area</a><br/>
+    <a class="all-objs-devices" href="{{ url_prefix }}query.html?q=.<%21{{ obj.name }} < %21{{ obj.floor }} < %21{{ obj.building }}">Objects and Devices in this area</a><br/>
     {% endif %}
     {% if obj.type == "Building" %}
     <a class="geoview" href="{{ url_prefix }}geo.html?building={{ obj.name }}">Geo view of this building</a><br/>

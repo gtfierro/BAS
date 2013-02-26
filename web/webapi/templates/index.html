@@ -74,6 +74,12 @@
           e.preventDefault();
           $('#q').val('.').keyup();
         });
+
+        $('#georesults').delegate('a.all-objs-devices', 'click', function(e) {
+          e.preventDefault();
+          var url = $(this).attr('href');
+          $('#q').val(decodeURI(url.trim()).slice(21)).keyup();
+        });
       });
     </script>
   </head>
