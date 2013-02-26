@@ -54,6 +54,12 @@
           $('#modal-results').attr('src', encodeURI(url.trim())).parents('.modal').modal('show');
         });
 
+        $('.results').on('click', 'a.objuuid', function(e) {
+          e.preventDefault();
+          var url = $(this).attr('href');
+          $('#details').load(url, function() {});
+        });
+
         // dumb edge-case
         $('#format').change(function() {
           $('#q').keyup();
@@ -97,11 +103,8 @@
           </div>
         </form>
 
-        <h4>Sample Queries</h4>
-        <ul>
-          <li>$Light Bank < ! Floor 4</li>
-          <li>.SEN < $Outside Air Damper</li>
-        </ul>
+        <h4>Object Details</h4>
+        <div class='results' id='details'></div>
       </div>
 
       <div class="span4">
