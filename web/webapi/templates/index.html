@@ -54,7 +54,7 @@
           $('#modal-results').attr('src', encodeURI(url.trim())).parents('.modal').modal('show');
         });
 
-        $('.results').on('click', 'a.objuuid', function(e) {
+        $('.results').on('click', 'a.uuid', function(e) {
           e.preventDefault();
           var url = $(this).attr('href');
           $('#details').load(url, function() {});
