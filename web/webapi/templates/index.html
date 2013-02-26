@@ -37,7 +37,6 @@
           // URL-encode form field
           url += '?' + query;
           geourl += '?q=%21%20>%20' + query.slice(2);
-          console.log("geo: %s", geourl);
 
           // load the results into the results <div>
           $('#results').addClass('loading').load(url, function() {
