@@ -6,7 +6,11 @@
   <body>
     {% for obj in objs %}
     <p>
+    {% if obj.type == 'Area' %}
     Name: <a class="floorplan" href="{{ url_prefix }}geo.html?building={{ obj.building }}&floor={{ obj.floor }}&zone={{ obj.name }}">{{ obj.name }}</a><br/>
+    {% else %}
+    Name: {{ obj.name }}<br/>
+    {% endif %}
     Type: {{ obj.type }}<br/>
     {% if obj.uuid %}
     UUID: <a class="uuid" href='{{ url_prefix }}uuid/{{ obj.uuid }}.html'>{{ obj.uuid }}</a><br/>
