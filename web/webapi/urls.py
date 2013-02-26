@@ -5,14 +5,12 @@ from piston.resource import Resource
 from piston.authentication import HttpBasicAuthentication
 from handlers import TagHandler, QueryHandler, AllHandler, UUIDHandler, UUIDMethodHandler
 
-auth = HttpBasicAuthentication(realm="My Realm")
-ad = { 'authentication': auth }
 
-tag_resource = Resource(handler=TagHandler, **ad)
-query_resource = Resource(handler=QueryHandler, **ad)
-all_resource = Resource(handler=AllHandler, **ad)
-uuid_resource = Resource(handler=UUIDHandler, **ad)
-uuid_method_resource = Resource(handler=UUIDMethodHandler, **ad)
+tag_resource = Resource(handler=TagHandler)
+query_resource = Resource(handler=QueryHandler)
+all_resource = Resource(handler=AllHandler)
+uuid_resource = Resource(handler=UUIDHandler)
+uuid_method_resource = Resource(handler=UUIDMethodHandler)
 
 urlpatterns = patterns('',
     url(r'^t/(?P<tag>\w+)(\.(?P<emitter_format>.+))?$', tag_resource),
