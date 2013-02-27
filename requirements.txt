@@ -4,7 +4,8 @@ django-piston==0.2.3
 fuzzywuzzy>=0.1
 ipython>=0.13.1
 networkx>=1.7
-matplotlib>=1.2.0
+numpy
+matplotlib
 PIL>=1.1.7
 ply>=3.4
 pysqlite3>=2.6.3
