@@ -48,6 +48,18 @@
           });
         }));
 
+        $('#run').on('click', function(e) {
+          var uuids = [];
+          var url = 'uuid/';
+          var command = $("#c").serialize().slice(2).trim();
+          $('#results').find('a.uuid').each(function(index) {
+            uuids.push($(this).text());
+          });
+          for (var i = 0; i < uuids.length; i++) {
+           console.log(url+uuids[i]+"/"+command);
+          };
+        });
+
         $('.results').on('click', 'a.floorplan', function(e) {
           e.preventDefault();
           var url = $(this).attr('href');
@@ -112,12 +124,12 @@
         <form>
           <div class="control-group">
             <label class="control-label" for="c">Commands:</label>
-            <textarea autocomplete="off" id="c" value="" name="c" type="form"> </textarea>
+            <textarea autocomplete="off" id="c" value="" name="c" type="form"></textarea>
           </div>
 
           <div class="control-group">
-            <button class="btn btn-primary" type="submit">Run</button>
-            <button class="btn" type="submit">Dry Run</button>
+            <button id="run" class="btn btn-primary" type="submit">Run</button>
+            <button id="dry-run" class="btn" type="submit">Dry Run</button>
           </div>
         </form>
 
