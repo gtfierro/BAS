@@ -92,23 +92,6 @@
       <div class="span4">
         <form>
           <div class="control-group">
-            <label class="control-label" for="q">Query:</label>
-            <div class="controls">
-              <input autofocus autocomplete="off" id="q" value="" type="text" name="q" /></label>
-            </div>
-          </div>
-
-          <div class="control-group">
-            <label class="control-label" for="c">Commands:</label>
-            <textarea autocomplete="off" id="c" value=""> </textarea>
-          </div>
-
-          <div class="control-group">
-            <button class="btn btn-primary" type="button">Run</button>
-            <button class="btn" type="button">Dry Run</button>
-          </div>
-
-          <div class="control-group">
             <label class="control-label" for="format">Format:</label>
             <div class="controls">
               <select id="format" name="format">
@@ -117,7 +100,27 @@
               </select>
             </div>
           </div>
+
+          <div class="control-group">
+            <label class="control-label" for="q">Query:</label>
+            <div class="controls">
+              <input autofocus autocomplete="off" id="q" value="" type="text" name="q" /></label>
+            </div>
+          </div>
         </form>
+
+        <form>
+          <div class="control-group">
+            <label class="control-label" for="c">Commands:</label>
+            <textarea autocomplete="off" id="c" value="" name="c" type="form"> </textarea>
+          </div>
+
+          <div class="control-group">
+            <button class="btn btn-primary" type="submit">Run</button>
+            <button class="btn" type="submit">Dry Run</button>
+          </div>
+        </form>
+
 
         <h4>Object Details</h4>
         <div id='details'></div>
