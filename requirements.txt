@@ -1,0 +1,17 @@
+BAS
+
+django-olwidget==0.60.3
+django-piston==0.2.3
+
+fuzzywuzzy>=0.1
+ipython>=0.13.1
+networkx>=1.7
+matplotlib>=1.2.0
+PIL>=1.1.7
+ply>=3.4
+pysqlite3>=2.6.3
+pygraphviz>=1.1
+
+zope.event>=4.0.2
+zope.interface>=4.0.4
+zope.schema>=4.2.2
