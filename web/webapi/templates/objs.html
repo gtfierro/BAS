@@ -4,30 +4,34 @@
     <title>Objects</title>
   </head>
   <body>
-    {% for obj in objs %}
-    <p>
-    {% if obj.type == 'Area' %}
-    Name: <a class="floorplan" href="{{ url_prefix }}geo.html?building={{ obj.building }}&floor={{ obj.floor }}&zone={{ obj.name }}">{{ obj.name }}</a><br/>
-    {% else %}
-    Name: {{ obj.name }}<br/>
-    {% endif %}
-    Type: {{ obj.type }}<br/>
-    {% if obj.uuid %}
-    UUID: <a class="uuid" href='{{ url_prefix }}uuid/{{ obj.uuid }}.html'>{{ obj.uuid }}</a><br/>
-    {% endif %}
-    {% if obj.building %}
-    Building: <a class="floorplan" href="{{ url_prefix }}geo.html?building={{ obj.building }}">{{ obj.building }}</a><br/>
-    {% endif %}
-    {% if obj.floor %}
-    Floor: <a class="floorplan" href="{{ url_prefix }}geo.html?building={{ obj.building }}&floor={{ obj.floor }}">{{ obj.floor }}</a><br/>
-    {% endif %}
-    {% if obj.building and obj.floor %}
-    <a class="all-objs-devices" href="{{ url_prefix }}query.html?q=.<%21{{ obj.name }} < %21{{ obj.floor }} < %21{{ obj.building }}">Objects and Devices in this area</a><br/>
-    {% endif %}
-    {% if obj.type == "Building" %}
-    <a class="geoview" href="{{ url_prefix }}geo.html?building={{ obj.name }}">Geo view of this building</a><br/>
-    {% endif %}
-    {% endfor %}
-    </p>
+    <table class="table table-hover">
+      {% for obj in objs %}
+      <tr>
+        <td>
+          {% if obj.type == 'Area' %}
+          Name: <a class="floorplan" href="{{ url_prefix }}geo.html?building={{ obj.building }}&floor={{ obj.floor }}&zone={{ obj.name }}">{{ obj.name }}</a><br/>
+          {% else %}
+          Name: {{ obj.name }}<br/>
+          {% endif %}
+          Type: {{ obj.type }}<br/>
+          {% if obj.uuid %}
+          UUID: <a class="uuid" href='{{ url_prefix }}uuid/{{ obj.uuid }}.html'>{{ obj.uuid }}</a><br/>
+          {% endif %}
+          {% if obj.building %}
+          Building: <a class="floorplan" href="{{ url_prefix }}geo.html?building={{ obj.building }}">{{ obj.building }}</a><br/>
+          {% endif %}
+          {% if obj.floor %}
+          Floor: <a class="floorplan" href="{{ url_prefix }}geo.html?building={{ obj.building }}&floor={{ obj.floor }}">{{ obj.floor }}</a><br/>
+          {% endif %}
+          {% if obj.building and obj.floor %}
+          <a class="all-objs-devices" href="{{ url_prefix }}query.html?q=.<%21{{ obj.name }} < %21{{ obj.floor }} < %21{{ obj.building }}">Objects and Devices in this area</a><br/>
+          {% endif %}
+          {% if obj.type == "Building" %}
+          <a class="geoview" href="{{ url_prefix }}geo.html?building={{ obj.name }}">Geo view of this building</a><br/>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
   </body>
 </html>
