@@ -56,7 +56,7 @@
             uuids.push($(this).text());
           });
           for (var i = 0; i < uuids.length; i++) {
-           console.log(url+uuids[i]+"/"+command);
+           $('#details').load(url+uuids[i]+"/"+command);
           };
         });
 
