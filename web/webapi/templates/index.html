@@ -57,6 +57,7 @@
 
           var floors = [];
           $('#georesults').find('tr').each( function(index) {
+            var building = $(this).find('a.building').text();
             var floorfull = $(this).find('a.floor').text();
             console.log(floors);
             if ($.inArray(floorfull, floors) > -1) { return; }
@@ -67,7 +68,7 @@
 
             $(x).appstack({
               url: 'http://127.0.0.1:8000', // root url of the appstack APIs
-              building: 'Sutardja Dai Hall', // name of the building
+              building: building, // name of the building
               floors: [floorfull], // list of floors to include. Omit to show all floors
               all: false, // (optional) if set to false, floors with no areas on them will not be returned
               onload: function() {} // callback for when the SVG is loaded.

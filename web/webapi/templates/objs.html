@@ -18,7 +18,7 @@
           UUID: <a class="uuid" href='{{ url_prefix }}uuid/{{ obj.uuid }}.html'>{{ obj.uuid }}</a><br/>
           {% endif %}
           {% if obj.building %}
-          Building: <a class="floorplan" href="{{ url_prefix }}geo.html?building={{ obj.building }}">{{ obj.building }}</a><br/>
+          Building: <a class="floorplan building" href="{{ url_prefix }}geo.html?building={{ obj.building }}">{{ obj.building }}</a><br/>
           {% endif %}
           {% if obj.floor %}
           Floor: <a class="floorplan floor" href="{{ url_prefix }}geo.html?building={{ obj.building }}&floor={{ obj.floor }}">{{ obj.floor }}</a><br/>
