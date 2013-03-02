@@ -18,6 +18,8 @@
       #modal-results { width: 98%; height: 380px; }
       .modal { width: 900px; height: 100%; margin-left: -450px; }
       #svgstuff { width:500px; height:500px;}
+      .area { fill: #0000ff; fill-opacity: 0.3; stroke-width: 2.0; stroke: #000000; }
+      .area:hover { fill-opacity: 0.6; }
     </style>
 
     <script>
@@ -50,6 +52,28 @@
 
           $('#georesults').addClass('loading').load(geourl, function() {
             $(this).removeClass('loading');
+          });
+
+
+          var floors = [];
+          $('#georesults').find('tr').each( function(index) {
+            var floorfull = $(this).find('a.floor').text();
+            console.log(floors);
+            if ($.inArray(floorfull, floors) > -1) { return; }
+            else { floors.push(floorfull); }
+            var floor = floorfull.replace(' ','');
+            var div = $('<h5>'+floor+'</h5><div></div>').attr('id',floor);
+            var x = 'div#' + floor;
+
+            $(x).appstack({
+              url: 'http://127.0.0.1:8000', // root url of the appstack APIs
+              building: 'Sutardja Dai Hall', // name of the building
+              floors: [floorfull], // list of floors to include. Omit to show all floors
+              all: false, // (optional) if set to false, floors with no areas on them will not be returned
+              onload: function() {} // callback for when the SVG is loaded.
+              // "this" will refer to the div containing the SVG
+            });
+            $('#svgstuff').append(div);
           });
         }));
 
@@ -150,7 +174,8 @@
 
       <div class="span4">
         <h4>Areas</h4>
-        <div class="results" id="georesults"></div>
+        <div class="results" id="georesults" style="display: none;"></div>
+        <div id="svgstuff"></div>
       </div>
     </div>
 
