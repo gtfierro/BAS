@@ -4,126 +4,17 @@
     <meta charset="utf-8" />
     <title>Appstack Web API</title>
 
-    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.0/css/bootstrap.min.css" rel="stylesheet" media="all" />
+    <link href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/static/jquery.bas.realtime.css" rel="stylesheet" />
 
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.0/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-migrate/1.1.1/jquery-migrate.min.js"></script>
-    <script type="text/javascript" src="/static/jquery.svg.min.js"></script>
-    <script type="text/javascript" src="/static/jquery.appstack.js"></script>
 
-    <style>
-      .loading { background: url('loading.gif') center center no-repeat; }
-      #modal-results { width: 98%; height: 380px; }
-      .modal { width: 900px; height: 100%; margin-left: -450px; }
-      #svgstuff { width:500px; height:500px;}
-      .area { fill: #0000ff; fill-opacity: 0.3; stroke-width: 2.0; stroke: #000000; }
-      .area:hover { fill-opacity: 0.6; }
-    </style>
-
-    <script>
-      jQuery(function($) {
-        // don't actually submit the form
-        $('form').submit(function(e) {
-          e.preventDefault(); 
-          return false;
-        });
-      
-        // only make AJAX calls every 250ms
-        $('#q').on('keyup', $.debounce(250, false, function(e) {
-          var url = 'query';
-          
-          if ($('#format').val() === 'HTML') {
-            url += '.html';
-          }
-            
-          var query = $(this).serialize();
-          var geourl = url;
-
-          // URL-encode form field
-          url += '?' + query;
-          geourl += '?q=%21%20>%20' + query.slice(2);
-
-          // load the results into the results <div>
-          $('#results').addClass('loading').load(url, function() {
-            $(this).removeClass('loading');
-          });
-
-          $('#georesults').addClass('loading').load(geourl, function() {
-            $(this).removeClass('loading');
-          });
-
-
-          var floors = [];
-          $('#georesults').find('tr').each( function(index) {
-            var building = $(this).find('a.building').text();
-            var floorfull = $(this).find('a.floor').text();
-            console.log(floors);
-            if ($.inArray(floorfull, floors) > -1) { return; }
-            else { floors.push(floorfull); }
-            var floor = floorfull.replace(' ','');
-            var div = $('<h5>'+floor+'</h5><div></div>').attr('id',floor);
-            var x = 'div#' + floor;
-
-            $(x).appstack({
-              url: 'http://127.0.0.1:8000', // root url of the appstack APIs
-              building: building, // name of the building
-              floors: [floorfull], // list of floors to include. Omit to show all floors
-              all: false, // (optional) if set to false, floors with no areas on them will not be returned
-              onload: function() {} // callback for when the SVG is loaded.
-              // "this" will refer to the div containing the SVG
-            });
-            $('#svgstuff').append(div);
-          });
-        }));
-
-        $('#run').on('click', function(e) {
-          var uuids = [];
-          var url = 'uuid/';
-          var command = $("#c").serialize().slice(2).trim();
-          $('#results').find('a.uuid').each(function(index) {
-            uuids.push($(this).text());
-          });
-          for (var i = 0; i < uuids.length; i++) {
-           $('#details').load(url+uuids[i]+"/"+command);
-          };
-        });
-
-        $('.results').on('click', 'a.floorplan', function(e) {
-          e.preventDefault();
-          var url = $(this).attr('href');
-          $('#modal-results').attr('src', encodeURI(url.trim())).parents('.modal').modal('show');
-        });
-
-        $('.results').on('click', 'a.uuid', function(e) {
-          e.preventDefault();
-          var url = $(this).attr('href');
-          $('#details').load(url);
-        });
-
-        // dumb edge-case
-        $('#format').change(function() {
-          $('#q').keyup();
-        });
-
-        $('#all-buildings').on('click', function(e) {
-          e.preventDefault();
-          $('#q').val('!').keyup(); // trigger AJAX programatically
-        });
-
-        $('#all').on('click', function(e) {
-          e.preventDefault();
-          $('#q').val('.').keyup();
-        });
-
-        $('#georesults').delegate('a.all-objs-devices', 'click', function(e) {
-          e.preventDefault();
-          var url = $(this).attr('href');
-          $('#q').val(decodeURI(url.trim()).slice(21)).keyup();
-        });
-      });
-    </script>
+    <script src="/static/jquery.svg.min.js"></script>
+    <script src="/static/jquery.appstack.js"></script>
+    <script src="/static/jquery.bas.realtime.js"></script>
   </head>
   <body class="container">
     <h1>Appstack HTML Pages</h1>
@@ -175,7 +66,6 @@
 
       <div class="span4">
         <h4>Areas</h4>
-        <div class="results" id="georesults" style="display: none;"></div>
         <div id="svgstuff"></div>
       </div>
     </div>

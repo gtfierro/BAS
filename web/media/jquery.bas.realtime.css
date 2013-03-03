@@ -1,0 +1,7 @@
+.loading { background: url('loading.gif') center center no-repeat; }
+#modal-results { width: 98%; height: 380px; }
+.modal { width: 900px; height: 100%; margin-left: -450px; }
+#svgstuff { width:500px; height:500px;}
+.svg { height: 200px; width: 500px; }
+.area { fill: #00f; fill-opacity: 0.3; stroke-width: 2.0; stroke: #000; }
+.area:hover { fill-opacity: 0.6; }
