@@ -8,62 +8,64 @@ jQuery(function($) {
   // only make AJAX calls every 250ms
   $('#q').on('keyup', $.debounce(250, false, function(e) {
     var url = 'query';
+    var geourl = url;
     
     if ($('#format').val() === 'HTML') {
       url += '.html';
     }
       
     var query = $(this).serialize();
-    var geourl = url;
 
     // URL-encode form field
     url += '?' + query;
-    geourl += '?q=%21%20>%20' + query.slice(2);
+    geourl += '?q=%21%20>%20' + query.slice(2); // remove 'q='
 
     // load the results into the results <div>
     $('#results').addClass('loading').load(url, function() {
       $(this).removeClass('loading');
     });
 
-    $('#georesults').addClass('loading').load(geourl, function() {
-      $(this).removeClass('loading');
-    });
-
-
-    var floors = [];
-    $('#georesults tr').each(function() {
-      var building = $(this).find('a.building').text();
-      var floorfull = $(this).find('a.floor').text();
+    $.getJSON(geourl, function(results) {
+      var $svgstuff = $('#svgstuff'); // cache the target <div>
+      $svgstuff.html(''); // clear container
       
-      if ($.inArray(floorfull, floors) > -1) {
-        return;
-      } else {
-        floors.push(floorfull);
-      }
-      var floor = floorfull.replace(' ', '');
-      var div = $('<h5>' + floor + '</h5><div class="svg"></div>').attr('id', floor);
+      var floors = [];
+      $.each(results, function(i, result) {
+        var building = result['building'];
+        var floor = result['floor'];
+        
+        if ($.inArray(floor, floors) > -1) {
+          return true; // continue
+        }
 
-      $('#' + floor).appstack({
-        url: 'http://127.0.0.1:8000',
-        building: building,
-        floors: [floorfull],
-        all: false
+        floors.push(floor);
+
+        var floorID = floor.toLowerCase().replace(' ', '-');
+
+        $('<h5>' + floor + '</h5><div id="' + floorID + '" class="svg"></div>').appendTo($svgstuff);
+
+        $('#' + floorID).appstack({
+          url: 'http://127.0.0.1:8000',
+          building: building,
+          floors: [floor],
+          all: false
+        });
       });
-
-      $('#svgstuff').append(div);
     });
   }));
 
   $('#run').on('click', function(e) {
     var uuids = [];
     var url = 'uuid/';
+
     var command = $("#c").serialize().slice(2).trim();
+
     $('#results a.uuid').each(function() {
       uuids.push($(this).text());
     });
 
     for (var i = 0; i < uuids.length; i++) {
-      $('#details').load(url+uuids[i]+"/"+command);
+      $('#details').load(url + uuids[i] + "/" + command);
     }
   });
 
