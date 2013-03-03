@@ -6,7 +6,7 @@ jQuery(function($) {
   });
 
   // only make AJAX calls every 250ms
-  $('#q').on('keyup', $.debounce(250, false, function(e) {
+  $('#q').on('keyup', $.debounce(250, false, function() {
     var url = 'query';
     var geourl = url;
     
@@ -73,15 +73,13 @@ jQuery(function($) {
     e.preventDefault();
     var url = $(this).attr('href');
     $('#modal-results').attr('src', encodeURI(url.trim())).parents('.modal').modal('show');
-  });
-
-  $('.results').on('click', 'a.uuid', function(e) {
+  }).on('click', 'a.uuid', function(e) {
     e.preventDefault();
     var url = $(this).attr('href');
     $('#details').load(url);
   });
 
-  // dumb edge-case
+  // dumb edge-cases
   $('#format').change(function() {
     $('#q').keyup();
   });
@@ -94,11 +92,5 @@ jQuery(function($) {
   $('#all').on('click', function(e) {
     e.preventDefault();
     $('#q').val('.').keyup();
-  });
-
-  $('#georesults').on('click', 'a.all-objs-devices', function(e) {
-    e.preventDefault();
-    var url = $(this).attr('href');
-    $('#q').val(decodeURI(url.trim()).slice(21)).keyup();
   });
 });
