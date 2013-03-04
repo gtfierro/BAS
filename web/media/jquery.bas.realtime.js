@@ -94,7 +94,7 @@ jQuery(function($) {
     $('#q').val('.').keyup();
   });
 
-  $('.results').on('mouseover', 'tr', function() {
+  $('.results').on('mouseenter', 'tr', function() {
     var uuid = $(this).find('a.uuid').text();
     var url = 'query?q=%21%20>%20^' + uuid;
     $.getJSON(url, function(results) {
@@ -113,7 +113,7 @@ jQuery(function($) {
     });
   });
 
-  $('.results').on('mouseout', 'tr', function() {
+  $('.results').on('mouseleave', 'tr', function() {
     var uuid = $(this).find('a.uuid').text();
     var url = 'query?q=%21%20>%20^' + uuid;
     $.getJSON(url, function(results) {
