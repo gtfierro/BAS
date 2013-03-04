@@ -100,10 +100,35 @@ jQuery(function($) {
     $.getJSON(url, function(results) {
       if (results === null) { return; }
       var floor = results[0]['floor'];
-      var area = results[0]['area'];
+      var area = '';
+      if (results[0]['type'] === 'Area') {
+        area = results[0]['name'];
+      }
       var building = results[0]['building'];
-      var floorID = floor.toLowerCase().replace(' ', '-');
-      console.log($('#'+floorID).appstack('area',area));
+      var floorID = floor.replace(' ', '_');
+      var areaID = area.replace(' ','_');
+      var $areaelem = $('#'+floorID+"__"+areaID);
+      var oldclass  = $areaelem.attr('class');
+      $areaelem.attr('class',oldclass+" selected");
+    });
+  });
+
+  $('.results').on('mouseout', 'tr', function() {
+    var uuid = $(this).find('a.uuid').text();
+    var url = 'query?q=%21%20>%20^' + uuid;
+    $.getJSON(url, function(results) {
+      if (results === null) { return; }
+      var floor = results[0]['floor'];
+      var area = '';
+      if (results[0]['type'] === 'Area') {
+        area = results[0]['name'];
+      }
+      var building = results[0]['building'];
+      var floorID = floor.replace(' ', '_');
+      var areaID = area.replace(' ','_');
+      var $areaelem = $('#'+floorID+"__"+areaID);
+      var oldclass  = $areaelem.attr('class');
+      $areaelem.attr('class',oldclass.substr(0,18));
     });
   });
 });
