@@ -24,17 +24,17 @@ class Node(object):
     def areas(self):
       return gis.Area.objects.filter(nodes__in=[x.link for x in self])
 
-  def __init__(self, name, uid=None):
+  def __init__(self, name, external_parents=[], external_childs=[], metadata={}, uid=None):
     """
     obj_type: string that conforms to the list of recognized object types
     container: Obj or Relational of which this object is a part
     name: string name of this object
     """
     self.name = name
-    self.external_parents = []
-    self.external_childs = []
+    self.external_parents = external_parents
+    self.external_childs = external_childs
     self.uid = uuid.uuid4() if not uid else uid
-    self.metadata = {}
+    self.metadata = metadata
 
     self.link, _ = gis.NodeLink.objects.get_or_create(uuid=self.uid)
 
