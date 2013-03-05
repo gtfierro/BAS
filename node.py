@@ -318,6 +318,9 @@ class Obj(Node, Container):
         raise NotImplementedError("Required devices %s are not provided for %s" %
                                   (str(list(req)), self.name))
 
+  def add_area(self, area):
+    self.areas.add(area)
+
   def __getitem__(self, key):
     if key in self.devices:
       return Node.NodeList(self.devices[key]) if isinstance(self.devices[key],list) else self.devices[key]
