@@ -97,6 +97,9 @@ jQuery(function($) {
   $('.results').on('mouseenter', 'tr', function() {
     var uuid = $(this).find('a.uuid').text();
     var url = 'query?q=%21%20>%20^' + uuid;
+    $('.area').each(function(i) {
+       $(this).attr('class', $(this).attr('class').substr(0,18));
+    });
     $.getJSON(url, function(results) {
       if (results === null) { return; }
       var floor = results[0]['floor'];
@@ -114,21 +117,8 @@ jQuery(function($) {
   });
 
   $('.results').on('mouseleave', 'tr', function() {
-    var uuid = $(this).find('a.uuid').text();
-    var url = 'query?q=%21%20>%20^' + uuid;
-    $.getJSON(url, function(results) {
-      if (results === null) { return; }
-      var floor = results[0]['floor'];
-      var area = '';
-      if (results[0]['type'] === 'Area') {
-        area = results[0]['name'];
-      }
-      var building = results[0]['building'];
-      var floorID = floor.replace(' ', '_');
-      var areaID = area.replace(' ','_');
-      var $areaelem = $('#'+floorID+"__"+areaID);
-      var oldclass  = $areaelem.attr('class');
-      $areaelem.attr('class',oldclass.substr(0,18));
+    $('.area').each(function(i) {
+       $(this).attr('class', $(this).attr('class').substr(0,18));
     });
   });
 });
