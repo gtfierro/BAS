@@ -83,20 +83,20 @@ lightbank7_4 = LIG(l, 'Light Bank 4', {
 
 if 'Sutardja Dai Hall' in gis.buildings:
     sdh_floor4 = gis.buildings['Sutardja Dai Hall']['Floor 4']
-    lightbank4_1.areas.add(sdh_floor4['Zone 1'])
-    lightbank4_2.areas.add(sdh_floor4['Zone 2'])
-    lightbank4_3.areas.add(sdh_floor4['Zone 3'])
-    lightbank4_4.areas.add(sdh_floor4['Zone 4'])
-    lightbank4_5.areas.add(sdh_floor4['Zone 5'])
+    lightbank4_1.add_area(sdh_floor4['Zone 1'])
+    lightbank4_2.add_area(sdh_floor4['Zone 2'])
+    lightbank4_3.add_area(sdh_floor4['Zone 3'])
+    lightbank4_4.add_area(sdh_floor4['Zone 4'])
+    lightbank4_5.add_area(sdh_floor4['Zone 5'])
 
     sdh_floor6 = gis.buildings['Sutardja Dai Hall']['Floor 6']
-    lightbank6_1.areas.add(sdh_floor6['Zone 1'])
+    lightbank6_1.add_area(sdh_floor6['Zone 1'])
 
     sdh_floor7 = gis.buildings['Sutardja Dai Hall']['Floor 7']
-    lightbank7_1.areas.add(sdh_floor7['Zone 1'])
-    lightbank7_2.areas.add(sdh_floor7['Zone 2'])
-    lightbank7_3.areas.add(sdh_floor7['Zone 3'])
-    lightbank7_4.areas.add(sdh_floor7['Zone 4'])
+    lightbank7_1.add_area(sdh_floor7['Zone 1'])
+    lightbank7_2.add_area(sdh_floor7['Zone 2'])
+    lightbank7_3.add_area(sdh_floor7['Zone 3'])
+    lightbank7_4.add_area(sdh_floor7['Zone 4'])
 
 #Air Handler 1
 hvac = Relational('HVAC')
@@ -234,7 +234,7 @@ def make_vav(floor, number, has_heat_cool=True, pxcm_number=11):
     if 'Sutardja Dai Hall' in gis.buildings:
         sdh = gis.buildings['Sutardja Dai Hall']
         if floor_name in sdh and area_name in sdh[floor_name]:
-            vav.areas.add(sdh[floor_name][area_name])
+            vav.add_area(sdh[floor_name][area_name])
         else:
             print 'VAV', number, 'on floor', floor, 'has no GIS area'
     else:
