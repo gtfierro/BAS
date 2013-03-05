@@ -3,6 +3,12 @@ import itertools
 import networkx as nx
 import zope.interface
 import gis
+import redis
+
+geocache = redis.StrictRedis(host='localhost', port=6379, db=0)
+# clean out old keys
+for k in geocache.keys():
+  geocache.delete(k)
 
 class Node(object):
   """
@@ -319,6 +325,7 @@ class Obj(Node, Container):
                                   (str(list(req)), self.name))
 
   def add_area(self, area):
+    geocache.set(str(self.uid), area)
     self.areas.add(area)
 
   def __getitem__(self, key):
