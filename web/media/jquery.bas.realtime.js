@@ -121,4 +121,12 @@ jQuery(function($) {
        $(this).attr('class', $(this).attr('class').substr(0,18));
     });
   });
+
+  $('#svgstuff').on('click', 'path', function() {
+    var zoneid = $(this).attr('id').split('__');
+    var floor = zoneid[0].replace('_',' ');
+    var area = zoneid[1].replace('_',' ');
+    var query = '. < !'+area+' < ! '+floor;
+    $('#q').val(query).keyup();
+  });
 });
