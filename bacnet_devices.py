@@ -10,8 +10,7 @@ ROOT_SIEMENS='http://127.0.0.1:8080/data/Siemens'
 ROOT_BANCROFT='http://127.0.0.1:8080/data/Bancroft'
 
 def read_point(point, root=ROOT):
-  print root+point
-  time, reading = requests.get(root + point).json['Readings'][-1]
+  time, reading = requests.get(root + point).json()['Readings']
   return reading
 
 def write_point(point, value, type=None, root=ROOT):
