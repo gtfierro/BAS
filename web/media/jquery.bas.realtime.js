@@ -155,8 +155,6 @@ jQuery(function($) {
           $('#actuation-candidates').append($('<li>').text(uuid.substr(0,5)).attr('id',uuid));
           $(this).find('td').addClass('shift-click');
         }
-        console.log(selected);
-        console.log('shiftclick!');
     }
   });
 
