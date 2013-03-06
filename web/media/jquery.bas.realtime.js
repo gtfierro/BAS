@@ -7,7 +7,7 @@ jQuery(function($) {
   var selected = [];
 
   // only make AJAX calls every 250ms
-  $('#q').on('keyup', $.debounce(250, false, function() {
+  $('#q').on('keyup', $.debounce(500, false, function() {
     selected = []; // clear out the list of selected UUIDs
     $('#actuation-candidates li').remove();
     $('#command-results li').remove();
