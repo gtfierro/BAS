@@ -15,6 +15,8 @@ jQuery(function($) {
     var geourl = url;
     if ($(this).text() == '') {
       $('.results td').remove();
+      $('#svgstuff div').remove();
+      $('#svgstuff h5').remove();
     }
 
     if ($('#format').val() === 'HTML') {
