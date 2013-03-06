@@ -18,8 +18,35 @@
   </head>
   <body class="container">
     <h1>Appstack HTML Pages</h1>
-    <p><a href='geo.html' id="all-buildings">All buildings</a></p>
-    <p><a href='all.html' id="all">All objects and devices</a></p>
+    <div class="row">
+      <div class="span4">
+        <p><a href='geo.html' id="all-buildings">All buildings</a></p>
+        <p><a href='all.html' id="all">All objects and devices</a></p>
+      </div>
+      <div class="span2">
+        <h5>Tags</h5>
+        <ul>
+          <li>Lights: .LIG</li>
+          <li>Dampers: .DMP</li>
+          <li>VAV Boxes: .VAV</li>
+          <li>Sensors: .SEN</li>
+        </ul>
+      </div>
+      <div class="span3">
+        <h5>Geospatial</h5>
+        <ul>
+          <li>Floors: !Floor 4</li>
+          <li>Buildings: !Sutardja Dai</li>
+        </ul>
+      </div>
+      <div class="span3">
+        <h5>Sample Queries</h5>
+        <ul>
+          <li>Lights on 4th floor: .LIG < !Floor 4</li>
+          <li>All areas served by VAV 2: ! < $VAV 2</li>
+        </ul>
+      </div>
+    </div>
 
     <div class="row">
       <div class="span4">
