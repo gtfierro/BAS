@@ -7,3 +7,7 @@ parsetab.py
 
 # databases
 *.db
+
+# output files
+nohup.out
+dryrun.pid
