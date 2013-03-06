@@ -429,10 +429,10 @@ if __name__ == '__main__':
           building = res if isinstance(res, gis.Building) else res.building if hasattr(res,'building') else floor.building if floor else ''
           print building,':',floor,':',area
 
+lexer = lex(module=Lexer())
+parser = yacc(module=Parser())
 def query(string):
   """returns list of objects as returned by the query language"""
-  lexer = lex(module=Lexer())
-  parser = yacc(module=Parser())
   lexer.input(string)
   while 1:
     tok = lexer.token()
