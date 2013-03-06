@@ -9,11 +9,11 @@ jQuery(function($) {
   $('#q').on('keyup', $.debounce(250, false, function() {
     var url = 'query';
     var geourl = url;
-    
+
     if ($('#format').val() === 'HTML') {
       url += '.html';
     }
-      
+
     var query = $(this).serialize();
 
     // URL-encode form field
@@ -28,12 +28,12 @@ jQuery(function($) {
     $.getJSON(geourl, function(results) {
       var $svgstuff = $('#svgstuff'); // cache the target <div>
       $svgstuff.html(''); // clear container
-      
+
       var floors = [];
       $.each(results, function(i, result) {
         var building = result['building'];
         var floor = result['floor'];
-        
+
         if ($.inArray(floor, floors) > -1) {
           return true; // continue
         }
