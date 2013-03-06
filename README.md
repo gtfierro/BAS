@@ -37,6 +37,8 @@ Most of these can be installed with `sudo pip install --upgrade <package-name>`:
 * zope.schema
 * requests
 * django-olwidget
+* flask
+* smap
 
 To install 'pysqlite', we need to customize the build so that it can accept extensions:
 
