@@ -13,6 +13,9 @@ jQuery(function($) {
     $('#command-results li').remove();
     var url = 'query';
     var geourl = url;
+    if ($(this).text() == '') {
+      $('.results td').remove();
+    }
 
     if ($('#format').val() === 'HTML') {
       url += '.html';
@@ -26,8 +29,6 @@ jQuery(function($) {
 
     // load the results into the results <div>
     $('#results').addClass('loading').load(url, function(response, status, xhr) {
-      console.log(status);
-      console.log(url);
       if (status == 'error') {
         $('#invalid-query').show();
       } else {
