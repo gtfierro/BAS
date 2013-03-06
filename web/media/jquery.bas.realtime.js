@@ -54,10 +54,19 @@ jQuery(function($) {
     });
   }));
 
+  function actuate(uuid, command) {
+    $.ajax({
+      url: 'uuid/'+uuid+'/'+command,
+      success: function(data) {
+        var $newelem = $('<li>');
+        $newelem.html( uuid.substr(0,5) + ':' + data);
+        $('#command-results').append($newelem);
+      }
+    });
+  }
+
   $('#run').on('click', function(e) {
     var uuids = [];
-    var url = 'uuid/';
-
     var command = $("#c").serialize().slice(2).trim();
 
     $('#results a.uuid').each(function() {
@@ -65,7 +74,7 @@ jQuery(function($) {
     });
 
     for (var i = 0; i < uuids.length; i++) {
-      $('#details').load(url + uuids[i] + "/" + command);
+      actuate(uuids[i], command);
     }
   });
 
