@@ -25,8 +25,15 @@ jQuery(function($) {
     geourl += '?q=%21%20>%20' + query.slice(2); // remove 'q='
 
     // load the results into the results <div>
-    $('#results').addClass('loading').load(url, function() {
-      $(this).removeClass('loading');
+    $('#results').addClass('loading').load(url, function(response, status, xhr) {
+      console.log(status);
+      console.log(url);
+      if (status == 'error') {
+        $('#invalid-query').show();
+      } else {
+        $('#invalid-query').hide();
+        $(this).removeClass('loading');
+      }
     });
 
     $.getJSON(geourl, function(results) {
@@ -174,5 +181,9 @@ jQuery(function($) {
       $(this).find('td').removeClass('shift-click');
       $('#actuation-candidates').find('#'+uuid).remove();
     });
+  });
+
+  $('.close').click(function(e) {
+    $('.alert').hide();
   });
 });
