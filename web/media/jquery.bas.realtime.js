@@ -4,9 +4,13 @@ jQuery(function($) {
     e.preventDefault();
     return false;
   });
+  var selected = [];
 
   // only make AJAX calls every 250ms
   $('#q').on('keyup', $.debounce(250, false, function() {
+    selected = []; // clear out the list of selected UUIDs
+    $('#actuation-candidates li').remove();
+    $('#command-results li').remove();
     var url = 'query';
     var geourl = url;
 
@@ -69,8 +73,8 @@ jQuery(function($) {
     var uuids = [];
     var command = $("#c").serialize().slice(2).trim();
 
-    $('#results a.uuid').each(function() {
-      uuids.push($(this).text());
+    $('#actuation-candidates li').each(function() {
+      uuids.push($(this).attr('id'));
     });
 
     for (var i = 0; i < uuids.length; i++) {
@@ -137,5 +141,22 @@ jQuery(function($) {
     var area = zoneid[1].replace('_',' ');
     var query = '. < !'+area+' < ! '+floor;
     $('#q').val(query).keyup();
+  });
+
+  $('#results').on('click', 'tr', function(e) {
+    if (e.shiftKey) {
+        var uuid = $(this).find('a.uuid').text();
+        if ($.inArray(uuid, selected) > -1) {
+          selected.splice(selected.indexOf(uuid), 1);
+          $(this).find('td').removeClass('shift-click');
+          $('#actuation-candidates').find('#'+uuid).remove();
+        } else {
+          selected.push(uuid);
+          $('#actuation-candidates').append($('<li>').text(uuid.substr(0,5)).attr('id',uuid));
+          $(this).find('td').addClass('shift-click');
+        }
+        console.log(selected);
+        console.log('shiftclick!');
+    }
   });
 });
