@@ -159,4 +159,22 @@ jQuery(function($) {
         console.log('shiftclick!');
     }
   });
+
+  $('#select-all').click(function(e) {
+    $('#results tr').each(function(i) {
+      var uuid = $(this).find('a.uuid').text();
+      selected.push(uuid);
+      $('#actuation-candidates').append($('<li>').text(uuid.substr(0,5)).attr('id',uuid));
+      $(this).find('td').addClass('shift-click');
+    });
+  });
+
+  $('#clear').click(function(e) {
+    $('#results tr').each(function(i) {
+      var uuid = $(this).find('a.uuid').text();
+      selected.splice(selected.indexOf(uuid), 1);
+      $(this).find('td').removeClass('shift-click');
+      $('#actuation-candidates').find('#'+uuid).remove();
+    });
+  });
 });
