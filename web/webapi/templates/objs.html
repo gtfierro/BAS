@@ -7,7 +7,7 @@
     <table class="table table-hover">
       {% for obj in objs %}
       <tr>
-        <td>
+        <td class='no-select'>
           {% if obj.type == 'Area' %}
           Name: <a class="floorplan" href="{{ url_prefix }}geo.html?building={{ obj.building }}&floor={{ obj.floor }}&zone={{ obj.name }}">{{ obj.name }}</a><br/>
           {% else %}
