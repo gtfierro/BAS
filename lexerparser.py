@@ -431,11 +431,16 @@ if __name__ == '__main__':
 
 lexer = lex(module=Lexer())
 parser = yacc(module=Parser())
+cache = {}
 def query(string):
   """returns list of objects as returned by the query language"""
-  lexer.input(string)
-  while 1:
-    tok = lexer.token()
-    if not tok: break
-    print tok
-  return parser.parse(string)
+  if string not in cache:
+    lexer.input(string)
+    while 1:
+      tok = lexer.token()
+      if not tok: break
+      print tok
+    cache[string] = parser.parse(string)
+  else:
+    print 'cache hit'*50
+  return cache[string]
