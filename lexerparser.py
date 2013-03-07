@@ -11,8 +11,9 @@ import gis
 # Delete all NodeLink objects: we don't have persistent UUIDs so they need to be
 # regenerated each time
 gis.NodeLink.objects.all().delete()
-import sdh
-import bancroft
+#import sdh
+import sdh_demo as sdh
+import bancroft_demo as bancroft
 
 class Lexer(object):
 
