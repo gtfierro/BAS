@@ -130,6 +130,7 @@ class Node(object):
   def __emittable__(self):
     """Returns a dictionary representation of the object (passed to Web API)"""
     import node_types
+    #TODO: do caching here?
     return {
       'name': self.name,
       'type': self.type(),
