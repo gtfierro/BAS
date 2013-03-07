@@ -29,6 +29,8 @@ jQuery(function($) {
     url += '?' + query;
     geourl += '?q=%21%20>%20' + query.slice(2); // remove 'q='
 
+    if (query === '') { return; }
+
     // load the results into the results <div>
     $('#results').addClass('loading').load(url, function(response, status, xhr) {
       if (status == 'error') {
