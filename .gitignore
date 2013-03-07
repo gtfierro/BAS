@@ -11,3 +11,6 @@ parsetab.py
 # output files
 nohup.out
 dryrun.pid
+
+# BAS python package files
+python/build/lib/bas/*.py
