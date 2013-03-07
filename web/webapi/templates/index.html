@@ -18,35 +18,10 @@
   </head>
   <body class="container">
     <h1>Appstack HTML Pages</h1>
-    <div class="row">
-      <div class="span4">
         <p><a href='geo.html' id="all-buildings">All buildings</a></p>
         <p><a href='all.html' id="all">All objects and devices</a></p>
+        <p><a data-toggle="modal" href="#help" class="btn btn-primary">Help</a></p>
       </div>
-      <div class="span2">
-        <h5>Tags</h5>
-        <ul>
-          <li>Lights: .LIG</li>
-          <li>Dampers: .DMP</li>
-          <li>VAV Boxes: .VAV</li>
-          <li>Sensors: .SEN</li>
-        </ul>
-      </div>
-      <div class="span3">
-        <h5>Geospatial</h5>
-        <ul>
-          <li>Floors: !Floor 4</li>
-          <li>Buildings: !Sutardja Dai</li>
-        </ul>
-      </div>
-      <div class="span3">
-        <h5>Sample Queries</h5>
-        <ul>
-          <li>Lights on 4th floor: .LIG < !Floor 4</li>
-          <li>All areas served by VAV 2: ! < $VAV 2</li>
-        </ul>
-      </div>
-    </div>
 
     <div class="row">
       <div class="span4">
@@ -109,17 +84,78 @@
       </div>
     </div>
 
-    <div class="modal hide fade">
+    <div id="help" class="modal hide fade in">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Modal header</h3>
+        <h3>BAS Help</h3>
       </div>
+
       <div class="modal-body">
-        <iframe id="modal-results"></iframe>
+        <div class="row">
+          <div class="span4">
+            <h5>Tags</h5>
+            <p>
+              All objects in BAS have 1 or more associated tags. You can reference tagged objects by
+              prepending a string with a period, and then listing underscore-separated tags. For example,
+              an exhaust air damper would be ".EXH_AIR_DMP" and a low light relay would be ".LO_REL". Specific
+              objects can be referred to by prepending the name with '$', e.g. '$VAV 2'.
+            </p>
+            <ul>
+              <li>DIS : Discharge</li>
+              <li>AIR : Air</li>
+              <li>TMP : Temperature</li>
+              <li>SEN : Sensor</li>
+              <li>SPD : Speed</li>
+              <li>CMD : Point of Actuation</li>
+              <li>RET : Return</li>
+              <li>MIX : Mixed</li>
+              <li>ZON : Zone</li>
+              <li>SPT : Setpoint</li>
+              <li>OUT : Outside</li>
+              <li>DMP : Damper</li>
+              <li>HUM : Humidity</li>
+              <li>PRS : Pressure</li>
+              <li>FLW : Flow</li>
+              <li>POW : Power</li>
+              <li>CO2 : Carbon Dioxide</li>
+              <li>EXH : Exhaust</li>
+              <li>FAN : Fan</li>
+              <li>COO : Cooling</li>
+              <li>VLV : Valve</li>
+              <li>AHU : Air Handler</li>
+              <li>CCV : Cooling Coil</li>
+              <li>CWL : Cold Water Loop</li>
+              <li>HWL : Hot Water Loop</li>
+              <li>REL : Relay</li>
+              <li>HI  : High</li>
+              <li>LO  : Low</li>
+              <li>LIG : Light</li>
+            </ul>
+          </div>
+          <div class="span4">
+            <h5>Geospatial</h5>
+            <p>
+            You can additionally reference objects by their geospatial properties. Geospatial areas are
+            referenced by prepending the name of an area with an exclamation point. For example, to see all
+            areas on the fourth floor of Sutardja Dai Hall: "!Floor 4 < !Sutardja Dai"
+            </p>
+            <ul>
+              <li>Floors: !Floor 4</li>
+              <li>Buildings: !Sutardja Dai</li>
+            </ul>
+          </div>
+          <div class="span4">
+            <h5>Sample Queries</h5>
+            <ul>
+              <li>Lights on 4th floor: .LIG < !Floor 4</li>
+              <li>All areas served by VAV 2: ! < $VAV 2</li>
+            </ul>
+          </div>
+        </div>
       </div>
+
       <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal" >Close</a>
-        <a href="#" class="btn btn-primary">Save changes</a>
+        <a href="#" class="btn btn-primary" data-dismiss="modal" >Close</a>
       </div>
     </div>
   </body>
