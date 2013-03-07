@@ -6,6 +6,7 @@
 .area { fill: #00f; fill-opacity: 0.3; stroke-width: 2.0; stroke: #000; }
 .area:hover { fill-opacity: 0.6; }
 .selected { fill: #f00; }
+.empty { background-color: #ff7878; }
 .shift-click { background-color: #bdecb6; }
 #c { resize: vertical; font-family: monospace; }
 .no-select {

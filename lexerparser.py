@@ -441,6 +441,8 @@ def query(string):
       if not tok: break
       print tok
     cache[string] = parser.parse(string)
+    if not cache[string]:
+      cache[string] = 'none'
   else:
     print 'cache hit'*50
   return cache[string]

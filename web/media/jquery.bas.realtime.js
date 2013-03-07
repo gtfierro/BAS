@@ -44,6 +44,8 @@ jQuery(function($) {
       $svgstuff.html(''); // clear container
 
       var floors = [];
+      if (results === 'none') { $('#svgstuff').addClass('empty'); return; }
+      else { $('#svgstuff').removeClass('empty'); }
       $.each(results, function(i, result) {
         var building = result['building'];
         var floor = result['floor'];
