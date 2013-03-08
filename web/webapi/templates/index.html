@@ -92,7 +92,7 @@
 
       <div class="modal-body">
         <div class="row">
-          <div class="span4">
+          <div class="span3">
             <h5>Tags</h5>
             <p>
               All objects in BAS have 1 or more associated tags. You can reference tagged objects by
@@ -132,7 +132,7 @@
               <li>LIG : Light</li>
             </ul>
           </div>
-          <div class="span4">
+          <div class="span3">
             <h5>Geospatial</h5>
             <p>
             You can additionally reference objects by their geospatial properties. Geospatial areas are
@@ -144,12 +144,19 @@
               <li>Buildings: !Sutardja Dai</li>
             </ul>
           </div>
-          <div class="span4">
+          <div class="span3">
             <h5>Sample Queries</h5>
             <ul>
               <li>Lights on 4th floor: .LIG < !Floor 4</li>
               <li>All areas served by VAV 2: ! < $VAV 2</li>
             </ul>
+          </div>
+          <div class="span3">
+            <h5>Tips and Tricks</h5>
+            <p>
+            Use the query strings '.' and '!' to get a list of all devices and geospatial areas, respectively. If a query doesn't work the first time, try
+            typing an extra space after your full query. This happens because I am bad at javascript.
+            </p>
           </div>
         </div>
       </div>
