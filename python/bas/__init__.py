@@ -122,7 +122,7 @@ class Appstack(object):
     def _request(self, path):
         r = requests.get(self.url + path, auth=self.auth)
         r.raise_for_status()
-        return self._format_obj(r.json)
+        return self._format_obj(r.json())
 
     def __call__(self, query):
         return self._request('/query?q=' + query)
