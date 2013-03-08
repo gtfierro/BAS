@@ -56,6 +56,10 @@ Now edit `setup.cfg` so that the last line is commented out:
 
 You can then run `sudo python setup.py install`
 
+### Installing the BAS Package
+
+From the `bas/python` directory, run `python setup.py install`. You can now `import bas`.
+
 ## Running BAS
 
 From the `web` directory, run the script `./runserver.sh` to setup the internal
