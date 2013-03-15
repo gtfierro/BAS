@@ -2,6 +2,7 @@
 
 ## Cleanup old files
 kill -9 $(cat dryrun.pid)
+killall redis-server
 rm nohup.out
 
 ## Setup database
@@ -16,6 +17,9 @@ echo 'Loading Bancroft Library hvac data...'
 python manage.py loadjson ../data/bancroft-hvac.json
 cd .. && ln -s web/geodjango.db .
 cd -
+
+## Start redis
+nohup redis-server &
 
 ## Start flask server
 nohup python ../dryrun/dryrun.py & echo $! > dryrun.pid
