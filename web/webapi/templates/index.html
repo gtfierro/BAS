@@ -17,39 +17,28 @@
     <script src="/static/jquery.bas.realtime.js"></script>
   </head>
   <body class="container">
-    <h1>Appstack HTML Pages</h1>
+    <h1>BAS</h1>
+    <div class="row">
+      <div class="span3">
         <p><a href='geo.html' id="all-buildings">All buildings</a></p>
         <p><a href='all.html' id="all">All objects and devices</a></p>
         <p><a data-toggle="modal" href="#help" class="btn btn-primary">Help</a></p>
       </div>
 
-    <div class="row">
-      <div class="span4">
+      <div class="span9">
         <form>
-          <div class="control-group">
-            <label class="control-label" for="format">Format:</label>
-            <div class="controls">
-              <select id="format" name="format">
-                <option>HTML</option>
-                <option>JSON</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="control-group">
-            <div id='invalid-query' class="alert alert-failure" style="display: none">
-              <button type="button" class="close">&times;</button>
-              <p>Invalid Query!</p>
-            </div>
-          </div>
-
           <div class="control-group">
             <label class="control-label" for="q">Query:</label>
             <div class="controls">
-              <input autofocus autocomplete="off" id="q" value="" type="text" name="q" /></label>
+              <input autofocus autocomplete="off" id="q" value="" type="text" name="q" />
             </div>
           </div>
         </form>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="span4">
 
         <form>
           <div class="control-group">
