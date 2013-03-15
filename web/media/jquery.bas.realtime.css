@@ -16,3 +16,4 @@
   user-select: none;
 }
 #invalid-query { width: 170px; padding-top: 0; padding-bottom: 0; }
+#q { width: 900px; height: 50px; font-size: 33px;}
