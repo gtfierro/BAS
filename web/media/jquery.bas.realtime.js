@@ -105,6 +105,12 @@ jQuery(function($) {
     $('#q').val('.').keyup();
   });
 
+  $('.results').on('click', 'td', function(e) {
+    e.preventDefault();
+    var url = 'uuid/' + $(this).data('uuid') + '.html';
+    $('#details').load(url);
+  });
+
   $('.results').on('mouseenter', 'td', function() {
     var uuid = $(this).data('uuid');
     var url = 'query?q=%21%20>%20^' + uuid;
