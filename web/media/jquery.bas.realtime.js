@@ -20,7 +20,7 @@ jQuery(function($) {
     var query = $(this).serialize();
 
     // URL-encode form field
-    var url += 'query.html?' + query;
+    var url = 'query.html?' + query;
     var geourl = 'query?q=%21%20>%20' + query.slice(2); // remove 'q='
 
     if (query === '') { return; }
