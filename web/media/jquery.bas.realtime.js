@@ -11,34 +11,23 @@ jQuery(function($) {
     selected = []; // clear out the list of selected UUIDs
     $('#actuation-candidates li').remove();
     $('#command-results li').remove();
-    var url = 'query';
-    var geourl = url;
     if ($(this).text() == '') {
       $('.results td').remove();
       $('#svgstuff div').remove();
       $('#svgstuff h5').remove();
     }
 
-    if ($('#format').val() === 'HTML') {
-      url += '.html';
-    }
-
     var query = $(this).serialize();
 
     // URL-encode form field
-    url += '?' + query;
-    geourl += '?q=%21%20>%20' + query.slice(2); // remove 'q='
+    var url += 'query.html?' + query;
+    var geourl = 'query?q=%21%20>%20' + query.slice(2); // remove 'q='
 
     if (query === '') { return; }
 
     // load the results into the results <div>
     $('#results').addClass('loading').load(url, function(response, status, xhr) {
-      if (status == 'error') {
-        $('#invalid-query').show();
-      } else {
-        $('#invalid-query').hide();
         $(this).removeClass('loading');
-      }
     });
 
     $.getJSON(geourl, function(results) {
@@ -104,11 +93,6 @@ jQuery(function($) {
     e.preventDefault();
     var url = $(this).attr('href');
     $('#details').load(url);
-  });
-
-  // dumb edge-cases
-  $('#format').change(function() {
-    $('#q').keyup();
   });
 
   $('#all-buildings').on('click', function(e) {
