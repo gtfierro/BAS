@@ -446,6 +446,4 @@ def query(string):
       cache[string] = 'none'
   elif cache[string] == 'none':
     cache[string] = parser.parse(string)
-  else:
-    print 'cache hit'*50
   return cache[string]
