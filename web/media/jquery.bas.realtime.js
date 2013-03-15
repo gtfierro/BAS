@@ -95,16 +95,6 @@ jQuery(function($) {
     }
   });
 
-  $('.results').on('click', 'a.floorplan', function(e) {
-    e.preventDefault();
-    var url = $(this).attr('href');
-    $('#modal-results').attr('src', encodeURI(url.trim())).parents('.modal').modal('show');
-  }).on('click', 'a.uuid', function(e) {
-    e.preventDefault();
-    var url = $(this).attr('href');
-    $('#details').load(url);
-  });
-
   $('#all-buildings').on('click', function(e) {
     e.preventDefault();
     $('#q').val('!').keyup(); // trigger AJAX programatically
