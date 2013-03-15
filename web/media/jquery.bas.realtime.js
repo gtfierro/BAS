@@ -115,8 +115,8 @@ jQuery(function($) {
     $('#q').val('.').keyup();
   });
 
-  $('.results').on('mouseenter', 'tr', function() {
-    var uuid = $(this).find('a.uuid').text();
+  $('.results').on('mouseenter', 'td', function() {
+    var uuid = $(this).data('uuid');
     var url = 'query?q=%21%20>%20^' + uuid;
     $.getJSON(url, function(results) {
       if (results === null) { return; }
@@ -137,7 +137,7 @@ jQuery(function($) {
     });
   });
 
-  $('.results').on('mouseleave', 'tr', function() {
+  $('.results').on('mouseleave', 'td', function() {
     $('.area').each(function(i) {
        $(this).attr('class', $(this).attr('class').substr(0,18));
     });
