@@ -4,7 +4,17 @@ jQuery(function($) {
     e.preventDefault();
     return false;
   });
+
   var selected = [];
+  var editor = ace.edit("editor");
+  editor.setTheme("ace/theme/solarized_light");
+  editor.getSession().setMode("ace/mode/python");
+  editor.getSession().setUseWrapMode(true);
+  editor.setValue('# the object \'bas\' refers to the currently selected objects\n');
+  document.getElementById('editor').style.fontSize='10px';
+  editor.clearSelection(); // start off not highlighting text
+  $('#q').focus();
+
 
   // only make AJAX calls every 250ms
   $('#q').on('keyup', $.debounce(500, false, function() {
