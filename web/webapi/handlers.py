@@ -73,5 +73,6 @@ class CodeHandler(BaseHandler):
         """
         if request.data:
             data = request.data
+            #TODO: turn data['domain'] into the objects we want to actuate
             code = compile(data['code'],'<string>','exec')
             eval(code)
