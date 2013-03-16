@@ -71,30 +71,6 @@ jQuery(function($) {
     });
   }));
 
-  function actuate(uuid, command) {
-    $.ajax({
-      url: 'uuid/'+uuid+'/'+command,
-      success: function(data) {
-        var $newelem = $('<li>');
-        $newelem.html( uuid.substr(0,5) + ':' + data);
-        $('#command-results').append($newelem);
-      }
-    });
-  }
-
-  $('#run').on('click', function(e) {
-    var uuids = [];
-    var command = $("#c").serialize().slice(2).trim();
-
-    $('#actuation-candidates li').each(function() {
-      uuids.push($(this).attr('id'));
-    });
-
-    for (var i = 0; i < uuids.length; i++) {
-      actuate(uuids[i], command);
-    }
-  });
-
   $('#all-buildings').on('click', function(e) {
     e.preventDefault();
     $('#q').val('!').keyup(); // trigger AJAX programatically
