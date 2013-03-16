@@ -123,35 +123,35 @@ jQuery(function($) {
     $('#q').val(query).keyup();
   });
 
-  $('#results').on('click', 'tr', function(e) {
+  $('#results').on('click', 'td', function(e) {
     if (e.shiftKey) {
-        var uuid = $(this).find('a.uuid').text();
+        var uuid = $(this).data('uuid');
         if ($.inArray(uuid, selected) > -1) {
           selected.splice(selected.indexOf(uuid), 1);
-          $(this).find('td').removeClass('shift-click');
+          $(this).removeClass('shift-click');
           $('#actuation-candidates').find('#'+uuid).remove();
         } else {
           selected.push(uuid);
           $('#actuation-candidates').append($('<li>').text(uuid.substr(0,5)).attr('id',uuid));
-          $(this).find('td').addClass('shift-click');
+          $(this).addClass('shift-click');
         }
     }
   });
 
   $('#select-all').click(function(e) {
-    $('#results tr').each(function(i) {
-      var uuid = $(this).find('a.uuid').text();
+    $('#results td').each(function(i) {
+      var uuid = $(this).data('uuid');
       selected.push(uuid);
       $('#actuation-candidates').append($('<li>').text(uuid.substr(0,5)).attr('id',uuid));
-      $(this).find('td').addClass('shift-click');
+      $(this).addClass('shift-click');
     });
   });
 
   $('#clear').click(function(e) {
-    $('#results tr').each(function(i) {
-      var uuid = $(this).find('a.uuid').text();
+    $('#results td').each(function(i) {
+      var uuid = $(this).data('uuid');
       selected.splice(selected.indexOf(uuid), 1);
-      $(this).find('td').removeClass('shift-click');
+      $(this).removeClass('shift-click');
       $('#actuation-candidates').find('#'+uuid).remove();
     });
   });
