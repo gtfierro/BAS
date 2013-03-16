@@ -13,7 +13,7 @@ jQuery(function($) {
   editor.setValue('# the object \'bas\' refers to the currently selected objects\n');
   document.getElementById('editor').style.fontSize='10px';
   editor.clearSelection(); // start off not highlighting text
-  $('#q').focus();
+  $('#q').focus(); //re-focus on query bar
 
 
   // only make AJAX calls every 250ms
