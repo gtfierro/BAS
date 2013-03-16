@@ -73,5 +73,5 @@ class CodeHandler(BaseHandler):
         """
         if request.data:
             data = request.data
-            print data['domain']
-            print data['code']
+            code = compile(data['code'],'<string>','exec')
+            eval(code)
