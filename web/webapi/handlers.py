@@ -63,3 +63,15 @@ class UUIDMethodHandler(BaseHandler):
         res = getattr(obj, method)(*args, **kwargs)
         return res
 
+class CodeHandler(BaseHandler):
+    methods_allowed = ('POST',)
+
+    def create(self, request):
+        """
+        [domain] is the list of objects referenced by the 'bas' variable
+        [code] is the code we want to run on those objects
+        """
+        if request.data:
+            data = request.data
+            print data['domain']
+            print data['code']
