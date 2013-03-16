@@ -15,6 +15,18 @@ jQuery(function($) {
   editor.clearSelection(); // start off not highlighting text
   $('#q').focus(); //re-focus on query bar
 
+  $('#run').on('click', function() {
+    console.log('run code!');
+    console.log(editor.getValue()); // get the current code
+    var data = { code: editor.getValue(),
+                 domain: JSON.stringify(selected)
+               };
+    console.log(data);
+    $.post('actuate', data, function() {
+      console.log('callbacked from post to actuate');
+    });
+  });
+
 
   // only make AJAX calls every 250ms
   $('#q').on('keyup', $.debounce(500, false, function() {
