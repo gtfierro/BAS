@@ -264,7 +264,7 @@ class Device(Node):
     Node.__init__(self,name,uid=uid)
 
     self.validate()
-    print "Device",self.name, self.uid
+    #print "Device",self.name, self.uid
 
   def validate(self):
     req = set(self.required_points)
@@ -313,7 +313,7 @@ class Obj(Node, Container):
     self.container._nk.add_node(self)
 
     self.validate()
-    print ">>>Object",self.name, self.uid
+    #print ">>>Object",self.name, self.uid
 
   def validate(self):
     req = set(self.required_devices)
