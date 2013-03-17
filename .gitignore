@@ -14,3 +14,6 @@ dryrun.pid
 
 # BAS python package files
 python/build/lib/bas/*.py
+
+# redis dump
+dump.rdb
