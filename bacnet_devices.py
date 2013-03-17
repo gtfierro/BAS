@@ -28,28 +28,28 @@ class BACnetFAN(node.Device):
 
   # required_setpoints = ['SPD']
   # required_points = ['POW']
-  def __init__(self, name, point):
-      node.Device.__init__(self, name)
+  def __init__(self, name, point, uid=None):
+      node.Device.__init__(self, name, uid=uid)
       self.point = point
 
 class BancroftFAN(node.Device):
   implements(device_types.DFAN)
 
-  def __init__(self, name, point_spd, point_pow=None):
-    node.Device.__init__(self, name)
+  def __init__(self, name, point_spd, point_pow=None, uid=None):
+    node.Device.__init__(self, name, uid=uid)
     self.point_spd = point_spd
     self.point_pow = point_pow
 
 class BACnetCCV(node.Device):
   implements(device_types.DCCV)
   def __init__(self, name, point):
-      node.Device.__init__(self, name)
+      node.Device.__init__(self, name, uid=uid)
       self.point = point
 
 class BACnetDMP(node.Device):
   implements(device_types.DDMP)
-  def __init__(self, name, point, setpoint=None):
-      node.Device.__init__(self, name)
+  def __init__(self, name, point, setpoint=None, uid=None):
+      node.Device.__init__(self, name, uid=uid)
       self.point = point
       self.setpoint = setpoint
 
@@ -67,8 +67,8 @@ class BACnetDMP(node.Device):
 class BancroftVAVDMP(node.Device):
   implements(device_types.DDMP)
 
-  def __init__(self, name, point, setpoint=None):
-    node.Device.__init__(self, name)
+  def __init__(self, name, point, setpoint=None, uid=None):
+    node.Device.__init__(self, name, uid=uid)
     self.device_id = point
     self.setpoint = setpoint
     self.point = point
@@ -83,8 +83,8 @@ class BancroftVAVDMP(node.Device):
 class BancroftAHUDMP(node.Device):
   implements(device_types.DDMP)
 
-  def __init__(self, name, point, setpoint=None):
-    node.Device.__init__(self, name)
+  def __init__(self, name, point, setpoint=None, uid=None):
+    node.Device.__init__(self, name, uid=uid)
     self.device_id = point
     self.setpoint = setpoint
     self.point = point
@@ -98,8 +98,8 @@ class BancroftAHUDMP(node.Device):
 
 class BACnetSEN(node.Device):
   implements(device_types.DSEN)
-  def __init__(self, name, point):
-      node.Device.__init__(self, name)
+  def __init__(self, name, point, uid=None):
+      node.Device.__init__(self, name, uid=uid)
       self.point = point
   
   def read(self):
@@ -107,8 +107,8 @@ class BACnetSEN(node.Device):
 
 class BancroftSEN(node.Device):
   implements(device_types.DSEN)
-  def __init__(self, name, point):
-      node.Device.__init__(self, name)
+  def __init__(self, name, point, uid=None):
+      node.Device.__init__(self, name, uid=uid)
       self.point = point
 
   def read(self):
@@ -117,26 +117,26 @@ class BancroftSEN(node.Device):
 
 class BACnetCHR(node.Device):
   implements(device_types.DCHR)
-  def __init__(self, name, point):
-      node.Device.__init__(self, name)
+  def __init__(self, name, point, uid=None):
+      node.Device.__init__(self, name, uid=uid)
       self.point = point
 
 class BACnetPMP(node.Device):
   implements(device_types.DPMP)
-  def __init__(self, name, point):
-      node.Device.__init__(self, name)
+  def __init__(self, name, point, uid=None):
+      node.Device.__init__(self, name, uid=uid)
       self.point = point
 
 class BACnetTOW(node.Device):
   implements(device_types.DTOW)
-  def __init__(self, name, point):
-      node.Device.__init__(self, name)
+  def __init__(self, name, point, uid=None):
+      node.Device.__init__(self, name, uid=uid)
       self.point = point
 
 class BACnetVLV(node.Device):
   implements(device_types.DVLV)
-  def __init__(self, name, point, setpoint=None):
-      node.Device.__init__(self, name)
+  def __init__(self, name, point, setpoint=None, uid=None):
+      node.Device.__init__(self, name, uid=uid)
       self.point = point
       self.setpoint = setpoint
 
@@ -151,16 +151,16 @@ class BACnetVLV(node.Device):
 
 class BACnetHX(node.Device):
   implements(device_types.DHX)
-  def __init__(self, name, point):
-      node.Device.__init__(self, name)
+  def __init__(self, name, point, uid=None):
+      node.Device.__init__(self, name, uid=uid)
       self.point = point
 
 
 class BACnetREL(node.Device):
   implements(device_types.DREL)
 
-  def __init__(self, name, point):
-      node.Device.__init__(self, name)
+  def __init__(self, name, point, uid=None):
+      node.Device.__init__(self, name, uid=uid)
       self.point = point
 
   def set_brightness(self, value):
