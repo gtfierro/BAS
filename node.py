@@ -259,9 +259,9 @@ class Device(Node):
   required_setpoints = []
   required_points = []
 
-  def __init__(self, name):
+  def __init__(self, name, uid=None):
     self.attributes = {}
-    Node.__init__(self,name)
+    Node.__init__(self,name,uid=uid)
 
     self.validate()
     print "Device",self.name, self.uid
@@ -298,7 +298,7 @@ class Obj(Node, Container):
   required_setpoints = []
   required_devices = []
 
-  def __init__(self, container, name, devices=None):
+  def __init__(self, container, name, devices=None, uid=None):
     self.container = container
     if devices is None:
       self.devices = {}
@@ -308,7 +308,7 @@ class Obj(Node, Container):
         return [item.set_name(item.name+" "+str(c.next())) if isinstance(item, Node) else item+" "+str(c.next()) for item in l]
       self.devices = dict(itertools.chain(*[zip(uniquify([k] * len(v)), uniquify(v)) if isinstance(v, list) else ((k, v),) for k, v in devices.items()]))
 
-    Node.__init__(self, name)
+    Node.__init__(self, name,uid=uid)
     Container.__init__(self, self.devices.values())
     self.container._nk.add_node(self)
 
