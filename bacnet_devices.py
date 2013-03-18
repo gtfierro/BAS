@@ -157,8 +157,12 @@ class BACnetREL(node.Device):
       node.Device.__init__(self, name, uid=uid)
       self.point = point
 
-  def set_brightness(self, value):
+  def set_brightness(self, value, raw=False):
+      if raw:
+        print """ bacnet.write_prop(self, object_type=bacnet.OBJECT_BINARY_OUTPUT, instance_number=self.instance_number, property=bacnet.PROP_PRESENT_VALUE, value=100, value_type=bacnet.BACNET_APPLICATION_TAG_REAL)"""
       write_point(self.uid, value)
 
-  def get_brightness(self):
+  def get_brightness(self, raw=False):
+      if raw:
+        print """bacnet.read_prop(self.h_dev, bacnet.OBJECT_BINARY_VALUE, instance_number=self.instance_number, property=bacnet.PROP_PRESENT_VALUE, array_index=3)"""
       return float(read_point(self.uid))
