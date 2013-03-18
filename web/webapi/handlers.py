@@ -1,6 +1,9 @@
 from piston.handler import BaseHandler
 from piston.utils import rc, throttle
 import json
+import ast
+import sys
+from StringIO import StringIO
 
 from appstack import lexerparser, node_types
 
@@ -73,6 +76,13 @@ class CodeHandler(BaseHandler):
         """
         if request.data:
             data = request.data
-            #TODO: turn data['domain'] into the objects we want to actuate
+            domain = ast.literal_eval(data['domain'])
+            objs = [lexerparser.get_uuid(x) for x in domain]
+            l = locals()
+            l['bas'] = objs
             code = compile(data['code'],'<string>','exec')
-            eval(code)
+            output = StringIO()
+            sys.stdout = output
+            eval(code, l)
+            sys.stdout = sys.__stdout__
+            return output.getvalue()
