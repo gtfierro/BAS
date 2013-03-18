@@ -21,9 +21,10 @@ jQuery(function($) {
     var data = { code: editor.getValue(),
                  domain: JSON.stringify(selected)
                };
+    $('#editor-output').addClass('loading');
     $.post('actuate', data).done(function(resp) {
       console.log(resp);
-      $('#editor-output').text(resp);
+      $('#editor-output').removeClass('loading').text(resp);
     });
   });
 
