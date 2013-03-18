@@ -4,7 +4,7 @@ import requests
 import json
 from zope.interface import implements
 
-ROOT='http://127.0.0.1:8080'
+ROOT='http://127.0.0.1:8080/'
 # Port forwarding:  ssh -L 8081:localhost:8080 user@<ip>
 ROOT_SIEMENS=ROOT#'http://127.0.0.1:8080/data/Siemens'
 ROOT_BANCROFT=ROOT#'http://127.0.0.1:8080/data/Bancroft'
@@ -13,15 +13,9 @@ def read_point(point, root=ROOT):
   time, reading = requests.get(root + point).json()['Readings']
   return reading
 
-def write_point(point, value, type=None, root=ROOT):
-    if type:
-        write_multiple_points({point: {'type': type, 'value': value}}, root)
-    else:
-        write_multiple_points({point: {'value': value}}, root)
-
-def write_multiple_points(data, root=ROOT):
-    requests.post(root+'/write', json.dumps(data))
-
+def write_point(point, value, root=ROOT):
+    res = requests.put(root + point + '?state='+str(value))
+    return res
 
 class BACnetFAN(node.Device):
   implements(device_types.DFAN)
@@ -164,7 +158,7 @@ class BACnetREL(node.Device):
       self.point = point
 
   def set_brightness(self, value):
-    write_point(self.point, value, type='enumerated')
+      write_point(self.uid, value)
 
   def get_brightness(self):
-    return read_point(self.point)
+      return float(read_point(self.uid))
