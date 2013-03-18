@@ -16,14 +16,21 @@ app = Flask(__name__)
 @app.route('/<path:point>',methods=['GET'])
 def read_point(point):
     if not rdb.exists(point):
-        rdb.set(point, random.randint(0,3))
+        res = c.query('select data before now limit 1 where uuid="{0}"'.format(point))
+        if res:
+            print 'from sMAP'
+            rdb.set(point, res[0]['Readings'][0][1])
+        else:
+            print 'random'
+            rdb.set(point, random.randint(0,3))
     return jsonify({'Readings': (time.time(),rdb.get(point)) })
 
-@app.route('/<path:point>', methods=['POST','PUT'])
+@app.route('/<path:point>', methods=['PUT'])
 def write_point(point):
-    data = ast.literal_eval(request.data)
-    rdb.set(point, data['value'])
-    return jsonify({point: rdb.get(point)})
+    newstate = request.args.get('state')
+    if rdb.exists(point):
+        rdb.set(point, newstate)
+    return jsonify({'Readings': (time.time(), rdb.get(point))})
  
 if __name__=="__main__":
     app.run(debug=True,port=8080)
