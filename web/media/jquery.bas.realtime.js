@@ -10,7 +10,7 @@ jQuery(function($) {
   editor.setTheme("ace/theme/solarized_light");
   editor.getSession().setMode("ace/mode/python");
   editor.getSession().setUseWrapMode(true);
-  editor.setValue('# the object \'bas\' refers to the currently selected objects. Example:\n# for item in bas:\n#\tprint item.get_level()');
+  editor.setValue('#the object \'bas\' refers to the currently selected objects. Example:\n#for item in bas:\n#\tprint item.get_level()');
   document.getElementById('editor').style.fontSize='10px';
   editor.clearSelection(); // start off not highlighting text
   $('#q').focus(); //re-focus on query bar
