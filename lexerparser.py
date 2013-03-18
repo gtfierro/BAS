@@ -407,6 +407,7 @@ class Parser(object):
 
   tokens = Lexer.tokens
 
+
 if __name__ == '__main__':
   debug= int(sys.argv[1]) if len(sys.argv) > 1 else 0
   lexer = lex(module=Lexer())
@@ -449,3 +450,9 @@ def query(string):
   elif cache[string] == 'none':
     cache[string] = parser.parse(string)
   return cache[string]
+
+def get_uuid(u):
+  res = []
+  for r in relationals:
+    res.extend(r.search(lambda x: str(x.uid) == u))
+  return res[0] if res else None
