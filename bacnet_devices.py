@@ -4,10 +4,10 @@ import requests
 import json
 from zope.interface import implements
 
-ROOT='http://127.0.0.1:8080/data/WattStopper'
+ROOT='http://127.0.0.1:8080'
 # Port forwarding:  ssh -L 8081:localhost:8080 user@<ip>
-ROOT_SIEMENS='http://127.0.0.1:8080/data/Siemens'
-ROOT_BANCROFT='http://127.0.0.1:8080/data/Bancroft'
+ROOT_SIEMENS=ROOT#'http://127.0.0.1:8080/data/Siemens'
+ROOT_BANCROFT=ROOT#'http://127.0.0.1:8080/data/Bancroft'
 
 def read_point(point, root=ROOT):
   time, reading = requests.get(root + point).json()['Readings']
