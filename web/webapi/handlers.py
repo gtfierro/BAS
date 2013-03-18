@@ -83,6 +83,10 @@ class CodeHandler(BaseHandler):
             code = compile(data['code'],'<string>','exec')
             output = StringIO()
             sys.stdout = output
+            sys.stderr = output
             eval(code, l)
             sys.stdout = sys.__stdout__
-            return output.getvalue()
+            sys.stderr = sys.__stderr__
+            val = output.getvalue()
+            print val
+            return val
