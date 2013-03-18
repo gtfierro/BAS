@@ -21,9 +21,9 @@ jQuery(function($) {
     var data = { code: editor.getValue(),
                  domain: JSON.stringify(selected)
                };
-    console.log(data);
-    $.post('actuate', data, function() {
-      console.log('callbacked from post to actuate');
+    $.post('actuate', data).done(function(resp) {
+      console.log(resp);
+      $('#editor-output').text(resp);
     });
   });
 
