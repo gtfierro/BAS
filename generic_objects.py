@@ -63,20 +63,20 @@ class LIG(node.Obj):
   def get_relays(self):
     return self['HI_REL'], self['LO_REL']
 
-  def get_level(self):
+  def get_level(self, raw=False):
     """
     Retrieves the current level of the light.
     """
-    low, high = self.get_relays()
-    low_value = int(low.get_brightness())
-    high_value = int(high.get_brightness())
+    low, high = self.get_relays(raw=raw)
+    low_value = int(low.get_brightness(raw=raw))
+    high_value = int(high.get_brightness(raw=raw))
     return low_value + 2*high_value
 
-  def set_level(self, level):
+  def set_level(self, level, raw=False):
     """
     Sets the level of the light.
     """
     low, high = self.get_relays()
-    low.set_brightness(level % 2)
-    high.set_brightness(level // 2)
+    low.set_brightness(level % 2, raw=raw)
+    high.set_brightness(level // 2, raw=raw)
 
