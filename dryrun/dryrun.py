@@ -6,6 +6,9 @@ import time
 import random
 import ast
 
+from smap.archiver import client
+c = client.SmapClient('http://ar1.openbms.org:8079')
+
 rdb = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 app = Flask(__name__)
