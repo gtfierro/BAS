@@ -15,6 +15,9 @@ gis.NodeLink.objects.all().delete()
 import sdh_demo as sdh
 import bancroft_demo as bancroft
 
+relationals = [getattr(sdh, i) for i in sdh.__dict__ if isinstance(getattr(sdh,i), Relational)]
+relationals.extend([getattr(bancroft, i) for i in bancroft.__dict__ if isinstance(getattr(bancroft,i), Relational)])
+
 class Lexer(object):
 
   tokens = [
@@ -99,8 +102,7 @@ class Parser(object):
   def __init__(self,debug_flag=False):
     self.debug = debug_flag
     self.lexer = lex(module=Lexer())
-    self.relationals = [getattr(sdh, i) for i in sdh.__dict__ if isinstance(getattr(sdh,i), Relational)]
-    self.relationals.extend([getattr(bancroft, i) for i in bancroft.__dict__ if isinstance(getattr(bancroft,i), Relational)])
+    self.relationals = relationals
     self.domain = []
     self.vars = {}
     self.lastvalue = []
