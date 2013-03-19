@@ -52,8 +52,10 @@ class Node(object):
   def __cmp__(self, other):
     # use self.uuid to compare to other objects
     if isinstance(other, Node):
-      return self.uid == other.uid
-#      return self.uid.__cmp__(other.uid)
+      if isinstance(self.uid, uuid.UUID):
+        return self.uid.__cmp__(other.uid)
+      else:
+        return self.uid == other.uid
     else:
       return NotImplemented
 
