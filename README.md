@@ -72,6 +72,8 @@ the login you created for your Django admin superuser.
 
 ## Interface
 
+**NOTE: This section is out of date as the layout has changed slightly and functionality has been added. This section will be updated before Thursday 21 March 2013**
+
 <img src="https://raw.github.com/gtfierro/BAS/master/diagram.png" />
 
 1. **Query box**: type queries in here and they are evaluated in real-time and
