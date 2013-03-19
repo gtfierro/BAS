@@ -246,7 +246,7 @@ def make_vav(floor, number, has_heat_cool=True, pxcm_number=11):
     area_name = 'VAV ' + str(number)
     if 'Sutardja Dai Hall' in gis.buildings:
         sdh = gis.buildings['Sutardja Dai Hall']
-        if '4' not in floor_name: return
+        #if '4' not in floor_name: return
         if floor_name in sdh and area_name in sdh[floor_name]:
             vav.add_area(sdh[floor_name][area_name])
         else:
