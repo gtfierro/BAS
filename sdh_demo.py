@@ -230,9 +230,9 @@ def make_vav(floor, number, has_heat_cool=True, pxcm_number=11):
         }
     if has_heat_cool:
         children.update({
-        'HEAT.COOL':BACnetSEN('heat.cool', path + 'HEAT.COOL'),
-        'HTG_LOOPOUT':BACnetSEN('HTG Loopout', path + 'HTG Loopout'),
-        'VLV_POS':BACnetVLV('VLV (valve)', path + 'VLV_POS', path + 'VLV_COMD'),
+        'HEAT.COOL':BACnetSEN('heat.cool', path + 'HEAT.COOL', uid=get_uuid('HEAT COOL', metadata)),
+        'HTG_LOOPOUT':BACnetSEN('HTG Loopout', path + 'HTG Loopout', uid=get_uuid('HTG LOOPOUT', metadata)),
+        'VLV_POS':BACnetVLV('VLV (valve)', path + 'VLV_POS', path + 'VLV_COMD', uid=get_uuid('VLV POS', metadata)),
         })
     vav = VAV(hvac, 'VAV ' + str(number), children)
     ah1.add_child(vav)
