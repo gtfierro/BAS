@@ -236,11 +236,6 @@ def make_vav(floor, number, has_heat_cool=True, pxcm_number=11):
         })
     vav = VAV(hvac, 'VAV ' + str(number), children)
     ah1.add_child(vav)
-    # ah1['SUP_AIR_FAN'].add_child(vav['EXH_AIR_FAN'])
-    # ah2['SUP_AIR_FAN'].add_child(vav['EXH_AIR_FAN'])
-    # hwl['HOT_WAT_SUP_TMP_SEN'].add_child(vav['EXH_AIR_FAN'])
-    # vav['EXH_AIR_FAN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
-    # vav['EXH_AIR_FAN'].add_child(cwl['CHL_WAT_PRS_DIF_SEN'])
 
     floor_name = 'Floor ' + str(floor)
     area_name = 'VAV ' + str(number)
@@ -258,35 +253,3 @@ def make_vav(floor, number, has_heat_cool=True, pxcm_number=11):
 
 for x in range(1, 21 + 1):
     make_vav(4, x, (x != 10 and x != 14))
-
-#node_types.verify_devices()
-#node_types.verify_objects()
-#
-#
-#def draw_all(filename='out.png'):
-#  """
-#  draw every graph connected and everything yeah
-#  """
-#  def _make_abbreviation(string):
-#    s = string.split(" ")
-#    return ''.join([word[0] for word in s])
-#  import matplotlib.pyplot as plt
-#  plt.clf()
-#  this = sys.modules[__name__]
-#  relationals = [getattr(this, i) for i in this.__dict__ if isinstance(getattr(this,i), Relational)]
-#  biggraph = nx.DiGraph()
-#  for r in relationals:
-#    for n in r._nk.nodes():
-#      biggraph.add_edges_from(n._nk.edges())
-#  for n in biggraph.nodes():
-#    if n.external_parents:
-#      for p in n.external_parents:
-#        biggraph.add_edges_from(p._nk.edges())
-#    if n.external_childs:
-#      for c in n.external_childs:
-#        biggraph.add_edges_from(c._nk.edges())
-#  for n in biggraph.nodes():
-#    if "." not in n.name:
-#      n.name = n.name+"."+_make_abbreviation(n.container.name)
-#  nx.draw_graphviz(biggraph,prog='neato',width=1,node_size=300,font_size=4,overlap='scalexy')
-#  plt.savefig(filename)
