@@ -70,7 +70,7 @@ class BancroftVAVDMP(node.Device):
   def get_percent_open(self):
     #point is something like device240202/flow_tab_1
     return read_point(self.point+'/DAMPER_OUTPUT',root=ROOT_BANCROFT)
- 
+
   def set_percent_open(self, value):
     return write_point(self.point+'/DAMPER_LOCK',value, type='real',root=ROOT_BANCROFT)
 
@@ -86,7 +86,7 @@ class BancroftAHUDMP(node.Device):
   def get_percent_open(self):
     #point is something like device240202/flow_tab_1
     return read_point(self.point,root=ROOT_BANCROFT)
- 
+
   def set_percent_open(self, value):
     return write_point(self.point, value, type='real',root=ROOT_BANCROFT)
 
@@ -95,9 +95,11 @@ class BACnetSEN(node.Device):
   def __init__(self, name, point, uid=None):
       node.Device.__init__(self, name, uid=uid)
       self.point = point
-  
-  def read(self):
-    return read_point(self.point,root=ROOT_SIEMENS)
+
+  def read(self, raw=False):
+      if raw:
+        print """bacnet.read_prop(self.h_dev, bacnet.OBJECT_ANALOG_OUTPUT, instance_number=self.instance_number, property=bacnet.PROP_PRESENT_VALUE, array_index=3)"""
+      return read_point(self.uid,root=ROOT_SIEMENS)
 
 class BancroftSEN(node.Device):
   implements(device_types.DSEN)
@@ -105,8 +107,10 @@ class BancroftSEN(node.Device):
       node.Device.__init__(self, name, uid=uid)
       self.point = point
 
-  def read(self):
-    return read_point(self.point,root=ROOT_BANCROFT)
+  def read(self, raw=False):
+      if raw:
+        print """bacnet.read_prop(self.h_dev, bacnet.OBJECT_ANALOG_OUTPUT, instance_number=self.instance_number, property=bacnet.PROP_PRESENT_VALUE, array_index=3)"""
+      return read_point(self.uid,root=ROOT_BANCROFT)
 
 
 class BACnetCHR(node.Device):
@@ -134,12 +138,16 @@ class BACnetVLV(node.Device):
       self.point = point
       self.setpoint = setpoint
 
-  def get_percent_open(self):
-      return read_point(self.point, root=ROOT_SIEMENS)
+  def get_percent_open(self, raw=False):
+      if raw:
+        print """bacnet.read_prop(self.h_dev, bacnet.OBJECT_ANALOG_OUTPUT, instance_number=self.instance_number, property=bacnet.PROP_PRESENT_VALUE, array_index=3)"""
+      return float(read_point(self.uid))
 
-  def set_percent_open(self, value):
+  def set_percent_open(self, value, raw=False):
       if self.setpoint is not None:
-          write_point(self.setpoint, value, type='real', root=ROOT_SIEMENS)
+          if raw:
+            print """bacnet.write_prop(self.h_dev, bacnet.OBJECT_ANALOG_VALUE, instance_number=self.instance_number, property=bacnet.PROP_PRESENT_VALUE, value=value, value_type=bacnet.BACNET_APPLICATION_TAG_REAL)"""
+          write_point(self.setpoint.uid, value, type='real')
       else:
           return "No setpoint given"
 
@@ -159,7 +167,7 @@ class BACnetREL(node.Device):
 
   def set_brightness(self, value, raw=False):
       if raw:
-        print """ bacnet.write_prop(self, object_type=bacnet.OBJECT_BINARY_OUTPUT, instance_number=self.instance_number, property=bacnet.PROP_PRESENT_VALUE, value=100, value_type=bacnet.BACNET_APPLICATION_TAG_REAL)"""
+        print """ bacnet.write_prop(self, object_type=bacnet.OBJECT_BINARY_OUTPUT, instance_number=self.instance_number, property=bacnet.PROP_PRESENT_VALUE, value=value, value_type=bacnet.BACNET_APPLICATION_TAG_REAL)"""
       write_point(self.uid, value)
 
   def get_brightness(self, raw=False):
