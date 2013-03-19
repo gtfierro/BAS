@@ -60,7 +60,7 @@ class LIG(node.Obj):
   required_setpoints = []
   required_devices = ['HI_REL','LO_REL']
 
-  def get_relays(self):
+  def get_relays(self, raw=False):
     return self['HI_REL'], self['LO_REL']
 
   def get_level(self, raw=False):
