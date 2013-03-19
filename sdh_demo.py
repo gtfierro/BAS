@@ -205,6 +205,15 @@ cwl['CHL_WAT_SUP_TMP_SEN'].add_child(ah1['COO_VLV'])
 #hwl['HOT_WAT_PRS_DIF_SEN'].add_child(hwl['HOT_WAT_RET_TMP_SEN'])
 #hwl['HOT_WAT_PMP'].add_child(hwl['HOT_WAT_SUP_TMP_SEN'])
 #
+def get_uuid(pointname, metadata):
+    """
+    Searches list of [metadata] for something resembling [pointname] and returns the uuid
+    """
+    for item in metadata:
+        if pointname in item['Metadata']['PointName']:
+            return item['uuid']
+    return None
+
 def make_vav(floor, number, has_heat_cool=True, pxcm_number=11):
     global hvac, hwl, cwl, ah1, ah2
     path = '/SDH.PXCM-{:02}/SDH/S{:1}-{:02}/'.format(pxcm_number, floor, number)
