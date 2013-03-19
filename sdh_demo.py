@@ -5,6 +5,10 @@ import networkx as nx
 import sys
 import gis
 import node_types
+import smap
+from smap import archiver
+from smap.archiver import client
+c = client.SmapClient('http://ar1.openbms.org:8079')
 
 # Lights
 l = Relational('Lights')
