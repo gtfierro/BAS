@@ -22,6 +22,7 @@ jQuery(function($) {
                  domain: JSON.stringify(selected)
                };
     $('#editor-output').addClass('loading');
+    console.log(data);
     $.post('actuate', data).done(function(resp) {
       console.log(resp);
       $('#editor-output').removeClass('loading').text(resp);
