@@ -217,14 +217,16 @@ def get_uuid(pointname, metadata):
 def make_vav(floor, number, has_heat_cool=True, pxcm_number=11):
     global hvac, hwl, cwl, ah1, ah2
     path = '/SDH.PXCM-{:02}/SDH/S{:1}-{:02}/'.format(pxcm_number, floor, number)
+    pointsearch = 'SDH.S{:1}-{:02}%'.format(floor,number)
+    metadata = c.query("select uuid, Metadata/PointName where Metadata/PointName like '{0}'".format(pointsearch))
     children = {
-        'AIR_VOLUME':BACnetSEN('Air Volume', path + 'AIR_VOLUME'),
-        'CLG_LOOPOUT':BACnetSEN('cooling temperature control loop output value', path + 'CLG_LOOPOUT'),
-        'CTL_FLOW_MAX':BACnetSEN('CTL Flow Max', path + 'CTL_FLOW_MAX'),
-        'CTL_FLOW_MIN':BACnetSEN('CTL Flow Min', path + 'CTL_FLOW_MIN'),
-        'CTL_STPT':BACnetSEN('CTL Setpoint', path + 'CTL_STPT'),
-        'DMPR_POS':BACnetDMP('Damper', path + 'DMPR_POS', path + 'DMPR_COMD'),
-        'ROOM_TEMP':BACnetSEN('Room temperature', path + 'ROOM_TEMP'),
+        'AIR_VOLUME':BACnetSEN('Air Volume', path + 'AIR_VOLUME', uid=get_uuid('AIR VOLUME',metadata)),
+        'CLG_LOOPOUT':BACnetSEN('cooling temperature control loop output value', path + 'CLG_LOOPOUT', uid=get_uuid('CLG LOOPOUT',metadata)),
+        'CTL_FLOW_MAX':BACnetSEN('CTL Flow Max', path + 'CTL_FLOW_MAX', uid=get_uuid('CTL FLOW MAX', metadata)),
+        'CTL_FLOW_MIN':BACnetSEN('CTL Flow Min', path + 'CTL_FLOW_MIN', uid=get_uuid('CTL FLOW MIN', metadata)),
+        'CTL_STPT':BACnetSEN('CTL Setpoint', path + 'CTL_STPT', uid=get_uuid('CTL STPT', metadata)),
+        'DMPR_POS':BACnetDMP('Damper', path + 'DMPR_POS', path + 'DMPR_COMD', uid=get_uuid('DMPR POS', metadata)),
+        'ROOM_TEMP':BACnetSEN('Room temperature', path + 'ROOM_TEMP', uid=get_uuid('ROOM TEMP', metadata)),
         }
     if has_heat_cool:
         children.update({
