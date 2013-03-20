@@ -13,10 +13,8 @@ import gis
 gis.NodeLink.objects.all().delete()
 #import sdh
 import sdh_demo as sdh
-import bancroft_demo as bancroft
 
 relationals = [getattr(sdh, i) for i in sdh.__dict__ if isinstance(getattr(sdh,i), Relational)]
-relationals.extend([getattr(bancroft, i) for i in bancroft.__dict__ if isinstance(getattr(bancroft,i), Relational)])
 
 class Lexer(object):
 
