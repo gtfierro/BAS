@@ -80,11 +80,19 @@ class CodeHandler(BaseHandler):
             objs = [lexerparser.get_uuid(x) for x in domain]
             l = locals()
             l['bas'] = objs
-            code = compile(data['code'],'<string>','exec')
+            try:
+              code = compile(data['code'],'<string>','exec')
+            except Exception as e:
+              return str(e)
             output = StringIO()
             sys.stdout = output
             sys.stderr = output
-            eval(code, l)
+            try:
+              eval(code, l)
+            except Exception as e:
+              sys.stdout = sys.__stdout__
+              sys.stderr = sys.__stderr__
+              return str(e)
             sys.stdout = sys.__stdout__
             sys.stderr = sys.__stderr__
             val = output.getvalue()
