@@ -242,14 +242,26 @@ class BasParser(object):
         p[0] = self.basvars.get(p[1],[])
 
     # QUERY
-    def p_query(self, p):
-        '''query : query UPSTREAM set
-                 | query DOWNSTREAM set'''
-        querynodes, setnodes = resolve_spatial_nodes(p[1],p[3])
-        if p[2] == ">": #query upstream of set
-          pass
-        else: #query downstream of set
-          pass
+    def p_query(self,p):
+      '''query : query UPSTREAM set
+               | query DOWNSTREAM set'''
+      res = []
+      domain,target = resolve_spatial_nodes(p[1],p[3])
+      if not isspatial(domain) and not isspatial(target):
+        if p[2] == ">": #upstream
+          next_domain = [search_relatives(node, target,"successors") for node in domain]
+        else:
+          next_domain = [search_relatives(node, target,"predecessors") for node in domain]
+        next_domain = filter(lambda x: x, next_domain)
+        p[0] = self.lastvalue=filter_dup_uids(next_domain)
+      elif not isspatial(domain) and isspatial(target): #nodes in an area
+        domain_areas = nodes_to_areas(domain)
+        domain,target = resolve_spatial_nodes(domain_areas, p[3])
+        while not (domain and target):
+          domain,target = resolve_spatial_areas(domain_areas, p[3])
+        p[0] = self.lastvalue = areas_to_nodes(domain)
+      else:
+        p[0] = self.lastvalue=domain
 
     def p_query_immediate(self, p):
         '''query : query UPSTREAMIMM set
