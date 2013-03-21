@@ -74,7 +74,6 @@ class BasParser(object):
     def p_query_set(self, p):
         '''query : set'''
         p[0] = self.last_value = p[1]
-        pass
 
     # DIRECTION
     def p_direction(self, p):
