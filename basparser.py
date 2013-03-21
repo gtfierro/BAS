@@ -234,9 +234,9 @@ class BasParser(object):
     def p_set_name(self, p):
         '''set : NAME'''
         name_lookup = p[1][1:].strip()
-        print 'Name:', p[0]
+        dom = p[0] if p[0] else domain
         res = []
-        for r in domain:
+        for r in dom:
             res.extend(r.search(lambda x: name_lookup in x.get_name()))
         p[0] = self.lastvalue = res
 
@@ -244,7 +244,8 @@ class BasParser(object):
         '''set : TAG'''
         tag_lookup = p[1][1:].strip().replace(' ','_')
         res = []
-        for r in domain:
+        dom = p[0] if p[0] else domain
+        for r in dom:
             if tag_lookup:
                 res.extend(r.search(lambda x: set_union(tag_lookup.split('_'), x.tags)))
             else:
@@ -256,7 +257,6 @@ class BasParser(object):
         '''set : UUID'''
         uuid_lookup = p[1][1:].strip()
         res = []
-        print 'start?', p[0]
         for r in domain:
             res.extend(r.search(lambda x: str(x.uid) == uuid_lookup))
         p[0] = self.lastvalue = res
