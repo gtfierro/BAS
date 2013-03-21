@@ -19,13 +19,11 @@ class QueryHandler(BaseHandler):
 
     def read(self, request):
         if 'q' not in request.GET:
-            print 'bad'*50
             return rc.BAD_REQUEST
         string = request.GET['q']
         print string
         q = queryengine.query(string.replace('+', ' '))
         if q is None:
-            print 'fuck'*20
             return rc.BAD_REQUEST
 
         return q
