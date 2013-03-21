@@ -10,6 +10,7 @@ import sdh_demo as sdh
 domain = [getattr(sdh, i) for i in sdh.__dict__ if isinstance(getattr(sdh,i), Relational)]
 
 class BasParser(object):
+    basvars = dict()
     def build(self):
         return yacc.yacc(module=self)
 
@@ -18,7 +19,7 @@ class BasParser(object):
     # STATEMENT
     def p_statement_var(self, p):
         '''statement : VAR EQUALS query'''
-        pass
+        self.basvars[p[1]] = p[3]
 
     def p_statement_query(self, p):
         '''statement : query'''
@@ -63,7 +64,7 @@ class BasParser(object):
 
     def p_set_var(self, p):
         '''set : VAR'''
-        pass
+        p[0] = self.basvars.get(p[1],[])
 
     # QUERY
     def p_query_direction(self, p):
