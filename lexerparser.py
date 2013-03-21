@@ -41,7 +41,7 @@ class Lexer(object):
     return t
 
   def t_TAG(self,t):
-    r'(\.|\#|\&)([^!]?[A-Z_]+)?[ ]?'
+    r'(\.|\#|\&)([^!]?[A-Z_ ]+)?[ ]?'
     t.value = t.value.strip()
     return t
 
@@ -368,7 +368,7 @@ class Parser(object):
   def p_set_tag(self,p):
     'set : TAG'
     res = []
-    tag_lookup = p[1][1:].strip()
+    tag_lookup = p[1][1:].strip().replace(' ','_')
     domain = p[0] if p[0] else self.relationals
     for r in domain:
       if tag_lookup:
