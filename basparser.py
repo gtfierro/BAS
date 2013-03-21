@@ -140,19 +140,33 @@ class BasParser(object):
         p[0] = self.basvars.get(p[1],[])
 
     # QUERY
-    def p_query_direction(self, p):
-        '''query : query direction set'''
-        pass
+    def p_query(self, p):
+        '''query : query UPSTREAM set
+                 | query DOWNSTREAM set'''
+        querynodes, setnodes = resolve_spatial_nodes(p[1],p[3])
+        print querynodes
+        print setnodes
+        if p[2] == ">": #query upstream of set
+          pass
+        else: #query downstream of set
+          pass
+
+    def p_query_immediate(self, p):
+        '''query : query UPSTREAMIMM set
+                 | query DOWNSTREAMIMM set'''
+        querynodes, setnodes = resolve_spatial_nodes(p[1],p[3])
+        if p[2] == '>>':
+            direction = 'upstream'
+        else:
+            direction = 'downstream'
+        p[0] = self.lastvalue = find_immediate(querynodes, setnodes, direction)
+
+
 
     def p_query_set(self, p):
         '''query : set'''
         p[0] = self.last_value = p[1]
 
-    # DIRECTION
-    def p_direction(self, p):
-        '''direction : UPSTREAM
-                     | DOWNSTREAM'''
-        pass
 
     def p_error(self, p):
         pass
