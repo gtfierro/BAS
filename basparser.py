@@ -23,6 +23,19 @@ def isspatial(nodes):
     nodes = [nodes] if not isinstance(nodes,list) else nodes
     return all(map(lambda x: not isinstance(x, (Relational, Node)),nodes))
 
+def filter_dup_uids(target):
+    """
+    Given a [target] list, returns a list where all components are unique by their uid
+    """
+    ret = []
+    for item in target:
+        if hasattr(item,'uid'):
+            if item.uid not in map(lambda x: x.uid, ret):
+                ret.append(item)
+        else: #if it doesn't have a uid, then it's a spatial
+            ret.append(item)
+    return ret
+
 
 def links_to_nodes(links):
     def _links_to_nodes( links):
