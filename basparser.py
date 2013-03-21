@@ -10,8 +10,6 @@ import sdh_demo as sdh
 domain = [getattr(sdh, i) for i in sdh.__dict__ if isinstance(getattr(sdh,i), Relational)]
 
 def set_union(set1, set2):
-    print 'set1',set1
-    print 'set2',set2
     return set(set1).issubset(set(set2))
 
 class BasParser(object):
