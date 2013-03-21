@@ -10,6 +10,14 @@ geocache = redis.StrictRedis(host='localhost', port=6379, db=0)
 for k in geocache.keys():
   geocache.delete(k)
 
+def uniquify(l):
+    c = itertools.count(start=1)
+    if isinstance(item, Node):
+        return [item.set_name(item.node_name+" "+str(c.next())) for item in l]
+    else:
+        raise Exception("we got here?!")
+        return [item+" "+str(c.next()) for item in l]
+
 class Node(object):
   """
   Inherited class for nodes and objects (below)
@@ -224,9 +232,6 @@ class Obj(Node, Container):
     if devices is None:
       self.devices = {}
     else:
-      def uniquify(l):
-        c = itertools.count(start=1)
-        return [item.set_name(item.name+" "+str(c.next())) if isinstance(item, Node) else item+" "+str(c.next()) for item in l]
       self.devices = dict(itertools.chain(*[zip(uniquify([k] * len(v)), uniquify(v)) if isinstance(v, list) else ((k, v),) for k, v in devices.items()]))
 
     Node.__init__(self, name,uid=uid)
