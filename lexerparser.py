@@ -266,7 +266,8 @@ class Parser(object):
     areas = [areas] if not isinstance(areas, list) else areas
     res = []
     for a in areas:
-      res.extend(gis.Area.objects.filter(regions__intersects=a.regions))
+      candidates = gis.Area.objects.filter(regions__overlaps=a.regions)
+      res.extend([c for c in candidates if self.allow_intersection(c, a)])
     return False if res == areas else res
 
   def resolve_spatial(self,node,target,direction,intersect=False):
@@ -290,7 +291,8 @@ class Parser(object):
     if nodespatial and targetspatial: #resolve the derivative relationship spatially
       target_regions = set(self.get_areas(target))
       node_regions = set(self.get_areas(node))
-      return list(target_regions.intersection(node_regions)), None
+      return list(set(self.expand_by_intersection(list(target_regions)))), None
+      #return list(target_regions.intersection(node_regions)), None
     else: #neither node nor target is spatial, so we do nothing
       return node,target
 
