@@ -87,6 +87,30 @@ def resolve_spatial_nodes(querynodes, setnodes):
       setnodes = areas_to_nodes(setnodes)
     return querynodes, setnodes
 
+def get_predecessors(qn):
+    preds = qn.container.predecessors(qn)
+    preds.extend(qn.container)
+    print qn.container
+    return filter_dup_uids(preds)
+
+def get_successors(qn):
+    succs = qn.container.successors(qn)
+    if isinstance(qn, Obj):
+      succs.extend(qn.devices.values())
+    return filter_dup_uids(succs)
+
+def find_immediate(querynodes, setnodes, direction):
+    immediates = []
+    for qn in querynodes:
+        if direction == "upstream":
+          if set(setnodes).intersection(set(get_successors(qn))):
+            immediates.append(qn)
+        else:
+          if set(setnodes).intersection(set(get_predecessors(qn))):
+            immediates.append(qn)
+    immediates = set(flatten(immediates))
+    return filter_dup_uids(immediates)
+
 class BasParser(object):
     basvars = dict()
     def build(self):
