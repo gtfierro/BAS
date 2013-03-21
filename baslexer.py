@@ -8,11 +8,14 @@ class BasLexer(object):
     tokens = [
         'NAME', 'UUID', 'VAR', 'TAG', 'SPATIAL',
         'UPSTREAM', 'DOWNSTREAM', 'EQUALS', 'LASTVALUE',
-        'LPAREN', 'RPAREN'
+        'LPAREN', 'RPAREN',
+        'UPSTREAMIMM', 'DOWNSTREAMIMM'
         ]
 
     t_UPSTREAM    = r'>'
     t_DOWNSTREAM  = r'<'
+    t_UPSTREAMIMM    = r'>>'
+    t_DOWNSTREAMIMM  = r'<<'
     t_LPAREN      = r'\('
     t_RPAREN      = r'\)'
     #t_LBRACK      = r'\['
