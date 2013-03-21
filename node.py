@@ -49,12 +49,15 @@ class Node(object):
     self.external_childs = external_childs
     self.uid = uuid.uuid4() if not uid else uid
     if isinstance(self.uid, str):
-      self.uid = uuid.uuid4()
+      self.uid = uuid.UUID(self.uid)
     self.metadata = metadata
 
     self.link, _ = gis.NodeLink.objects.get_or_create(uuid=self.uid)
 
     #self.container.add_nodes(self)
+
+  def get_name(self):
+    return self.node_name
 
   def __str__(self):
     return self.node_name
@@ -258,7 +261,7 @@ class Obj(Node, Container):
     if not self.nodes():
       return []
     res = []
-    for dev in map(lambda x: x.node_name, self.nodes()):
+    for dev in self.nodes():
       if fn(dev):
         res.append(retfn(dev))
     return res
@@ -289,6 +292,9 @@ class Relational(Container):
     self.domain_name = name
     self.uid = uuid.uuid4()
     Container.__init__(self, objects)
+
+  def get_name(self):
+    return self.domain_name
 
 #place holder...?
 class Domain(Relational):
