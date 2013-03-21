@@ -78,17 +78,41 @@ def nodes_to_areas(nodes):
         flattened.extend(extension)
     return list(set(flattened))
 
+def allow_intersection(a1, a2):
+    """
+    double checks that the gis areas a1, a2 are on the same floor and building
+    returns T/F
+    """
+    a1f = a1.floor
+    a2f = a2.floor
+    if a1f == a2f and a1f.building == a2f.building:
+      return True
+    return False
+
+def expand_by_intersection(areas):
+    """
+    given an area or list of areas, returns the list of areas that intersect with those areas
+    """
+    areas = [areas] if not isinstance(areas, list) else areas
+    res = []
+    for a in areas:
+      candidates = gis.Area.objects.filter(regions__overlaps=a.regions)
+      res.extend([c for c in candidates if allow_intersection(c, a)])
+    return False if res == areas else res
+
 def resolve_spatial_nodes(querynodes, setnodes):
     query_is_spatial = isspatial(querynodes)
     set_is_spatial = isspatial(setnodes)
     if query_is_spatial and not set_is_spatial:
       setnodes = nodes_to_areas(setnodes)
+      set_is_spatial = True
     elif not query_is_spatial and set_is_spatial:
       setnodes = areas_to_nodes(setnodes)
     if query_is_spatial and set_is_spatial:
       query_regions = set(get_areas(querynodes))
       set_regions = set(get_areas(setnodes))
-      return list(query_regions.intersection(set_regions)), None
+      #return list(query_regions.intersection(set_regions)), None
+      return list(set(expand_by_intersection(list(set_regions)))), None
     return querynodes, setnodes
 
 def get_predecessors(qn):
