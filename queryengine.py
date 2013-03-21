@@ -1,5 +1,5 @@
 from baslexer import BasLexer
-from basparser import BasParser
+from basparser import *
 
 lexer = BasLexer().build()
 parser = BasParser().build()
@@ -16,7 +16,7 @@ def query(string):
 
 def get_uuid(u):
   res = []
-  for r in basparser.domains:
+  for r in domain:
     res.extend(r.search(lambda x: str(x.uid) == u))
   return res[0] if res else None
 
