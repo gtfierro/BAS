@@ -263,3 +263,6 @@ class Relational(Container):
     self.uid = uuid.uuid4()
     Container.__init__(self, objects)
 
+#place holder...?
+class Domain(Relational):
+  pass
