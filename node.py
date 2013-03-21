@@ -44,7 +44,7 @@ class Node(object):
     container: Obj or Relational of which this object is a part
     name: string name of this object
     """
-    self.name = name
+    self.node_name = name
     self.external_parents = external_parents
     self.external_childs = external_childs
     self.uid = uuid.uuid4() if not uid else uid
