@@ -4,6 +4,7 @@ from collections import deque
 
 from node import *
 import gis
+gis.NodeLink.objects.all().delete()
 import sdh_demo as sdh
 
 domain = [getattr(sdh, i) for i in sdh.__dict__ if isinstance(getattr(sdh,i), Relational)]
@@ -44,7 +45,7 @@ class BasParser(object):
         print 'Name:', p[0]
         res = []
         for r in domain:
-            res.extend(r.search(lambda x: name_lookup in str(x)))
+            res.extend(r.search(lambda x: name_lookup in x.get_name()))
         p[0] = self.lastvalue = res
 
     def p_set_tag(self, p):
