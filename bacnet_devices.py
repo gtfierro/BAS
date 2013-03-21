@@ -10,11 +10,11 @@ ROOT_SIEMENS=ROOT#'http://127.0.0.1:8080/data/Siemens'
 ROOT_BANCROFT=ROOT#'http://127.0.0.1:8080/data/Bancroft'
 
 def read_point(point, root=ROOT):
-  time, reading = requests.get(root + point).json()['Readings']
+  time, reading = requests.get(root + str(point)).json()['Readings']
   return reading
 
 def write_point(point, value, root=ROOT):
-    res = requests.put(root + point + '?state='+str(value))
+    res = requests.put(root + str(point) + '?state='+str(value))
     return res
 
 class BACnetFAN(node.Device):
