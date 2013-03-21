@@ -182,6 +182,18 @@ class Container(nx.DiGraph):
         results.extend(nd.search(fn,retfn))
     return results
 
+  def add_node_child(self, node, child):
+    if child not in self:
+      self.add_node(child)
+    if not self.__contains__(node):
+      self.add_edge(node,child)
+
+  def add_node_parent(self, node, parent):
+    if parent not in self:
+      self.add_node(parent)
+    if not self.__contains__(node):
+      self.add_edge(parent,node)
+
 class Device(Node):
   """
   Internal components of a larger object
