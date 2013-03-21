@@ -54,7 +54,12 @@ class BasParser(object):
 
     def p_set_uuid(self, p):
         '''set : UUID'''
-        pass
+        uuid_lookup = p[1][1:].strip()
+        res = []
+        print 'start?', p[0]
+        for r in domain:
+            res.extend(r.search(lambda x: str(x.uid) == uuid_lookup))
+        p[0] = self.lastvalue = res
 
     def p_set_var(self, p):
         '''set : VAR'''
