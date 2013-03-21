@@ -114,6 +114,68 @@ def find_immediate(querynodes, setnodes, direction):
     immediates = set(flatten(immediates))
     return filter_dup_uids(immediates)
 
+def search_relatives(node, target, direction):
+    """
+    [direction] is either "successors" or "predecessors"
+    Given a [node], search all of its successors: Successors are all nodes reachable by a bfs from this node
+    as well as the container of this node (if it exists) and all successors of that object and all nodes 
+    in those successors. As soon as we find a successor that is in [target], we return [node], but if we reach
+    the end of the recursion, then we return None.
+
+    How do we do this? We can get the immediate successors for a node using node.container._nk.successors(node)
+    put these all onto a deque, followed by the container. We iterate through this generator, checking for membership in [target]. As we pop 
+    nodes off the deque, we add their immediate children to the deque.
+    """
+    #initialize whether we're looking for successors or predecessors
+    relative_fxn = lambda x: getattr(x.container, direction)(x)
+    #initialize already-visited lists
+    already_visited = [node]
+    #initialize queue
+    queue = deque()
+    #add first node to queue
+    queue.appendleft(node)
+    #add its Container if it isn't already a container
+    if not isinstance(node, Container):
+      queue.appendleft(node.container)
+      already_visited.append(node.container)
+
+    while queue: #loop until we reach the end of the queue
+      #get next node off the top (FIFO)
+      current = queue.pop()
+      if current in target: #successful!
+        return node
+      #if this node is in a container we haven't visited yet, add
+      #all of that container's nodes to our queue
+      if isinstance(current, Container):
+        if current not in already_visited:
+          for n in current.nodes():
+            if n not in already_visited:
+              already_visited.append(n)
+              queue.appendleft(n)
+      #search the relatives of the current node according to relative_fxn
+      #for each relative, if we haven't traversed it, add it to the queue
+      for n in relative_fxn(current):
+        if n not in already_visited:
+          already_visited.append(n)
+          queue.appendleft(n)
+      #if current has an external container, add it to the queue
+      if current.external_parents and direction == "predecessors":
+        for p in current.external_parents:
+          if p not in already_visited:
+            already_visited.append(p)
+            queue.appendleft(p)
+      elif current.external_childs and direction == "successors":
+        for c in current.external_childs:
+          if c not in already_visited:
+            already_visited.append(c)
+            queue.appendleft(c)
+      #finally, add the current's container to the queue
+      if not isinstance(current.container, Relational):
+        if current.container not in queue and current.container not in already_visited:
+          already_visited.append(current.container)
+          queue.appendleft(current.container)
+    return None
+
 class BasParser(object):
     basvars = dict()
     def build(self):
