@@ -142,12 +142,12 @@ def search_relatives(node, target, direction):
     """
     [direction] is either "successors" or "predecessors"
     Given a [node], search all of its successors: Successors are all nodes reachable by a bfs from this node
-    as well as the container of this node (if it exists) and all successors of that object and all nodes 
+    as well as the container of this node (if it exists) and all successors of that object and all nodes
     in those successors. As soon as we find a successor that is in [target], we return [node], but if we reach
     the end of the recursion, then we return None.
 
     How do we do this? We can get the immediate successors for a node using node.container._nk.successors(node)
-    put these all onto a deque, followed by the container. We iterate through this generator, checking for membership in [target]. As we pop 
+    put these all onto a deque, followed by the container. We iterate through this generator, checking for membership in [target]. As we pop
     nodes off the deque, we add their immediate children to the deque.
     """
     #initialize whether we're looking for successors or predecessors
