@@ -178,7 +178,7 @@ class Container(nx.DiGraph):
       if fn(nd):
         results.append(retfn(nd))
       #if the node is itself a container, we search it too!
-      if isinstance(nd, nx.DiGraph):
+      if isinstance(nd, Container):
         results.extend(nd.search(fn,retfn))
     return results
 
@@ -253,6 +253,15 @@ class Obj(Node, Container):
 
     self.validate()
     #print ">>>Object",self.name, self.uid
+
+  def search(self, fn, retfn=lambda x: x):
+    if not self.nodes():
+      return []
+    res = []
+    for dev in map(lambda x: x.node_name, self.nodes()):
+      if fn(dev):
+        res.append(retfn(dev))
+    return res
 
   def validate(self):
     req = set(self.required_devices)
