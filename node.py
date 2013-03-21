@@ -156,6 +156,7 @@ class Container(nx.DiGraph):
   """
 
   def __init__(self, contents):
+    nx.DiGraph.__init__(self)
     self.parents = []
     self.children = []
     # TODO: can we get rid of the obj stuff?
