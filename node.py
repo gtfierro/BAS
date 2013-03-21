@@ -41,7 +41,7 @@ class Node(object):
     self.external_childs = external_childs
     self.uid = uuid.uuid4() if not uid else uid
     if isinstance(self.uid, str):
-      self.uid = uuid.UUID(4)
+      self.uid = uuid.uuid4()
     self.metadata = metadata
 
     self.link, _ = gis.NodeLink.objects.get_or_create(uuid=self.uid)
