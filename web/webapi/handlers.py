@@ -21,7 +21,6 @@ class QueryHandler(BaseHandler):
         if 'q' not in request.GET:
             return rc.BAD_REQUEST
         string = request.GET['q']
-        print string
         q = queryengine.query(string.replace('+', ' '))
         if q is None:
             return rc.BAD_REQUEST

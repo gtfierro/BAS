@@ -147,7 +147,7 @@ class Node(object):
     import node_types
     #TODO: do caching here?
     return {
-      'name': self.name,
+      'name': self.node_name,
       'type': self.type(),
       'uuid': str(self.uid),
       'methods': node_types.get_methods(self),
