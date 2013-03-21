@@ -191,12 +191,17 @@ class Container(nx.DiGraph):
       self.add_node(child)
     if not self.__contains__(node):
       self.add_edge(node,child)
+    elif not self.has_edge(node,child):
+      self.add_edge(node,child)
 
   def add_node_parent(self, node, parent):
     if parent not in self:
       self.add_node(parent)
     if not self.__contains__(node):
       self.add_edge(parent,node)
+    elif not self.has_edge(parent, node):
+      self.add_edge(parent,node)
+
 
 class Device(Node):
   """
