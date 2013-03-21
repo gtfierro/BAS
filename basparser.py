@@ -85,6 +85,10 @@ def resolve_spatial_nodes(querynodes, setnodes):
       setnodes = nodes_to_areas(setnodes)
     elif not query_is_spatial and set_is_spatial:
       setnodes = areas_to_nodes(setnodes)
+    if query_is_spatial and set_is_spatial:
+      query_regions = set(get_areas(querynodes))
+      set_regions = set(get_areas(setnodes))
+      return list(query_regions.intersection(set_regions)), None
     return querynodes, setnodes
 
 def get_predecessors(qn):
