@@ -9,6 +9,11 @@ import sdh_demo as sdh
 
 domain = [getattr(sdh, i) for i in sdh.__dict__ if isinstance(getattr(sdh,i), Relational)]
 
+def set_union(set1, set2):
+    print 'set1',set1
+    print 'set2',set2
+    return set(set1).issubset(set(set2))
+
 class BasParser(object):
     basvars = dict()
     def build(self):
@@ -51,7 +56,15 @@ class BasParser(object):
 
     def p_set_tag(self, p):
         '''set : TAG'''
-        pass
+        tag_lookup = p[1][1:].strip().replace(' ','_')
+        res = []
+        for r in domain:
+            if tag_lookup:
+                res.extend(r.search(lambda x: set_union(tag_lookup.split('_'), x.tags)))
+            else:
+                res.extend(r.search(lambda x: True))
+
+        p[0] = self.lastvalue = res
 
     def p_set_uuid(self, p):
         '''set : UUID'''
