@@ -173,15 +173,6 @@ class Container(nx.DiGraph):
         results.extend(nd.search(fn,retfn))
     return results
 
-  @property
-  def nodes(self):
-    for nd in nx.dfs_preorder_nodes(self._nk):
-      yield nd
-      #if the node is itself a container, we search it too!
-      if isinstance(nd, Container):
-        for node in nd.nodes:
-            yield node
-
 class Device(Node):
   """
   Internal components of a larger object
