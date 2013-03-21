@@ -259,7 +259,7 @@ class Obj(Node, Container):
 class Relational(Container):
 
   def __init__(self, name, objects=[]):
-    self.name = name
+    self.domain_name = name
     self.uid = uuid.uuid4()
     Container.__init__(self, objects)
 
