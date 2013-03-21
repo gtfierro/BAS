@@ -5,13 +5,13 @@ import ast
 import sys
 from StringIO import StringIO
 
-from appstack import lexerparser, node_types
+from appstack import queryengine, node_types
 
 class TagHandler(BaseHandler):
     methods_allowed = ('GET',)
 
     def read(self, request, tag):
-        q = lexerparser.query('.' + tag)
+        q = queryengine.query('.' + tag)
         return q
 
 class QueryHandler(BaseHandler):
@@ -21,7 +21,7 @@ class QueryHandler(BaseHandler):
         if 'q' not in request.GET:
             return rc.BAD_REQUEST
         string = request.GET['q']
-        q = lexerparser.query(string.replace('+', ' '))
+        q = queryengine.query(string.replace('+', ' '))
         if q is None:
             return rc.BAD_REQUEST
 
@@ -31,21 +31,21 @@ class AllHandler(BaseHandler):
     methods_allowed = ('GET',)
 
     def read(self, request):
-        q = lexerparser.query('.')
+        q = queryengine.query('.')
         return q
 
 class UUIDHandler(BaseHandler):
     methods_allowed = ('GET',)
 
     def read(self, request, uuid):
-        q = lexerparser.query('^' + uuid)
+        q = queryengine.query('^' + uuid)
         return q[0] if q else rc.NOT_FOUND
 
 class UUIDMethodHandler(BaseHandler):
     methods_allowed = ('GET',)
 
     def read(self, request, uuid, method):
-        q = lexerparser.query('^' + uuid)
+        q = queryengine.query('^' + uuid)
         if not q:
             return rc.NOT_FOUND
 
@@ -77,7 +77,7 @@ class CodeHandler(BaseHandler):
         if request.data:
             data = request.data
             domain = ast.literal_eval(data['domain'])
-            objs = [lexerparser.get_uuid(x) for x in domain]
+            objs = [queryengine.get_uuid(x) for x in domain]
             l = locals()
             l['bas'] = objs
             try:

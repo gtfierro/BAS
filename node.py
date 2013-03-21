@@ -10,6 +10,14 @@ geocache = redis.StrictRedis(host='localhost', port=6379, db=0)
 for k in geocache.keys():
   geocache.delete(k)
 
+def uniquify(l):
+    c = itertools.count(start=1)
+    if isinstance(item, Node):
+        return [item.set_name(item.node_name+" "+str(c.next())) for item in l]
+    else:
+        raise Exception("we got here?!")
+        return [item+" "+str(c.next()) for item in l]
+
 class Node(object):
   """
   Inherited class for nodes and objects (below)
@@ -36,28 +44,33 @@ class Node(object):
     container: Obj or Relational of which this object is a part
     name: string name of this object
     """
-    self.name = name
+    self.node_name = name
     self.external_parents = external_parents
     self.external_childs = external_childs
     self.uid = uuid.uuid4() if not uid else uid
+    if isinstance(self.uid, str):
+      self.uid = uuid.UUID(self.uid)
     self.metadata = metadata
+    self.tags = []
 
     self.link, _ = gis.NodeLink.objects.get_or_create(uuid=self.uid)
 
     #self.container.add_nodes(self)
 
+  def get_name(self):
+    return self.node_name
+
   def __str__(self):
-    return self.name
+    return self.node_name
 
   def __cmp__(self, other):
     # use self.uuid to compare to other objects
     if isinstance(other, Node):
       if isinstance(self.uid, uuid.UUID):
         return self.uid.__cmp__(other.uid)
-      else:
-        return self.uid == other.uid
+      return -1
     else:
-      return NotImplemented
+      return -1
 
   def __hash__(self):
     #hack to get graph copy working
@@ -135,125 +148,61 @@ class Node(object):
     import node_types
     #TODO: do caching here?
     return {
-      'name': self.name,
+      'name': self.node_name,
       'type': self.type(),
       'uuid': str(self.uid),
       'methods': node_types.get_methods(self),
       }
 
 
-class Container(object):
+class Container(nx.DiGraph):
   """
   Inheritable class for handling basic graph operations beyond what networkx provides
   """
 
   def __init__(self, contents):
-    self._nk = nx.DiGraph()
+    nx.DiGraph.__init__(self)
     self.parents = []
     self.children = []
+    # TODO: can we get rid of the obj stuff?
+    # if contents: for c in contents, self.add_node(c)
     if contents:
       for obj in contents:
         obj.container = self
-        self._nk.add_node(obj)
-
-  def draw_graph(self, filename="out.png"):
-    """
-    Uses matplotlib.pyplot and nx.draw_circular to make a graph and saves it as "out.png"
-    """
-    import matplotlib.pyplot as plt
-    plt.clf()
-    nx.draw_graphviz(self._nk,prog='neato',width=1,node_size=300,font_size=6)
-    plt.savefig(filename)
-
-  def draw_all(self, filename="out.png"):
-    """
-    Connect all the containers so we have one big graph
-    """
-    def _make_abbreviation(string):
-      s = string.split(" ")
-      return ''.join([word[0] for word in s])
-    import matplotlib.pyplot as plt
-    plt.clf()
-    biggraph = self._nk.copy()
-    for n in biggraph.nodes():
-      if n.external_parents:
-        for p in n.external_parents:
-          biggraph.add_edges_from(p._nk.edges())
-      if n.external_childs:
-        for c in n.external_childs:
-          biggraph.add_edges_from(c._nk.edges())
-    for n in biggraph.nodes():
-      n.name = n.name+"."+_make_abbreviation(n.container.name)
-    nx.draw_graphviz(biggraph,prog='neato',width=1,node_size=300,font_size=6,overlap='scalexy')
-    plt.savefig(filename)
-  
-
-  def add_node_child(self, node, child):
-    """
-    check if child exists as a node in our interal graph
-    if false, add the child then add the edge
-    regardless, add edge if edge doesn't exist
-
-    node,child: type Obj
-    """
-    if child not in self._nk:
-      self._nk.add_node(child)
-    if child not in self._nk[node]:
-      self._nk.add_edge(node,child)
-
-  #add parent to an internal node
-  def add_node_parent(self, node, parent):
-    """
-    check if parent exists as a node in our interal graph
-    if false, add the parent then add the edge
-    regardless, add edge if edge doesn't exist
-
-    node,parent: type Obj
-    """
-    if parent not in self._nk:
-      self._nk.add_node(parent)
-    if node not in self._nk[parent]:
-      self._nk.add_edge(parent,node)
-
-  #for internal graph setup
-  def add_nodes(self, nodes):
-    """
-    Associates nodes with this object's internal graph
-    """
-    extension = [nodes] if type(nodes) != list else nodes
-    for node in extension:
-      node.container = self
-      self._nk.add_node(node)
+        self.add_node(obj)
 
   def search(self, fn, retfn=lambda x: x):
     """
     searches dfs preorder for nodes for which the function [fn] evaluates to true
     It appends all True values to a results list, and applies [retfn] to them
     """
-    if not self._nk.nodes():
+    if not self.nodes():
       return []
     results = []
-    #apply fn to arbitrary node, make sure that it is a binary fxn
-    tmp = self._nk.nodes()[0]
-    if fn(tmp) not in [True, False]:
-      print "Function must return True or False"
-      return None
-    for nd in nx.dfs_preorder_nodes(self._nk):
+    for nd in nx.dfs_preorder_nodes(self):
       if fn(nd):
         results.append(retfn(nd))
       #if the node is itself a container, we search it too!
-      if hasattr(nd,"_nk"):
+      if isinstance(nd, Container):
         results.extend(nd.search(fn,retfn))
     return results
 
-  @property
-  def nodes(self):
-    for nd in nx.dfs_preorder_nodes(self._nk):
-      yield nd
-      #if the node is itself a container, we search it too!
-      if isinstance(nd, Container):
-        for node in nd.nodes:
-            yield node
+  def add_node_child(self, node, child):
+    if child not in self:
+      self.add_node(child)
+    if not self.__contains__(node):
+      self.add_edge(node,child)
+    elif not self.has_edge(node,child):
+      self.add_edge(node,child)
+
+  def add_node_parent(self, node, parent):
+    if parent not in self:
+      self.add_node(parent)
+    if not self.__contains__(node):
+      self.add_edge(parent,node)
+    elif not self.has_edge(parent, node):
+      self.add_edge(parent,node)
+
 
 class Device(Node):
   """
@@ -306,17 +255,26 @@ class Obj(Node, Container):
     if devices is None:
       self.devices = {}
     else:
-      def uniquify(l):
-        c = itertools.count(start=1)
-        return [item.set_name(item.name+" "+str(c.next())) if isinstance(item, Node) else item+" "+str(c.next()) for item in l]
       self.devices = dict(itertools.chain(*[zip(uniquify([k] * len(v)), uniquify(v)) if isinstance(v, list) else ((k, v),) for k, v in devices.items()]))
+    for d in self.devices:
+      self.devices[d].tags = d.replace(' ','_').split('_')
 
     Node.__init__(self, name,uid=uid)
     Container.__init__(self, self.devices.values())
-    self.container._nk.add_node(self)
+    self.container.add_node(self)
+    self.tags.append(self.type())
 
     self.validate()
     #print ">>>Object",self.name, self.uid
+
+  def search(self, fn, retfn=lambda x: x):
+    if not self.nodes():
+      return []
+    res = []
+    for dev in self.nodes():
+      if fn(dev):
+        res.append(retfn(dev))
+    return res
 
   def validate(self):
     req = set(self.required_devices)
@@ -341,7 +299,13 @@ class Obj(Node, Container):
 class Relational(Container):
 
   def __init__(self, name, objects=[]):
-    self.name = name
+    self.domain_name = name
     self.uid = uuid.uuid4()
     Container.__init__(self, objects)
 
+  def get_name(self):
+    return self.domain_name
+
+#place holder...?
+class Domain(Relational):
+  pass
