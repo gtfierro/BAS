@@ -57,7 +57,7 @@ class Node(object):
     #self.container.add_nodes(self)
 
   def __str__(self):
-    return self.name
+    return self.node_name
 
   def __cmp__(self, other):
     # use self.uuid to compare to other objects
