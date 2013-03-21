@@ -51,6 +51,7 @@ class Node(object):
     if isinstance(self.uid, str):
       self.uid = uuid.UUID(self.uid)
     self.metadata = metadata
+    self.tags = []
 
     self.link, _ = gis.NodeLink.objects.get_or_create(uuid=self.uid)
 
@@ -249,10 +250,13 @@ class Obj(Node, Container):
       self.devices = {}
     else:
       self.devices = dict(itertools.chain(*[zip(uniquify([k] * len(v)), uniquify(v)) if isinstance(v, list) else ((k, v),) for k, v in devices.items()]))
+    for d in self.devices:
+      self.devices[d].tags = d.replace(' ','_').split('_')
 
     Node.__init__(self, name,uid=uid)
     Container.__init__(self, self.devices.values())
     self.container.add_node(self)
+    self.tags.append(self.type())
 
     self.validate()
     #print ">>>Object",self.name, self.uid
