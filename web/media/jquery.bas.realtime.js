@@ -64,6 +64,7 @@ jQuery(function($) {
       $.each(results, function(i, result) {
         var building = result['building'];
         var floor = result['floor'];
+        if (!floor) return true;
 
         if ($.inArray(floor, floors) > -1) {
           return true; // continue
