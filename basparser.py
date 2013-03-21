@@ -112,7 +112,11 @@ def resolve_spatial_nodes(querynodes, setnodes):
       query_regions = set(get_areas(querynodes))
       set_regions = set(get_areas(setnodes))
       #return list(query_regions.intersection(set_regions)), None
-      return list(set(expand_by_intersection(list(set_regions)))), None
+      res = expand_by_intersection(list(set_regions))
+      if res:
+        return list(set(res)), None
+      else:
+        return False, None
     return querynodes, setnodes
 
 def get_predecessors(qn):
@@ -275,6 +279,11 @@ class BasParser(object):
           _, target = resolve_spatial_nodes(p[1],p[3])
           p[0] = self.lastvalue = list(set(p[1]).intersection(set(target)))
           return
+        else:
+          _, target = resolve_spatial_nodes(p[1],p[3])
+          p[0] = self.lastvalue = list(set(p[1]).intersection(set(target)))
+          return
+
       domain,target = resolve_spatial_nodes(p[1],p[3])
       if not isspatial(domain) and not isspatial(target):
         if p[2] == ">": #upstream
@@ -287,7 +296,7 @@ class BasParser(object):
         domain_areas = nodes_to_areas(domain)
         domain,target = resolve_spatial_nodes(domain_areas, p[3])
         while not (domain and target):
-          domain,target = resolve_spatial_areas(domain_areas, p[3])
+          domain,target = resolve_spatial_nodes(domain_areas, p[3])
         p[0] = self.lastvalue = areas_to_nodes(domain)
       else:
         p[0] = self.lastvalue=domain
