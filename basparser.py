@@ -14,7 +14,7 @@ def flatten(l):
     return map(lambda x: x, list(itertools.chain(*l)))
 
 def set_union(set1, set2):
-  return set(set1).issubset(set(set2))
+    return set(set1).issubset(set(set2))
 
 def isspatial(nodes):
     """
