@@ -267,9 +267,14 @@ class BasParser(object):
 
     # QUERY
     def p_query(self,p):
-      '''query : query UPSTREAM set
-               | query DOWNSTREAM set'''
+      '''query : set UPSTREAM query
+               | set DOWNSTREAM query'''
       res = []
+      if not isspatial(p[1]) and isspatial(p[3]):
+        if p[2] == ">":
+          _, target = resolve_spatial_nodes(p[1],p[3])
+          p[0] = self.lastvalue = list(set(p[1]).intersection(set(target)))
+          return
       domain,target = resolve_spatial_nodes(p[1],p[3])
       if not isspatial(domain) and not isspatial(target):
         if p[2] == ">": #upstream
