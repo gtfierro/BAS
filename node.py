@@ -142,13 +142,12 @@ class Node(object):
       }
 
 
-class Container(object):
+class Container(nx.DiGraph):
   """
   Inheritable class for handling basic graph operations beyond what networkx provides
   """
 
   def __init__(self, contents):
-    self._nk = nx.DiGraph()
     self.parents = []
     self.children = []
     if contents:
