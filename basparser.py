@@ -90,7 +90,6 @@ def resolve_spatial_nodes(querynodes, setnodes):
 def get_predecessors(qn):
     preds = qn.container.predecessors(qn)
     preds.extend(qn.container)
-    print qn.container
     return filter_dup_uids(preds)
 
 def get_successors(qn):
@@ -181,8 +180,6 @@ class BasParser(object):
         '''query : query UPSTREAM set
                  | query DOWNSTREAM set'''
         querynodes, setnodes = resolve_spatial_nodes(p[1],p[3])
-        print querynodes
-        print setnodes
         if p[2] == ">": #query upstream of set
           pass
         else: #query downstream of set
