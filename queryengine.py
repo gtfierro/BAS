@@ -5,8 +5,7 @@ lexer = BasLexer().build()
 parser = BasParser().build()
 
 def query(string):
-    ans = parser.parse(string)
-    print ans
+    return parser.parse(string)
 
 if __name__ == '__main__':
     import readline
