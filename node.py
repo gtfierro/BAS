@@ -68,8 +68,7 @@ class Node(object):
     if isinstance(other, Node):
       if isinstance(self.uid, uuid.UUID):
         return self.uid.__cmp__(other.uid)
-      else:
-        return self.uid == other.uid
+      return -1
     else:
       return -1
 
