@@ -170,10 +170,10 @@ class Container(nx.DiGraph):
     searches dfs preorder for nodes for which the function [fn] evaluates to true
     It appends all True values to a results list, and applies [retfn] to them
     """
-    if not self._nk.nodes():
+    if not self.nodes():
       return []
     results = []
-    for nd in nx.dfs_preorder_nodes(self._nk):
+    for nd in nx.dfs_preorder_nodes(self):
       if fn(nd):
         results.append(retfn(nd))
       #if the node is itself a container, we search it too!
@@ -236,7 +236,7 @@ class Obj(Node, Container):
 
     Node.__init__(self, name,uid=uid)
     Container.__init__(self, self.devices.values())
-    self.container._nk.add_node(self)
+    self.container.add_node(self)
 
     self.validate()
     #print ">>>Object",self.name, self.uid
