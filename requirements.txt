@@ -1,3 +1,4 @@
+django>=1.3
 django-olwidget==0.60.3
 django-piston==0.2.3
 
