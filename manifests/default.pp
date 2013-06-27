@@ -14,8 +14,9 @@ package { $aptpackages:
 }
 
 $pippackages = ['django','django-olwidget','django-piston','fuzzywuzzy',
-                'ipython','networkx','PIL', 'ply','zope.event',
-                'zope.interface','zope.schema', 'lxml', 'redis']
+                'ipython','networkx','PIL', 'ply','zope.event','smap','numpy',
+                'zope.interface','zope.schema', 'lxml', 'redis','requests',
+                'BeautifulSoup','pycurl']
 
 package { $pippackages:
     require => Package[$aptpackages],
