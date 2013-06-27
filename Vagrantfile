@@ -47,7 +47,8 @@ Vagrant::Config.run do |config|
 
   # Forward a port from the guest to the host, which allows for outside
   # computers to access the VM, whereas host only networking does not.
-  config.vm.forward_port 80, 8000
+  config.vm.forward_port 80, 8080
+  config.vm.forward_port 8000, 8000
 
   # provision!
   config.vm.provision :puppet
