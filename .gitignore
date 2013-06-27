@@ -17,3 +17,6 @@ python/build/lib/bas/*.py
 
 # redis dump
 dump.rdb
+
+# vagrant files
+.vagrant
