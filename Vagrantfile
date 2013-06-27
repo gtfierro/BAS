@@ -6,6 +6,8 @@ git clone https://github.com/gtfierro/dotfiles/
 cp -r dotfiles/.vim* .
 cp -r dotfiles/.tmux* .
 cp -r dotfiles/tmux* .
+cp -r dotfiles/.zshrc .
+cp -r dotfiles/.oh-my-zsh .
 mkdir -p .vim/swaps
 mkdir -p .vim/backups
 rm -rf dotfiles
