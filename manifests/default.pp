@@ -23,3 +23,12 @@ package { $pippackages:
     require => Package[$aptpackages],
     provider => pip,
 }
+
+package { 'zsh':
+  ensure => installed
+}
+
+user { ["vagrant", "root"]:
+    ensure => present,
+    shell  => "/usr/bin/zsh",
+}
