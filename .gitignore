@@ -20,3 +20,6 @@ dump.rdb
 
 # vagrant files
 .vagrant
+
+# vim swap file
+*.swp
