@@ -8,6 +8,7 @@ cp -r dotfiles/.tmux* .
 cp -r dotfiles/tmux* .
 cp -r dotfiles/.zshrc .
 cp -r dotfiles/.oh-my-zsh .
+cp -r dotfiles/.gitconfig .
 mkdir -p .vim/swaps
 mkdir -p .vim/backups
 rm -rf dotfiles
