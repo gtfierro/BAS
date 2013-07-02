@@ -11,10 +11,10 @@ cp -r dotfiles/.oh-my-zsh .
 mkdir -p .vim/swaps
 mkdir -p .vim/backups
 rm -rf dotfiles
-git clone https://github.com/gtfierro/BAS/
-cd BAS/python
-sudo python setup.py install
-cd ../..
+sed -i '1 s/^/#/' .tmux.conf
+sed -i '58 s/^/#/' .tmux.conf
+sed -i '59 s/^/#/' .tmux.conf
+sed -i '64 s/^/#/' .zshrc
 wget http://pysqlite.googlecode.com/files/pysqlite-2.6.3.tar.gz
 tar xzf pysqlite-2.6.3.tar.gz
 cd pysqlite-2.6.3
@@ -22,6 +22,10 @@ sed -i '6 s/^/#/' setup.cfg
 sudo python setup.py install
 cd ..
 rm -rf pysqlite-2.6.3*
+git clone git@github.com:gtfierro/BAS.git
+cd BAS/python
+sudo python setup.py install
+cd ../..
 SCRIPT
 
 Vagrant::Config.run do |config|
@@ -36,6 +40,9 @@ Vagrant::Config.run do |config|
   # doesn't already exist on the user's system.
   config.vm.box_url = "http://files.vagrantup.com/precise64.box"
 
+  # forward my SSH keys
+  #config.ssh.private_key_path = '~/.ssh/id_rsa'
+  config.ssh.forward_agent = true
   # Assign this VM to a host-only network IP, allowing you to access it
   # via the IP. Host-only networks can talk to the host machine as well as
   # any other machines on the same network, but cannot be accessed (through this
