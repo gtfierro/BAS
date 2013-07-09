@@ -10,11 +10,17 @@ class Building(models.Model, Serializable):
     polygon = models.PolygonField()
     objects = models.GeoManager()
 
+    def __unicode__(self):
+        return self.name
+
 class Floor(models.Model, Serializable):
     name = models.CharField(max_length=50, unique=True)
     polygon = models.PolygonField()
     building = models.ForeignKey(Building, related_name='floors')
     objects = models.GeoManager()
+
+    def __unicode__(self):
+        return self.name
 
 class Area(models.Model, Serializable):
     name = models.CharField(max_length=50, unique=True)
@@ -22,8 +28,14 @@ class Area(models.Model, Serializable):
     floor = models.ForeignKey(Floor, related_name='areas')
     objects = models.GeoManager()
 
+    def __unicode__(self):
+        return self.name
+
 class Node(models.Model, Serializable):
     smap_uuid = models.CharField(max_length=100, unique=True) # should I use a UUID field here?
     point = models.PointField()
     area = models.ForeignKey(Area, related_name='nodes')
     objects = models.GeoManager()
+
+    def __unicode__(self):
+        return self.smap_uuid
