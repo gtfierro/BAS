@@ -23,3 +23,6 @@ dump.rdb
 
 # vim swap file
 *.swp
+
+# ignore api_keys file
+api_keys
