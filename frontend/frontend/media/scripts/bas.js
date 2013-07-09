@@ -1,16 +1,5 @@
 jQuery(function($) {
-  function initialize() {
-    var mapOptions = {
-        center: new google.maps.LatLng(-34.397, 150.644),
-        zoom: 8,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
-    var map = new google.maps.Map(document.getElementById("map-canvas"), mapOptions);
-  }
-
-  google.maps.event.addDomListener(window, 'load', initialize);
-
-  console.log('hi');
-
+  var yourStartLatLng = new google.maps.LatLng(37.87, -122.2705);
+  $('#map_canvas').gmap({'center': yourStartLatLng});
 });
 
