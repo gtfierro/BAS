@@ -15,9 +15,16 @@ class Building(models.Model, Serializable):
 
 class Floor(models.Model, Serializable):
     name = models.CharField(max_length=50, unique=True)
-    polygon = models.PolygonField()
+    polygon = models.PolygonField(default="POLYGON((-12.12890625 58.768200159239576, 1.1865234375 58.49369382056807, 5.537109375 50.2612538275847, -12.9638671875 49.18170338770662, -12.12890625 58.768200159239576))")
     building = models.ForeignKey(Building, related_name='floors')
     objects = models.GeoManager()
+
+    # on save, set the floor area to the same coordinates as the building
+    def save(self):
+        if self.pk is None:
+            print self.building.polygon
+            self.polygon = self.building.polygon
+        super(Floor, self).save()
 
     def __unicode__(self):
         return self.name
