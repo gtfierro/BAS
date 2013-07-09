@@ -27,6 +27,9 @@ git clone git@github.com:gtfierro/BAS.git
 cd BAS/python
 sudo python setup.py install
 cd ../..
+wget http://swiftsignal.com/packages/ubuntu/quantal/the-silver-searcher_0.14-1_amd64.deb
+sudo dpkg -i the-silver-searcher_0.14-1_amd64.deb
+rm the-silver-searcher_0.14-1_amd64.deb
 SCRIPT
 
 Vagrant::Config.run do |config|
