@@ -2,11 +2,6 @@ from geo.models import Building, Floor, Area, Node
 from django.contrib.gis import admin
 from olwidget.admin import GeoModelAdmin
 
-#class OSMAdmin(admin.OSMGeoAdmin):
-#   zoom_level = 8
-#   default_lat = 37.871775
-#   default_lon = -122.274603
-
 class GoogleMapsAdmin(GeoModelAdmin):
     options = {
       'layers': ['google.streets'],
@@ -15,4 +10,5 @@ class GoogleMapsAdmin(GeoModelAdmin):
       'default_zoom' : 15,
       }
 
-admin.site.register([Building, Floor, Area, Node], GoogleMapsAdmin)
+admin.site.register([Building, Area, Node], GoogleMapsAdmin)
+admin.site.register([Floor])
