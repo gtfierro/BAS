@@ -1,6 +1,9 @@
 from django.conf.urls import patterns, include, url
-import geo.urls
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.contrib import admin
+admin.autodiscover()
+import geo.urls
+
 
 
 # Uncomment the next two lines to enable the admin:
@@ -16,7 +19,7 @@ urlpatterns = patterns('',
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', include(admin.site.urls)),
     url(r'^geo/', include(geo.urls)),
 )
 
