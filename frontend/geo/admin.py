@@ -14,20 +14,17 @@ class GoogleMapsAdmin(GeoModelAdmin):
       }
 
 class FloorForm(forms.ModelForm):
-    polygon = MapField([
-      #EditableLayerField({'geometry': 'polygon', 'name':'polygon'}),
+    buildings = MapField([
       InfoLayerField([(get_ewkt(p.polygon), p.name) for p in Building.objects.all()],
-        {'name': 'Current Buildings'})
+                     {'name': 'Current Buildings'}),
       ], template = 'olwidget/admin_olwidget.html'
       )
-    print Building.objects.all()
 
     class Meta:
         model = Floor
 
 class FloorAdmin(admin.ModelAdmin):
     form = FloorForm
-
 
 admin.site.register([Building, Area, Node], GoogleMapsAdmin)
 admin.site.register(Floor, FloorAdmin)

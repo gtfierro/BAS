@@ -22,7 +22,6 @@ class Floor(models.Model, Serializable):
     # on save, set the floor area to the same coordinates as the building
     def save(self):
         if self.pk is None:
-            print self.building.polygon
             self.polygon = self.building.polygon
         super(Floor, self).save()
 
