@@ -1,9 +1,10 @@
 from django.contrib.gis.db import models
 from django.conf import settings
 from serialization import Serializable
+from django.core.files.storage import FileSystemStorage
+import os
 
 # Create your models here.
-
 
 class Building(models.Model, Serializable):
     name = models.CharField(max_length=50, unique=True)
@@ -17,7 +18,14 @@ class Floor(models.Model, Serializable):
     name = models.CharField(max_length=50, unique=True)
     polygon = models.PolygonField(default="POLYGON((-12.12890625 58.768200159239576, 1.1865234375 58.49369382056807, 5.537109375 50.2612538275847, -12.9638671875 49.18170338770662, -12.12890625 58.768200159239576))")
     building = models.ForeignKey(Building, related_name='floors')
+    floorplan = models.ImageField(upload_to='uploads')
     objects = models.GeoManager()
+
+    def image_tag(self):
+        print self.floorplan
+        return u'<img src="/media/{0}" />'.format(self.floorplan)
+    image_tag.short_description = 'Image'
+    image_tag.allow_tags = True
 
     # on save, set the floor area to the same coordinates as the building
     def save(self):

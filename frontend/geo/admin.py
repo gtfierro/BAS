@@ -23,7 +23,9 @@ class FloorForm(forms.ModelForm):
     class Meta:
         model = Floor
 
+
 class FloorAdmin(admin.ModelAdmin):
+    readonly_fields = ('image_tag', )
     form = FloorForm
 
 admin.site.register([Building, Area, Node], GoogleMapsAdmin)
