@@ -13,6 +13,29 @@ class GoogleMapsAdmin(GeoModelAdmin):
       'default_zoom' : 15,
       }
 
+class AreaForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(AreaForm, self).__init__(*args, **kwargs)
+        self.fields['Floor'] = forms.ChoiceField(choices = Floor.objects.all())
+
+    buildings = MapField([
+      InfoLayerField([(get_ewkt(p.polygon), p.name) for p in Building.objects.all()],
+                     {'name': 'Current Buildings'}),
+      ], template = 'olwidget/admin_olwidget.html'
+      )
+
+    class Meta:
+        model = Area
+
+class AreaAdmin(admin.ModelAdmin):
+    model = Area
+    form = AreaForm
+    readonly_fields = ('image_tag', )
+    class Media:
+        js = (
+            '/static/scripts/bas.admin.js',
+        )
+
 class FloorForm(forms.ModelForm):
     buildings = MapField([
       InfoLayerField([(get_ewkt(p.polygon), p.name) for p in Building.objects.all()],
@@ -23,10 +46,10 @@ class FloorForm(forms.ModelForm):
     class Meta:
         model = Floor
 
-
 class FloorAdmin(admin.ModelAdmin):
     readonly_fields = ('image_tag', )
     form = FloorForm
 
-admin.site.register([Building, Area, Node], GoogleMapsAdmin)
+admin.site.register([Building, Node], GoogleMapsAdmin)
 admin.site.register(Floor, FloorAdmin)
+admin.site.register(Area, AreaAdmin)
