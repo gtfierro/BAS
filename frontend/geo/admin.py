@@ -34,6 +34,7 @@ class AreaAdmin(admin.ModelAdmin):
     class Media:
         js = (
             '/static/scripts/bas.admin.js',
+            '/static/scripts/jquery.geo.min.js',
         )
 
 class FloorForm(forms.ModelForm):

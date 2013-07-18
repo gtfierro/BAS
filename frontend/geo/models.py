@@ -44,7 +44,7 @@ class Area(models.Model, Serializable):
 
     def image_tag(self):
         all_floors = [(f.id, f.floorplan) for f in Floor.objects.all()]
-        return ''.join([u'<img id="floorplan_{0}" src="/media/{1}" />'.format(f[0], f[1]) for f in all_floors])
+        return ''.join([u'<img id="floorplan_{0}" class="floorplan" src="/media/{1}" />'.format(f[0], f[1]) for f in all_floors])
     image_tag.short_description = 'Image'
     image_tag.allow_tags = True
 
