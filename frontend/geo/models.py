@@ -4,6 +4,23 @@ from serialization import Serializable
 from django.core.files.storage import FileSystemStorage
 import os
 
+canvas_string = lambda x, y: "\
+<canvas id='floorplan_{0}' class='floorplan'></canvas>\
+<script>\
+    var canvas = document.getElementById('floorplan_{0}');\
+    var context = canvas.getContext('2d');\
+    var imageObj = new Image();\
+    imageObj.onload = function() {{\
+        canvas.width = imageObj.imgWidth;\
+        canvas.height = imageObj.imgHeight;\
+        context.drawImage(imageObj, 0, 0);\
+        console.log('hi');\
+    }};\
+    imageObj.src = 'https://encrypted.google.com/images/srpr/logo4w.png';\
+</script>\
+".format(x,y)
+print canvas_string(1,2)
+
 # Create your models here.
 
 class Building(models.Model, Serializable):
@@ -44,7 +61,8 @@ class Area(models.Model, Serializable):
 
     def image_tag(self):
         all_floors = [(f.id, f.floorplan) for f in Floor.objects.all()]
-        return ''.join([u'<img id="floorplan_{0}" class="floorplan" src="/media/{1}" />'.format(f[0], f[1]) for f in all_floors])
+        return ''.join([canvas_string(f[0], f[1]) for f in all_floors])
+        #return ''.join([u'<img id="floorplan_{0}" class="floorplan" src="/media/{1}" />'.format(f[0], f[1]) for f in all_floors])
     image_tag.short_description = 'Image'
     image_tag.allow_tags = True
 
