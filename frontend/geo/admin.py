@@ -23,6 +23,7 @@ class AreaForm(forms.ModelForm):
                      {'name': 'Current Buildings'}),
       ], template = 'olwidget/admin_olwidget.html'
       )
+    coordinates = forms.CharField(widget=forms.HiddenInput())
 
     class Meta:
         model = Area
