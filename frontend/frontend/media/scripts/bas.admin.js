@@ -50,6 +50,7 @@ var jQuery = django.jQuery;
             ctx.closePath();
             ctx.stroke();
         }
+        $('#id_coordinates').val(xcoords.toString() + ycoords.toString());
         return true;
     });
     return false;
