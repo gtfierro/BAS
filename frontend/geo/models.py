@@ -18,7 +18,6 @@ canvas_string = lambda x, y: "\
     imageObj.src = '{1}';\
 </script>\
 ".format(x,y)
-print canvas_string(1,2)
 
 # Create your models here.
 
@@ -54,7 +53,7 @@ class Floor(models.Model, Serializable):
 
 class Area(models.Model, Serializable):
     name = models.CharField(max_length=50, unique=True)
-    polygon = models.PolygonField()
+    polygon = models.PolygonField(default="POLYGON((-12.12890625 58.768200159239576, 1.1865234375 58.49369382056807, 5.537109375 50.2612538275847, -12.9638671875 49.18170338770662, -12.12890625 58.768200159239576))")
     floor = models.ForeignKey(Floor, related_name='areas')
     objects = models.GeoManager()
 
